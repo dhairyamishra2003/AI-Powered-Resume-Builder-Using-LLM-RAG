@@ -1,0 +1,39 @@
+@import './styles/variables.css';
+@import './styles/reset.css';
+@import './styles/typography.css';
+@import './styles/utilities.css';
+@import './styles/animations.css';
+
+#root {
+  min-width: 320px;
+}
+
+.root-error {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--color-page);
+  text-align: center;
+}
+
+.root-error__card {
+  width: min(480px, 100%);
+  display: grid;
+  gap: 16px;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+}
+
+.root-error__card h2 {
+  margin: 0;
+  color: var(--color-primary);
+}
+
+.root-error__card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}

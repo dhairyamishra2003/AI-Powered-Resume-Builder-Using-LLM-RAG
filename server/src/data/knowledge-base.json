@@ -1,0 +1,465 @@
+{
+  "resume_bullets": [
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Architected and deployed a microservices-based payment gateway processing $2M+ in daily transactions with 99.99% uptime using Node.js, Kubernetes, and AWS Lambda.",
+      "tags": ["backend", "payments", "microservices", "aws"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Led migration of monolithic REST API to GraphQL, reducing data over-fetching by 60% and improving mobile app load times by 45% across 12 microservices.",
+      "tags": ["backend", "api", "graphql", "performance"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Developed and launched a React-based analytics dashboard serving 10,000+ daily active users, implementing real-time data visualization with WebSocket integration.",
+      "tags": ["frontend", "react", "dashboard", "websocket"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Designed and implemented CI/CD pipelines using GitHub Actions and Docker, reducing deployment time from 45 minutes to 8 minutes and eliminating 90% of manual deployment errors.",
+      "tags": ["devops", "cicd", "docker", "automation"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Optimized PostgreSQL database queries and implemented Redis caching layer, reducing API response times by 70% and handling 3x more concurrent users.",
+      "tags": ["backend", "database", "performance", "redis"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Built a real-time notification system using Apache Kafka and WebSockets, delivering 500K+ messages daily with sub-100ms latency to mobile and web clients.",
+      "tags": ["backend", "messaging", "kafka", "realtime"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Implemented OAuth 2.0 and JWT-based authentication system with role-based access control (RBAC), securing API endpoints for 50,000+ registered users.",
+      "tags": ["backend", "security", "authentication", "api"]
+    },
+    {
+      "role": "Software Engineer",
+      "category": "resume_example",
+      "content": "Spearheaded adoption of TypeScript across 8 frontend repositories, reducing production bugs by 35% and improving developer onboarding time by 50%.",
+      "tags": ["frontend", "typescript", "quality", "developer-experience"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "resume_example",
+      "content": "Built responsive, accessible UI components library using React and Storybook, adopted by 5 product teams and reducing feature development time by 40%.",
+      "tags": ["frontend", "react", "ui-library", "accessibility"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "resume_example",
+      "content": "Implemented server-side rendering (SSR) with Next.js, improving SEO rankings by 60% and achieving Lighthouse performance score of 95+ across all pages.",
+      "tags": ["frontend", "nextjs", "ssr", "performance", "seo"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "resume_example",
+      "content": "Developed pixel-perfect, responsive layouts using CSS Grid and Flexbox, ensuring cross-browser compatibility across Chrome, Safari, Firefox, and Edge.",
+      "tags": ["frontend", "css", "responsive", "cross-browser"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "resume_example",
+      "content": "Integrated Redux Toolkit and RTK Query for state management, eliminating prop drilling across 200+ components and reducing API boilerplate code by 65%.",
+      "tags": ["frontend", "redux", "state-management", "react"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "resume_example",
+      "content": "Developed a customer churn prediction model using XGBoost and feature engineering, achieving 92% accuracy and saving $1.2M annually in retention costs.",
+      "tags": ["ml", "prediction", "xgboost", "business-impact"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "resume_example",
+      "content": "Built an NLP pipeline using BERT and spaCy for sentiment analysis of 100K+ customer reviews, enabling data-driven product prioritization decisions.",
+      "tags": ["ml", "nlp", "bert", "sentiment-analysis"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "resume_example",
+      "content": "Designed and deployed A/B testing framework analyzing 50+ experiments quarterly, driving a 15% increase in user engagement through data-driven decisions.",
+      "tags": ["analytics", "ab-testing", "statistics", "experimentation"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "resume_example",
+      "content": "Created automated ETL pipelines using Apache Airflow and PySpark, processing 5TB+ of daily data from 12 sources with 99.5% pipeline reliability.",
+      "tags": ["data-engineering", "etl", "airflow", "spark"]
+    },
+    {
+      "role": "Product Manager",
+      "category": "resume_example",
+      "content": "Led cross-functional team of 12 engineers and designers to launch a B2B SaaS product from concept to market, acquiring 500+ enterprise customers in the first year.",
+      "tags": ["product", "launch", "b2b", "leadership"]
+    },
+    {
+      "role": "Product Manager",
+      "category": "resume_example",
+      "content": "Defined product roadmap and prioritized 40+ feature requests using RICE framework, resulting in 25% increase in user retention and 18% growth in MRR.",
+      "tags": ["product", "roadmap", "prioritization", "metrics"]
+    },
+    {
+      "role": "Product Manager",
+      "category": "resume_example",
+      "content": "Conducted 200+ user interviews and synthesized insights into actionable product requirements, leading to a redesigned onboarding flow that improved activation rate by 35%.",
+      "tags": ["product", "user-research", "onboarding", "ux"]
+    },
+    {
+      "role": "DevOps Engineer",
+      "category": "resume_example",
+      "content": "Architected Kubernetes-based infrastructure on AWS EKS, managing 50+ microservices with auto-scaling, achieving 99.99% uptime and reducing cloud costs by 30%.",
+      "tags": ["devops", "kubernetes", "aws", "infrastructure"]
+    },
+    {
+      "role": "DevOps Engineer",
+      "category": "resume_example",
+      "content": "Implemented Infrastructure as Code using Terraform and Ansible, automating provisioning of 200+ servers and reducing environment setup time from 3 days to 30 minutes.",
+      "tags": ["devops", "terraform", "iac", "automation"]
+    },
+    {
+      "role": "DevOps Engineer",
+      "category": "resume_example",
+      "content": "Built comprehensive monitoring and alerting system using Prometheus, Grafana, and PagerDuty, reducing Mean Time to Recovery (MTTR) from 4 hours to 15 minutes.",
+      "tags": ["devops", "monitoring", "prometheus", "grafana"]
+    },
+    {
+      "role": "UI/UX Designer",
+      "category": "resume_example",
+      "content": "Redesigned the core checkout flow through user research and A/B testing, increasing conversion rate by 28% and reducing cart abandonment by 40%.",
+      "tags": ["design", "ux", "conversion", "checkout"]
+    },
+    {
+      "role": "UI/UX Designer",
+      "category": "resume_example",
+      "content": "Created a comprehensive design system with 100+ reusable components in Figma, standardizing UI patterns across 6 product teams and reducing design-to-dev handoff time by 50%.",
+      "tags": ["design", "design-system", "figma", "ui"]
+    },
+    {
+      "role": "Marketing Manager",
+      "category": "resume_example",
+      "content": "Developed and executed multi-channel digital marketing strategy across SEO, SEM, and social media, driving 150% increase in organic traffic and 40% reduction in CAC.",
+      "tags": ["marketing", "digital", "seo", "growth"]
+    },
+    {
+      "role": "Marketing Manager",
+      "category": "resume_example",
+      "content": "Launched email marketing automation using HubSpot, nurturing 25,000+ leads through personalized drip campaigns with 35% open rate and 12% click-through rate.",
+      "tags": ["marketing", "email", "automation", "hubspot"]
+    },
+    {
+      "role": "Data Analyst",
+      "category": "resume_example",
+      "content": "Built interactive Tableau dashboards visualizing KPIs across 8 departments, enabling data-driven decision making and reducing report generation time by 80%.",
+      "tags": ["analytics", "tableau", "dashboard", "visualization"]
+    },
+    {
+      "role": "Data Analyst",
+      "category": "resume_example",
+      "content": "Performed cohort analysis and customer segmentation using SQL and Python, identifying high-value segments that contributed to 60% of total revenue.",
+      "tags": ["analytics", "sql", "python", "segmentation"]
+    },
+    {
+      "role": "Mobile Developer",
+      "category": "resume_example",
+      "content": "Developed a cross-platform mobile app using React Native, achieving 4.7-star rating on App Store with 100K+ downloads and 50% reduction in development costs.",
+      "tags": ["mobile", "react-native", "cross-platform", "app-store"]
+    },
+    {
+      "role": "Mobile Developer",
+      "category": "resume_example",
+      "content": "Implemented offline-first architecture with SQLite and background sync, ensuring app functionality in low-connectivity regions for 30,000+ field workers.",
+      "tags": ["mobile", "offline", "sqlite", "sync"]
+    },
+    {
+      "role": "Full Stack Developer",
+      "category": "resume_example",
+      "content": "Built end-to-end e-commerce platform using MERN stack (MongoDB, Express, React, Node.js) with Stripe integration, processing 10,000+ monthly transactions.",
+      "tags": ["fullstack", "mern", "ecommerce", "stripe"]
+    },
+    {
+      "role": "Full Stack Developer",
+      "category": "resume_example",
+      "content": "Developed RESTful APIs serving 5 client applications with JWT authentication, rate limiting, and comprehensive Swagger documentation for 30+ endpoints.",
+      "tags": ["fullstack", "api", "rest", "documentation"]
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "category": "resume_example",
+      "content": "Deployed ML models to production using MLflow and AWS SageMaker, serving 10M+ predictions daily with p99 latency under 50ms and automated model retraining pipelines.",
+      "tags": ["ml", "mlops", "sagemaker", "production"]
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "category": "resume_example",
+      "content": "Fine-tuned large language models (LLMs) using LoRA and PEFT techniques for domain-specific text generation, reducing inference costs by 60% while maintaining 95% quality.",
+      "tags": ["ml", "llm", "fine-tuning", "nlp"]
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "category": "resume_example",
+      "content": "Conducted penetration testing and vulnerability assessments across 20+ web applications, identifying and remediating 150+ critical security vulnerabilities.",
+      "tags": ["security", "pentesting", "vulnerability", "web-security"]
+    },
+    {
+      "role": "Cloud Architect",
+      "category": "resume_example",
+      "content": "Designed multi-region AWS architecture with disaster recovery, achieving RPO of 1 minute and RTO of 5 minutes while reducing infrastructure costs by 35%.",
+      "tags": ["cloud", "aws", "architecture", "disaster-recovery"]
+    },
+    {
+      "role": "QA Engineer",
+      "category": "resume_example",
+      "content": "Developed end-to-end test automation framework using Cypress and Jest, achieving 85% code coverage and reducing regression testing time from 3 days to 4 hours.",
+      "tags": ["qa", "testing", "cypress", "automation"]
+    },
+    {
+      "role": "Business Analyst",
+      "category": "resume_example",
+      "content": "Gathered and documented business requirements for enterprise CRM migration, creating 50+ user stories and facilitating UAT with 200+ stakeholders across 4 regions.",
+      "tags": ["business", "requirements", "crm", "stakeholder-management"]
+    },
+    {
+      "role": "Finance Analyst",
+      "category": "resume_example",
+      "content": "Built financial forecasting models using Excel VBA and Python, improving budget accuracy by 25% and supporting $50M+ annual capital allocation decisions.",
+      "tags": ["finance", "forecasting", "modeling", "python"]
+    },
+    {
+      "role": "HR Manager",
+      "category": "resume_example",
+      "content": "Redesigned recruitment process implementing ATS optimization and structured interviews, reducing time-to-hire by 40% and improving quality-of-hire scores by 30%.",
+      "tags": ["hr", "recruitment", "ats", "hiring"]
+    }
+  ],
+
+  "industry_keywords": [
+    {
+      "role": "Software Engineer",
+      "category": "industry_keywords",
+      "content": "Key technical skills and keywords for Software Engineering roles: JavaScript, TypeScript, Python, Java, C++, Go, Rust, React, Angular, Vue.js, Node.js, Express, Django, Flask, Spring Boot, REST API, GraphQL, gRPC, microservices, monolith, SQL, NoSQL, PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch, Docker, Kubernetes, AWS, GCP, Azure, CI/CD, GitHub Actions, Jenkins, Terraform, Git, Agile, Scrum, TDD, BDD, unit testing, integration testing, system design, data structures, algorithms, OOP, functional programming, design patterns, SOLID principles.",
+      "synonyms": {
+        "CI/CD": ["continuous integration", "continuous deployment", "continuous delivery", "CICD"],
+        "REST API": ["RESTful API", "RESTful services", "REST services", "web services"],
+        "JavaScript": ["JS", "ECMAScript", "ES6", "ES2015+"],
+        "TypeScript": ["TS"],
+        "PostgreSQL": ["Postgres", "PGSQL"],
+        "MongoDB": ["Mongo"],
+        "Kubernetes": ["K8s", "k8s"],
+        "Docker": ["containerization", "containers"],
+        "AWS": ["Amazon Web Services"],
+        "GCP": ["Google Cloud Platform", "Google Cloud"],
+        "Azure": ["Microsoft Azure"],
+        "Machine Learning": ["ML"],
+        "Artificial Intelligence": ["AI"],
+        "React": ["React.js", "ReactJS"],
+        "Node.js": ["NodeJS", "Node"],
+        "Vue.js": ["VueJS", "Vue"],
+        "Angular": ["AngularJS", "Angular.js"]
+      },
+      "tags": ["software-engineer", "keywords"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "industry_keywords",
+      "content": "Key skills and keywords for Data Science roles: Python, R, SQL, TensorFlow, PyTorch, scikit-learn, Keras, XGBoost, LightGBM, pandas, NumPy, SciPy, matplotlib, seaborn, Plotly, Jupyter, machine learning, deep learning, neural networks, NLP, natural language processing, computer vision, reinforcement learning, statistics, hypothesis testing, A/B testing, regression, classification, clustering, dimensionality reduction, feature engineering, model deployment, MLOps, MLflow, Kubeflow, Apache Spark, Hadoop, Airflow, ETL, data pipeline, data visualization, Tableau, Power BI, big data.",
+      "synonyms": {
+        "Natural Language Processing": ["NLP"],
+        "Machine Learning": ["ML"],
+        "Deep Learning": ["DL"],
+        "Computer Vision": ["CV"],
+        "Artificial Intelligence": ["AI"],
+        "TensorFlow": ["TF"],
+        "scikit-learn": ["sklearn"]
+      },
+      "tags": ["data-scientist", "keywords"]
+    },
+    {
+      "role": "Product Manager",
+      "category": "industry_keywords",
+      "content": "Key skills and keywords for Product Management roles: product strategy, product roadmap, user research, user stories, epics, backlog grooming, sprint planning, Agile, Scrum, Kanban, JIRA, Confluence, A/B testing, metrics, KPIs, OKRs, RICE framework, MoSCoW prioritization, MVP, product-market fit, go-to-market strategy, competitive analysis, market research, stakeholder management, cross-functional leadership, wireframing, prototyping, Figma, user journey mapping, customer discovery, data-driven decisions, PRD, feature specifications, product analytics, Mixpanel, Amplitude, Google Analytics.",
+      "synonyms": {
+        "Product Requirements Document": ["PRD"],
+        "Key Performance Indicators": ["KPIs"],
+        "Objectives and Key Results": ["OKRs"],
+        "Minimum Viable Product": ["MVP"],
+        "User Experience": ["UX"],
+        "User Interface": ["UI"]
+      },
+      "tags": ["product-manager", "keywords"]
+    },
+    {
+      "role": "DevOps Engineer",
+      "category": "industry_keywords",
+      "content": "Key skills and keywords for DevOps Engineer roles: Docker, Kubernetes, AWS, GCP, Azure, Terraform, Ansible, Chef, Puppet, CI/CD, Jenkins, GitHub Actions, GitLab CI, CircleCI, ArgoCD, Linux, Bash, Python, Go, Infrastructure as Code, IaC, monitoring, Prometheus, Grafana, Datadog, New Relic, ELK Stack, Elasticsearch, Logstash, Kibana, load balancing, Nginx, HAProxy, networking, TCP/IP, DNS, SSL/TLS, security, IAM, secrets management, Vault, Helm, service mesh, Istio, microservices, serverless, Lambda, cloud-native.",
+      "synonyms": {
+        "Infrastructure as Code": ["IaC"],
+        "Continuous Integration/Continuous Deployment": ["CI/CD", "CICD"],
+        "Amazon Web Services": ["AWS"],
+        "Google Cloud Platform": ["GCP"],
+        "Kubernetes": ["K8s"]
+      },
+      "tags": ["devops", "keywords"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "industry_keywords",
+      "content": "Key skills and keywords for Frontend Developer roles: HTML5, CSS3, JavaScript, TypeScript, React, Vue.js, Angular, Next.js, Nuxt.js, Svelte, Redux, Zustand, MobX, Webpack, Vite, Babel, ESLint, Prettier, responsive design, mobile-first, cross-browser compatibility, accessibility, WCAG, ARIA, SEO, Core Web Vitals, performance optimization, lazy loading, code splitting, PWA, Service Workers, WebSocket, REST API integration, GraphQL, testing, Jest, Cypress, React Testing Library, Storybook, design systems, Figma, CSS-in-JS, Tailwind CSS, SASS, LESS.",
+      "synonyms": {
+        "Progressive Web App": ["PWA"],
+        "Search Engine Optimization": ["SEO"],
+        "Web Content Accessibility Guidelines": ["WCAG"],
+        "Cascading Style Sheets": ["CSS"],
+        "HyperText Markup Language": ["HTML"]
+      },
+      "tags": ["frontend", "keywords"]
+    },
+    {
+      "role": "Mobile Developer",
+      "category": "industry_keywords",
+      "content": "Key skills and keywords for Mobile Developer roles: iOS, Android, Swift, Kotlin, Java, Objective-C, React Native, Flutter, Dart, Xamarin, SwiftUI, UIKit, Jetpack Compose, Material Design, Human Interface Guidelines, App Store, Google Play, push notifications, FCM, APNs, offline-first, SQLite, Realm, Core Data, REST API, GraphQL, WebSocket, CI/CD for mobile, Fastlane, Xcode, Android Studio, app performance, crash reporting, Firebase, analytics, unit testing, UI testing, XCTest, Espresso.",
+      "synonyms": {
+        "Firebase Cloud Messaging": ["FCM"],
+        "Apple Push Notification service": ["APNs"]
+      },
+      "tags": ["mobile", "keywords"]
+    }
+  ],
+
+  "ats_best_practices": [
+    {
+      "category": "ats_practices",
+      "content": "ATS Formatting Best Practices: Use standard section headings (Experience, Education, Skills, Summary). Avoid tables, columns, headers, footers, and text boxes. Use standard bullet points (•). Do not use images, graphics, or icons. Use standard fonts (Arial, Calibri, Times New Roman). Save as PDF or DOCX. Keep file size under 2MB. Use simple formatting with consistent spacing.",
+      "tags": ["ats", "formatting"]
+    },
+    {
+      "category": "ats_practices",
+      "content": "ATS Keyword Optimization: Mirror exact keywords from the job description. Use both acronyms and full forms (e.g., 'Machine Learning (ML)'). Place critical keywords in the first half of the resume. Include keywords in context, not just listed. Use industry-standard terminology. Include both hard skills and soft skills from the JD. Repeat important keywords 2-3 times naturally throughout the resume.",
+      "tags": ["ats", "keywords"]
+    },
+    {
+      "category": "ats_practices",
+      "content": "ATS Section Completeness: A complete resume must have: Contact Information (name, email, phone, location, LinkedIn), Professional Summary (2-4 sentences), Work Experience (company, title, dates, bullet points), Education (degree, institution, graduation date), Skills (technical and soft skills). Optional but recommended: Projects, Certifications, Publications. Missing sections reduce ATS scores significantly.",
+      "tags": ["ats", "sections"]
+    },
+    {
+      "category": "ats_practices",
+      "content": "ATS Bullet Point Quality: Start every bullet with a strong action verb. Include quantifiable metrics (percentages, dollar amounts, user counts, time saved). Follow the STAR method (Situation, Task, Action, Result). Keep bullets to 1-2 lines maximum. Use past tense for previous roles, present tense for current role. Avoid personal pronouns (I, me, my). Each bullet should demonstrate impact, not just describe duties.",
+      "tags": ["ats", "bullets", "quality"]
+    },
+    {
+      "category": "ats_practices",
+      "content": "Common ATS Mistakes to Avoid: Using creative job titles instead of standard ones. Putting important info in headers/footers (ATS can't read them). Using abbreviations without spelling them out first. Having spelling errors or typos. Using fancy templates with graphics. Not tailoring resume for each job application. Listing responsibilities instead of achievements. Having employment gaps without explanation. Using outdated or irrelevant skills.",
+      "tags": ["ats", "mistakes"]
+    }
+  ],
+
+  "action_verbs": [
+    {
+      "category": "action_verbs",
+      "content": "Leadership Action Verbs: Led, Directed, Managed, Supervised, Coordinated, Mentored, Guided, Oversaw, Headed, Chaired, Orchestrated, Spearheaded, Championed, Pioneered, Initiated, Launched, Established, Founded.",
+      "tags": ["verbs", "leadership"]
+    },
+    {
+      "category": "action_verbs",
+      "content": "Technical Action Verbs: Developed, Engineered, Architected, Designed, Built, Implemented, Programmed, Coded, Deployed, Configured, Integrated, Automated, Optimized, Debugged, Refactored, Migrated, Containerized, Provisioned.",
+      "tags": ["verbs", "technical"]
+    },
+    {
+      "category": "action_verbs",
+      "content": "Achievement Action Verbs: Achieved, Exceeded, Surpassed, Improved, Increased, Boosted, Enhanced, Accelerated, Maximized, Elevated, Amplified, Doubled, Tripled, Reduced, Decreased, Minimized, Eliminated, Streamlined.",
+      "tags": ["verbs", "achievement"]
+    },
+    {
+      "category": "action_verbs",
+      "content": "Analytical Action Verbs: Analyzed, Assessed, Evaluated, Investigated, Researched, Identified, Diagnosed, Measured, Quantified, Calculated, Forecasted, Modeled, Interpreted, Validated, Audited, Benchmarked, Surveyed, Examined.",
+      "tags": ["verbs", "analytical"]
+    },
+    {
+      "category": "action_verbs",
+      "content": "Communication Action Verbs: Presented, Communicated, Collaborated, Negotiated, Facilitated, Articulated, Authored, Published, Documented, Reported, Briefed, Advocated, Persuaded, Influenced, Mediated, Translated, Conveyed, Liaised.",
+      "tags": ["verbs", "communication"]
+    },
+    {
+      "category": "action_verbs",
+      "content": "Creative Action Verbs: Created, Designed, Conceptualized, Innovated, Invented, Crafted, Devised, Formulated, Envisioned, Reimagined, Revamped, Transformed, Modernized, Renovated, Customized, Tailored, Shaped, Produced.",
+      "tags": ["verbs", "creative"]
+    }
+  ],
+
+  "skill_taxonomies": [
+    {
+      "category": "skill_taxonomy",
+      "content": "Frontend Development Skill Tree: Core (HTML, CSS, JavaScript) → Frameworks (React, Vue, Angular, Svelte) → Meta-Frameworks (Next.js, Nuxt.js, Remix) → State Management (Redux, Zustand, MobX, Recoil) → Styling (Tailwind CSS, SASS, CSS Modules, Styled Components) → Build Tools (Vite, Webpack, esbuild) → Testing (Jest, Cypress, Playwright, Testing Library) → Related Skills (TypeScript, GraphQL, REST APIs, WebSocket, PWA, Accessibility, SEO, Performance Optimization).",
+      "tags": ["skills", "frontend", "taxonomy"]
+    },
+    {
+      "category": "skill_taxonomy",
+      "content": "Backend Development Skill Tree: Languages (Node.js, Python, Java, Go, Rust, C#) → Frameworks (Express, Django, Flask, Spring Boot, Gin, FastAPI) → Databases (PostgreSQL, MySQL, MongoDB, Redis, Cassandra, DynamoDB) → APIs (REST, GraphQL, gRPC, WebSocket) → Message Queues (Kafka, RabbitMQ, SQS, Redis Pub/Sub) → Authentication (JWT, OAuth 2.0, SAML, SSO) → Related Skills (Docker, Kubernetes, CI/CD, Microservices, System Design, Caching, Load Balancing).",
+      "tags": ["skills", "backend", "taxonomy"]
+    },
+    {
+      "category": "skill_taxonomy",
+      "content": "Data Science Skill Tree: Languages (Python, R, SQL, Scala) → ML Libraries (scikit-learn, TensorFlow, PyTorch, XGBoost, LightGBM) → Data Processing (pandas, NumPy, Spark, Dask) → Visualization (matplotlib, seaborn, Plotly, Tableau, Power BI) → ML Concepts (Regression, Classification, Clustering, NLP, Computer Vision, Deep Learning, Reinforcement Learning) → MLOps (MLflow, Kubeflow, SageMaker, Docker) → Big Data (Hadoop, Spark, Airflow, Kafka) → Statistics (Hypothesis Testing, A/B Testing, Bayesian Methods).",
+      "tags": ["skills", "data-science", "taxonomy"]
+    },
+    {
+      "category": "skill_taxonomy",
+      "content": "DevOps Skill Tree: Containers (Docker, Podman, containerd) → Orchestration (Kubernetes, Docker Swarm, ECS) → Cloud (AWS, GCP, Azure, DigitalOcean) → IaC (Terraform, Ansible, Pulumi, CloudFormation) → CI/CD (GitHub Actions, Jenkins, GitLab CI, CircleCI, ArgoCD) → Monitoring (Prometheus, Grafana, Datadog, New Relic, ELK Stack) → Networking (DNS, Load Balancing, CDN, VPN, SSL/TLS) → Security (IAM, Vault, SOPS, Security Scanning).",
+      "tags": ["skills", "devops", "taxonomy"]
+    },
+    {
+      "category": "skill_taxonomy",
+      "content": "Mobile Development Skill Tree: iOS (Swift, SwiftUI, UIKit, Core Data, XCTest) → Android (Kotlin, Jetpack Compose, Room, Espresso) → Cross-Platform (React Native, Flutter, Kotlin Multiplatform) → Backend Integration (REST APIs, GraphQL, Firebase, WebSocket) → Storage (SQLite, Realm, Core Data, SharedPreferences) → Distribution (App Store Connect, Google Play Console, Fastlane, TestFlight) → Analytics (Firebase Analytics, Mixpanel, Crashlytics).",
+      "tags": ["skills", "mobile", "taxonomy"]
+    }
+  ],
+
+  "summary_examples": [
+    {
+      "role": "Software Engineer",
+      "category": "summary_example",
+      "content": "Results-driven Software Engineer with 4+ years of experience building scalable web applications using React, Node.js, and AWS. Proven track record of improving system performance by 60% and leading teams of 5+ developers. Passionate about clean code, test-driven development, and delivering high-impact products that serve millions of users.",
+      "tags": ["summary", "software-engineer"]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "summary_example",
+      "content": "Data Scientist with 3+ years of experience in machine learning, statistical modeling, and data-driven decision making. Skilled in Python, TensorFlow, and SQL, with a proven ability to develop predictive models that have generated $2M+ in business value. Strong communicator who translates complex analytical findings into actionable business insights.",
+      "tags": ["summary", "data-scientist"]
+    },
+    {
+      "role": "Product Manager",
+      "category": "summary_example",
+      "content": "Strategic Product Manager with 5+ years of experience launching B2B SaaS products from ideation to scale. Expert in user research, data-driven prioritization, and cross-functional team leadership. Successfully grew product ARR from $1M to $8M by identifying market opportunities and delivering features that drove 40% improvement in user retention.",
+      "tags": ["summary", "product-manager"]
+    },
+    {
+      "role": "Frontend Developer",
+      "category": "summary_example",
+      "content": "Creative Frontend Developer with 3+ years specializing in React and TypeScript, building performant, accessible web applications. Experienced in design systems, responsive UI development, and SEO optimization. Achieved Lighthouse scores of 95+ and contributed to open-source component libraries used by 10,000+ developers.",
+      "tags": ["summary", "frontend"]
+    },
+    {
+      "role": "DevOps Engineer",
+      "category": "summary_example",
+      "content": "Experienced DevOps Engineer with 4+ years designing and managing cloud infrastructure on AWS and GCP. Expert in Kubernetes, Terraform, and CI/CD pipeline automation. Reduced deployment frequency from weekly to multiple times daily while maintaining 99.99% uptime and cutting infrastructure costs by 35%.",
+      "tags": ["summary", "devops"]
+    },
+    {
+      "role": "Full Stack Developer",
+      "category": "summary_example",
+      "content": "Versatile Full Stack Developer with 3+ years of experience building end-to-end web applications using the MERN stack. Proficient in React, Node.js, MongoDB, and cloud deployment. Delivered 10+ production applications serving 50,000+ users with focus on performance, security, and exceptional user experience.",
+      "tags": ["summary", "fullstack"]
+    }
+  ]
+}

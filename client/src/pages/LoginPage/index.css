@@ -1,0 +1,106 @@
+.login-page {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.login-page__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-heading);
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.login-page__logo {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.login-card {
+  width: 100%;
+  display: grid;
+  gap: 20px;
+  border: 1px solid var(--color-border-purple);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+}
+
+.login-card__header {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.login-card__google {
+  display: flex;
+  justify-content: center;
+}
+
+.login-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  height: 1px;
+  background: var(--color-border);
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-form__submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.login-switch {
+  margin: 0;
+  text-align: center;
+}
+
+.login-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+.login-page__back {
+  color: var(--color-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.login-trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.login-trust span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}

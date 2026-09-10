@@ -1,0 +1,62 @@
+.resume-preview {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--color-preview);
+}
+
+.resume-preview__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.resume-preview__viewport {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  padding: 24px;
+}
+
+.resume-preview__stage {
+  flex: 0 0 auto;
+}
+
+.resume-preview__paper {
+  width: 794px;
+  min-height: 1123px;
+  overflow: visible;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: var(--shadow-md);
+  box-sizing: border-box;
+}
+
+/* Page-break avoidance rules for printing and PDF generation */
+.resume-preview__paper h1,
+.resume-preview__paper h2,
+.resume-preview__paper h3,
+.resume-preview__paper .section-title,
+.resume-preview__paper .experience-item,
+.resume-preview__paper li {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+@media print {
+  .resume-preview__toolbar {
+    display: none !important;
+  }
+
+  .resume-preview__paper {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+}

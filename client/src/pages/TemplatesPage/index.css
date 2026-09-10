@@ -1,0 +1,112 @@
+.templates-page__hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.templates-page__kicker {
+  margin: 0 0 10px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.templates-page__hero .text-muted {
+  max-width: 700px;
+  margin: 10px 0 0;
+}
+
+.templates-page__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.templates-page__stats span {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: 10px 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 750;
+  box-shadow: var(--shadow-xs);
+}
+
+.templates-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.templates-page__preview {
+  height: min(70vh, 760px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-preview);
+  padding: 24px;
+}
+
+.templates-page__preview-stage {
+  position: relative;
+}
+
+.templates-page__preview-paper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: var(--shadow-md);
+  transform-origin: top left;
+}
+
+.templates-page__use {
+  margin-left: auto;
+}
+
+.templates-page__create-form {
+  display: grid;
+  gap: 16px;
+}
+
+.templates-page__create-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 980px) {
+  .templates-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .templates-page__hero {
+    display: grid;
+  }
+
+  .templates-page__stats {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .templates-page__grid,
+  .templates-page__create-actions {
+    grid-template-columns: 1fr;
+  }
+}
