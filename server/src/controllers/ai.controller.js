@@ -1,6 +1,8 @@
+import crypto from 'crypto';
 import * as aiService from '../services/ai.service.js';
 import ChatHistory from '../models/ChatHistory.model.js';
 import Resume from '../models/Resume.model.js';
+import { cacheAtsScore, getCachedAtsScore, makeAtsCacheKey } from '../services/ats-cache.service.js';
 
 export const chat = async (req, res, next) => {
   try {
@@ -107,7 +109,8 @@ export const generateSummary = async (req, res, next) => {
 
 export const atsScore = async (req, res, next) => {
   try {
-    const { resumeId, jobDescription } = req.body;
+    const startedAt = performance.now();
+    const { resumeId, jobDescription, sections, targetRole } = req.body;
 
     if (!resumeId) {
       return res.status(400).json({ success: false, message: 'resumeId is required.' });
@@ -121,12 +124,32 @@ export const atsScore = async (req, res, next) => {
     if (jobDescription) {
       resume.jobDescription = jobDescription;
     }
+    if (sections && typeof sections === 'object') {
+      resume.sections = sections;
+    }
+    if (targetRole) {
+      resume.targetRole = targetRole;
+    }
 
-    const result = await aiService.getAtsScore({
-      sections: resume.sections,
-      jobDescription: jobDescription || resume.jobDescription,
-      targetRole: resume.targetRole,
-    });
+    const activeSections = sections || resume.sections;
+    const activeJd = jobDescription || resume.jobDescription || '';
+    const activeRole = targetRole || resume.targetRole || '';
+
+    const jdHash = crypto.createHash('md5').update(activeJd).digest('hex').slice(0, 8);
+    const resumeTextStr = JSON.stringify(activeSections || {});
+
+    const cacheKey = makeAtsCacheKey({ sections: activeSections, jobDescription: activeJd, targetRole: activeRole });
+    let result = getCachedAtsScore(cacheKey);
+    const cacheHit = Boolean(result);
+    const scoringStartedAt = performance.now();
+    if (!result) {
+      result = await aiService.getAtsScore({ sections: activeSections, jobDescription: activeJd, targetRole: activeRole });
+      cacheAtsScore(cacheKey, result);
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`[ATS] resume=${resume._id} jd=${jdHash} cache=${cacheHit ? 'hit' : 'miss'} scoring=${(performance.now() - scoringStartedAt).toFixed(1)}ms`);
+    }
 
     const numericBreakdown = {};
     if (result.breakdown) {
@@ -142,6 +165,10 @@ export const atsScore = async (req, res, next) => {
       suggestions: result.suggestions || [],
     };
     await resume.save();
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`[ATS] total=${(performance.now() - startedAt).toFixed(1)}ms database+save included`);
+    }
 
     return res.json({ success: true, data: result });
   } catch (error) {

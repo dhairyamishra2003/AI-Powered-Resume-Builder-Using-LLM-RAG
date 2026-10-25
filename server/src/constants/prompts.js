@@ -1,4 +1,5 @@
 export const resumeParserPrompt = (resumeText) => `You are an expert resume parser. Extract structured data from this resume text.\r
+Never invent, infer, embellish, or fill in information that is not explicitly present. Preserve facts and all distinct entries. Use empty strings or arrays for missing values.\r
 \r
 RESUME TEXT:\r
 ${resumeText}\r
@@ -11,7 +12,8 @@ Parse the resume and extract ALL information into this EXACT JSON format:\r
     "phone": "",\r
     "location": "",\r
     "linkedIn": "",\r
-    "portfolio": ""\r
+    "portfolio": "",\r
+    "github": ""\r
   },\r
   "summary": "professional summary text if present",\r
   "experience": [\r
@@ -39,11 +41,26 @@ Parse the resume and extract ALL information into this EXACT JSON format:\r
     "soft": ["skill1"],\r
     "languages": ["English"]\r
   },\r
-  "projects": [],\r
-  "certifications": []\r
+  "projects": [\r
+    {\r
+      "name": "Project Name",\r
+      "description": "Project overview and details",\r
+      "technologies": ["tech1", "tech2"],\r
+      "link": "",\r
+      "bullets": ["bullet point 1", "bullet point 2"]\r
+    }\r
+  ],\r
+  "certifications": [\r
+    {\r
+      "name": "Certification Name",\r
+      "issuer": "Issuing Organization",\r
+      "date": "YYYY-MM",\r
+      "link": ""\r
+    }\r
+  ]\r
 }\r
 \r
-Extract EVERYTHING you can find. Convert dates to YYYY-MM format. If information is missing, leave as empty string or empty array. Respond ONLY with valid JSON.`;
+Extract only information actually present. For projects, return an array of project objects with name, description, technologies, link, and bullets. Normalize dates to YYYY-MM only when the source supplies enough date information; otherwise preserve the available text. If information is missing, leave it as an empty string or empty array. Respond ONLY with valid JSON.`;
 
 export const bulletWriterPrompt = (data, ragContext = '') => `You are an expert resume writer specializing in STAR-method bullet points.\r
 \r
@@ -104,7 +121,7 @@ You MUST respond with valid JSON:\r
 }`;
 
 
-export const atsScorerPrompt = (data, ragContext = '') => `You are an ATS (Applicant Tracking System) expert who scores resumes.\r
+export const atsScorerPrompt = (data, ragContext = '') => `You are an ATS (Applicant Tracking System) expert reviewing a resume against a job description.\r
 \r
 RESUME SECTIONS:\r
 ${JSON.stringify(data.sections || {}, null, 2)}\r
@@ -114,33 +131,39 @@ ${data.jobDescription || ''}\r
 \r
 TARGET ROLE: ${data.targetRole || ''}\r
 \r
-ALGORITHMIC PRE-ANALYSIS:\r
-${JSON.stringify(data.algorithmicResults || {}, null, 2)}\r
-\r
-${ragContext ? `KNOWLEDGE BASE CONTEXT (use these best practices and keyword synonyms for more accurate scoring):\r
+${ragContext ? `KNOWLEDGE BASE CONTEXT (use keyword synonyms and best practices to improve your analysis):\r
 ${ragContext}\r
 \r
-` : ''}Score the resume on these 10 categories from 0-100. Provide one specific, actionable fix for each.\r
-Use the algorithmic pre-analysis data to inform your scores where available.\r
-If keyword synonyms are provided in the context, treat synonym matches as keyword matches (e.g., "CI/CD" = "continuous integration").\r
+` : ''}Your task is to provide QUALITATIVE analysis only. Do NOT output any numeric scores.\r
+The numeric scoring is handled separately by the backend — your job is to identify keywords, skills, and improvements.\r
 \r
-You MUST respond with valid JSON in this exact format:\r
+STRICT RULES — you MUST follow these exactly:\r
+1. matchedKeywords: ONLY keywords that literally appear in the Job Description above.\r
+2. missingKeywords: ONLY keywords from the Job Description that are absent from the resume. Do NOT add generic keywords not present in the JD.\r
+3. matchedSkills: ONLY technical skills, tools, frameworks, or technologies explicitly mentioned in the Job Description text.\r
+4. missingSkills: ONLY skills explicitly in the JD that are missing from the resume. Do NOT hallucinate skills like "Cloud Infrastructure", "Testing/QA", or anything not written in the JD.\r
+5. suggestions: Give 3 actionable improvements based solely on the resume vs this specific JD. Reference actual JD content.\r
+6. breakdown.fix: Each fix must be specific to THIS resume and THIS JD. Do not give generic advice.\r
+\r
+You MUST respond with valid JSON in this EXACT format — no numeric scores, only strings:\r
 {\r
-  "overall": 0,\r
+  "matchedKeywords": ["keyword1", "keyword2"],\r
+  "missingKeywords": ["keyword3", "keyword4"],\r
+  "matchedSkills": ["skill1", "skill2"],\r
+  "missingSkills": ["skill3", "skill4"],\r
+  "suggestions": ["Specific improvement 1 based on this JD", "Improvement 2", "Improvement 3"],\r
   "breakdown": {\r
-    "keywordMatch": { "score": 0, "fix": "specific actionable suggestion" },\r
-    "formatting": { "score": 0, "fix": "" },\r
-    "sectionCompleteness": { "score": 0, "fix": "" },\r
-    "bulletQuality": { "score": 0, "fix": "" },\r
-    "summaryStrength": { "score": 0, "fix": "" },\r
-    "skillCoverage": { "score": 0, "fix": "" },\r
-    "quantification": { "score": 0, "fix": "" },\r
-    "actionVerbs": { "score": 0, "fix": "" },\r
-    "length": { "score": 0, "fix": "" },\r
-    "contactInfo": { "score": 0, "fix": "" }\r
-  },\r
-  "missingKeywords": ["keyword1", "keyword2"],\r
-  "suggestions": ["Top priority suggestion 1", "Suggestion 2", "Suggestion 3"]\r
+    "keywordMatch":        { "fix": "one specific actionable suggestion for this metric" },\r
+    "bulletQuality":       { "fix": "" },\r
+    "formatting":          { "fix": "" },\r
+    "sectionCompleteness": { "fix": "" },\r
+    "summaryStrength":     { "fix": "" },\r
+    "skillCoverage":       { "fix": "" },\r
+    "quantification":      { "fix": "" },\r
+    "actionVerbs":         { "fix": "" },\r
+    "length":              { "fix": "" },\r
+    "contactInfo":         { "fix": "" }\r
+  }\r
 }`;
 
 

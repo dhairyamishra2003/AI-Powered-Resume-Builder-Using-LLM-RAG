@@ -18,18 +18,23 @@ import authRoutes from './auth.routes.js';
 import resumeRoutes from './resume.routes.js';
 import aiRoutes from './ai.routes.js';
 import versionRoutes from './version.routes.js';
-import linkedinRoutes from './linkedin.routes.js';
-import digilockerRoutes from './digilocker.routes.js';
 import feedbackRoutes from './feedback.routes.js';
 
 const router = Router();
+
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'ok',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 router.use('/auth', authRoutes);
 router.use('/resumes', resumeRoutes);
 router.use('/ai', aiRoutes);
 router.use('/versions', versionRoutes);
-router.use('/linkedin', linkedinRoutes);
-router.use('/digilocker', digilockerRoutes);
 router.use('/feedback', feedbackRoutes);
 
 export default router;

@@ -12,14 +12,18 @@ import TemplatesPage from './pages/TemplatesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function PublicRoute({ children }) {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, isAuthenticating } = useContext(AuthContext);
 
-  if (loading) {
+  // While auth is initializing or an OAuth request is in-flight, show spinner.
+  // Do NOT render the login page — it would flash or duplicate the form.
+  if (loading || isAuthenticating) {
     return (
       <div className="app-loading">
         <div className="app-loading__content">
           <div className="spinner" />
-          <p className="text-muted">Loading...</p>
+          <p className="text-muted">
+            {isAuthenticating ? 'Signing you in…' : 'Loading…'}
+          </p>
         </div>
       </div>
     );

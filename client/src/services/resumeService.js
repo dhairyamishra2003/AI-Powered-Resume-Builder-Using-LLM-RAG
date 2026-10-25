@@ -63,7 +63,14 @@ const deleteVersion = async (resumeId, versionId) => {
 const uploadResume = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await API.post('/resumes/upload', formData);
+  const response = await API.post('/resumes/upload', formData, { timeoutMs: 120000 });
+  return response.data;
+};
+
+const importResumeData = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await API.post('/resumes/import', formData, { timeoutMs: 120000 });
   return response.data;
 };
 
@@ -71,5 +78,5 @@ export {
   createResume, getResumes, getResume,
   updateResume, updateSection, updateTemplate, deleteResume,
   saveVersion, getVersions, restoreVersion, deleteVersion,
-  uploadResume,
+  uploadResume, importResumeData,
 };

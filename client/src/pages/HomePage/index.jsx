@@ -69,11 +69,18 @@ function HomePage() {
       setUploadFile(null);
       navigate(`/builder/${resume._id}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to parse resume');
+      // api.js wraps server errors as: error.message = server message,
+      // error.response = { data, status }. Both paths are checked here.
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to parse resume. Please try a text-selectable PDF.';
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
   };
+
 
   return (
     <HomeLayout>
@@ -230,12 +237,12 @@ function HomePage() {
             <label className={`home-upload-dropzone ${uploadFile ? 'home-upload-dropzone--active' : ''}`}>
               <input
                 type="file"
-                accept=".pdf"
+                accept=".pdf,application/pdf"
                 onChange={(event) => setUploadFile(event.target.files[0] || null)}
               />
               <HiArrowUpTray />
               <span>{uploadFile ? uploadFile.name : 'Click to select a PDF file'}</span>
-              <small>PDF up to 5MB</small>
+              <small>PDF up to 10MB</small>
             </label>
             {uploadFile && (
               <div className="home-upload-file">

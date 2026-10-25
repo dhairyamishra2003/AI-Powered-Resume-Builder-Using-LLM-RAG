@@ -71,9 +71,15 @@ export const emailLogin = async (rawEmail, password) => {
 
 export const googleLogin = async (credential) => {
   checkDbConnection();
+
+  // ── 1. Verify Google ID token ───────────────────────────────────────────
+  console.log('[Auth:BE] Verifying Google ID token with google-auth-library');
   const googleUser = await verifyGoogleToken(credential);
   const email = (googleUser.email || '').toLowerCase().trim();
+  console.log('[Auth:BE] Google user information received:', { email, googleId: googleUser.googleId });
 
+  // ── 2. Database lookup ─────────────────────────────────────────────────
+  console.log('[Auth:BE] Database lookup for googleId or email:', email);
   let user = await User.findOne({
     $or: [
       { googleId: googleUser.googleId },
@@ -81,14 +87,18 @@ export const googleLogin = async (credential) => {
     ],
   });
 
+  // ── 3. User creation / update ──────────────────────────────────────────
   if (user) {
+    console.log('[Auth:BE] Existing user found — updating Google profile data', { userId: user._id.toString() });
     user.googleId = googleUser.googleId;
     user.email = email;
     user.name = googleUser.name || user.name;
     user.picture = googleUser.picture || user.picture;
     user.lastLogin = new Date();
     await user.save();
+    console.log('[Auth:BE] User updated in database');
   } else {
+    console.log('[Auth:BE] No existing user — creating new user for', email);
     user = await User.create({
       googleId: googleUser.googleId,
       email,
@@ -96,9 +106,12 @@ export const googleLogin = async (credential) => {
       picture: googleUser.picture,
       lastLogin: new Date(),
     });
+    console.log('[Auth:BE] New user created', { userId: user._id.toString() });
   }
 
+  // ── 4. JWT generation ──────────────────────────────────────────────────
   const token = generateToken(user);
+  console.log('[Auth:BE] JWT token created successfully for user:', user._id.toString());
 
   return {
     token,

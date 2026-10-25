@@ -1,0 +1,11 @@
+{
+  "name": "ai-powered-resume-builder",
+  "private": true,
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
+    "dev:client": "npm run dev:ui --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build": "npm run build --prefix client",
+    "test": "npm run test --prefix client && npm run test --prefix server"
+  }
+}

@@ -47,16 +47,14 @@ const googleClientId = (rawClientId && rawClientId !== 'your-google-')
   : '100000000000-dummyclientid.apps.googleusercontent.com';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <BrowserRouter>
-          <AuthProvider>
-            <App />
-            <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-          </AuthProvider>
-        </BrowserRouter>
-      </GoogleOAuthProvider>
-    </ErrorBoundary>
-  </React.StrictMode>
+  <ErrorBoundary>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+          <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+  </ErrorBoundary>
 );

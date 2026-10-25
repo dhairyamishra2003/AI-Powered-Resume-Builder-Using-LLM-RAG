@@ -99,11 +99,6 @@ const resumeSchema = new mongoose.Schema(
       missingKeywords: [{ type: String }],
       suggestions: [{ type: String }],
     },
-    linkedin: {
-      connected: { type: Boolean, default: false },
-      linkedinId: { type: String, default: '' },
-      lastImportedAt: { type: Date },
-    },
     isActive: {
       type: Boolean,
       default: true,

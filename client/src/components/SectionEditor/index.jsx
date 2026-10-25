@@ -16,8 +16,7 @@ import SkillsForm from '../SkillsForm';
 import ProjectsForm from '../ProjectsForm';
 import CertificationsForm from '../CertificationsForm';
 import SummaryForm from '../SummaryForm';
-import LinkedInImport from '../LinkedInImport';
-import DigiLockerImport from '../DigiLockerImport';
+import UploadDataImport from '../UploadDataImport';
 import { HiChevronRight } from 'react-icons/hi2';
 
 function SectionEditor() {
@@ -46,8 +45,7 @@ function SectionEditor() {
 
   return (
     <div>
-      <LinkedInImport />
-      <DigiLockerImport />
+      <UploadDataImport />
       {SECTION_TYPES.map(({ id, label, icon: Icon }) => {
         const isActive = activeSection === id;
 

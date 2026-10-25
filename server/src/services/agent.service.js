@@ -1,20 +1,27 @@
 // ============================================
 // agent.service.js - AI Interview Agent
 // ============================================
-// Handles conversational resume building via Gemini.
-// Uses a direct Gemini API approach with manual tool
-// dispatch to avoid the thought_signature compatibility
-// issue in @langchain/google-genai + LangGraph.
-// ============================================
-
 import { GoogleGenAI } from '@google/genai';
 import Resume from '../models/Resume.model.js';
 import { normalizeSectionData } from './resume.service.js';
 import * as aiService from './ai.service.js';
 import { searchKnowledgeBase } from './rag.service.js';
-import { toGeminiError } from '../config/gemini.config.js';
+import { toGeminiError, FALLBACK_MODELS as GEMINI_FALLBACK_MODELS } from '../config/gemini.config.js';
 
-const AGENT_MODEL_NAME = process.env.GEMINI_AGENT_MODEL || process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+// Use the same confirmed-available model as gemini.config.js.
+// gemini-3.6-flash is live-tested and confirmed to support generateContent for this API key.
+const AGENT_MODEL_NAME = process.env.GEMINI_AGENT_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+
+// Reuse the same confirmed fallback chain from gemini.config.js.
+// All models in GEMINI_FALLBACK_MODELS are verified to support generateContent.
+const AGENT_FALLBACK_MODELS = Array.from(
+  new Set([AGENT_MODEL_NAME, ...GEMINI_FALLBACK_MODELS])
+);
+
+console.log(`[Agent] Model: ${AGENT_MODEL_NAME}`);
+console.log(`[Agent] Fallback chain: ${AGENT_FALLBACK_MODELS.join(' -> ')}`);
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -171,6 +178,79 @@ const executeTool = async (toolName, toolArgs, context) => {
   }
 };
 
+// ---- withGeminiRetry — agent equivalent of generateContent in gemini.config.js ----
+// Tries each fallback model with exponential backoff on 503/high-demand errors.
+// Skips retired/unavailable models immediately (same logic as gemini.config.js).
+const MAX_AGENT_RETRIES = 3;
+const AGENT_BASE_DELAY_MS = 1000;
+
+const withGeminiRetry = async (callArgs) => {
+  let lastError = null;
+
+  for (const model of AGENT_FALLBACK_MODELS) {
+    for (let attempt = 0; attempt < MAX_AGENT_RETRIES; attempt++) {
+      try {
+        const response = await ai.models.generateContent({ ...callArgs, model });
+        return response;
+      } catch (error) {
+        lastError = error;
+        const msg = error?.message || '';
+
+        const isHighDemand =
+          msg.includes('high demand') ||
+          msg.includes('503') ||
+          msg.includes('overloaded') ||
+          error?.status === 'UNAVAILABLE';
+
+        // Model retired / not found / not supported for this API version
+        const isModelUnavailable =
+          msg.includes('not found for API version') ||
+          msg.includes('not supported for generateContent') ||
+          msg.includes('404') ||
+          msg.includes('not found') ||
+          msg.includes('does not exist') ||
+          msg.includes('is retired') ||
+          msg.includes('is deprecated');
+
+        const isQuota =
+          msg.includes('429') ||
+          msg.includes('RESOURCE_EXHAUSTED') ||
+          msg.includes('Quota exceeded');
+
+        // thought_signature errors are a 400 that can happen when a model's
+        // internal state requirements change.  Skip to next fallback model
+        // rather than crashing the entire request.
+        const isThoughtSignatureError =
+          msg.includes('thought_signature') ||
+          msg.includes('thoughtSignature');
+
+        console.warn(`[Agent] model=${model} attempt=${attempt + 1} → ${msg.slice(0, 160)}`);
+
+        if (isModelUnavailable || isQuota) {
+          console.warn(`[Agent] model=${model} unavailable/retired/quota — skipping to next fallback`);
+          break; // try next model
+        }
+
+        if (isThoughtSignatureError) {
+          console.warn(`[Agent] model=${model} thought_signature error — skipping to next fallback`);
+          break; // try next model
+        }
+
+        if (isHighDemand && attempt < MAX_AGENT_RETRIES - 1) {
+          const delay = AGENT_BASE_DELAY_MS * Math.pow(2, attempt);
+          console.warn(`[Agent] model=${model} high demand — retrying in ${delay}ms`);
+          await sleep(delay);
+          continue;
+        }
+
+        break; // exhausted retries for this model
+      }
+    }
+  }
+
+  throw toGeminiError(lastError, AGENT_MODEL_NAME);
+};
+
 // ---- Build system instruction ----
 const buildSystemInstruction = (data) => `You are a concise, professional AI resume assistant helping a user build their resume.
 
@@ -241,8 +321,7 @@ export const runInterviewAgent = async (data) => {
   try {
     // Agentic loop — max 5 iterations to prevent runaway tool calls
     for (let iteration = 0; iteration < 5; iteration++) {
-      const response = await ai.models.generateContent({
-        model: AGENT_MODEL_NAME,
+      const response = await withGeminiRetry({
         systemInstruction: buildSystemInstruction(data),
         contents,
         tools,
@@ -267,8 +346,14 @@ export const runInterviewAgent = async (data) => {
 
       // If there are tool calls, execute them
       if (toolCallParts.length > 0) {
-        // Add the model's response (with tool calls) to contents
-        contents.push({ role: 'model', parts });
+        // CRITICAL: Append the raw candidate.content object from the SDK
+        // response, NOT a reconstructed plain object.  Gemini 3.x models
+        // embed opaque `thoughtSignature` fields inside functionCall parts.
+        // The API requires these exact fields to be echoed back in the
+        // subsequent request.  Reconstructing the object as
+        // `{ role: 'model', parts }` would strip those internal fields,
+        // causing a 400 "thought_signature" error.
+        contents.push(candidate.content);
 
         // Execute each tool and collect results
         const toolResults = [];

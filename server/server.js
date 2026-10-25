@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5000;
 // Using async/await pattern (JS Essentials: Async/Await)
 const startServer = async () => {
   try {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`\n🚀 Server is running on port ${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
       console.log(`🔗 URL: http://localhost:${PORT}\n`);
@@ -28,10 +28,12 @@ const startServer = async () => {
     initializeKnowledgeBase().catch((err) => {
       console.warn('⚠️ Knowledge base initialization warning:', err.message);
     });
+    const shutdown = () => server.close(() => process.exit(0));
+    process.once('SIGTERM', shutdown);
+    process.once('SIGINT', shutdown);
   } catch (error) {
     console.error("❌ Failed to start server:", error.message);
   }
 };
 
 startServer();
-

@@ -2,6 +2,7 @@
 // db.config.js - MongoDB Connection
 // ============================================
 
+import dns from 'dns';
 import mongoose from 'mongoose'; // Mongoose ODM (MongoDB: Database Connection)
 
 // Using async/await pattern (JS Essentials: Async/Await)
@@ -10,8 +11,15 @@ const connectDB = async () => {
   const localURI = 'mongodb://127.0.0.1:27017/ai-resume-builder';
 
   try {
+    // Configure public DNS servers to resolve MongoDB SRV records (fixes querySrv ECONNREFUSED on Windows/ISPs)
+    dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+
     if (mongoURI) {
-      const conn = await mongoose.connect(mongoURI, { serverSelectionTimeoutMS: 5000 });
+      const conn = await mongoose.connect(mongoURI, {
+        serverSelectionTimeoutMS: 5000,
+        maxPoolSize: 10,
+        minPoolSize: 1,
+      });
       console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
       return;
     }
@@ -21,11 +29,12 @@ const connectDB = async () => {
   }
 
   try {
-    const localConn = await mongoose.connect(localURI, { serverSelectionTimeoutMS: 3000 });
+    const localConn = await mongoose.connect(localURI, { serverSelectionTimeoutMS: 3000, maxPoolSize: 10, minPoolSize: 1 });
     console.log(`✅ Local MongoDB Connected: ${localConn.connection.host}`);
   } catch (localErr) {
     console.error(`❌ MongoDB Connection Error: ${localErr.message}`);
     console.error('💡 TIP: If using MongoDB Atlas, whitelist your IP address in MongoDB Atlas dashboard (Network Access -> Add IP Address -> Allow Access from Anywhere 0.0.0.0/0 for dev).');
+    throw localErr;
   }
 };
 

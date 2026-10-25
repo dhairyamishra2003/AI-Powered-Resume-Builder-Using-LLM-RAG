@@ -5,38 +5,40 @@
 
 import API from './api.js';
 
+const AI_REQUEST_OPTIONS = { timeoutMs: 90000 };
+
 const chatWithAgent = async (resumeId, message, sectionTargeted = '') => {
-  const response = await API.post('/ai/chat', { resumeId, message, sectionTargeted });
+  const response = await API.post('/ai/chat', { resumeId, message, sectionTargeted }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
 const generateBullets = async (data) => {
-  const response = await API.post('/ai/generate-bullets', data);
+  const response = await API.post('/ai/generate-bullets', data, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
 const generateSummary = async (resumeId) => {
-  const response = await API.post('/ai/generate-summary', { resumeId });
+  const response = await API.post('/ai/generate-summary', { resumeId }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
-const getAtsScore = async (resumeId, jobDescription) => {
-  const response = await API.post('/ai/ats-score', { resumeId, jobDescription });
+const getAtsScore = async (resumeId, jobDescription, sections = null, targetRole = '') => {
+  const response = await API.post('/ai/ats-score', { resumeId, jobDescription, sections, targetRole }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
 const reviewResume = async (resumeId) => {
-  const response = await API.post('/ai/review', { resumeId });
+  const response = await API.post('/ai/review', { resumeId }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
 const matchJob = async (resumeId, jobDescription) => {
-  const response = await API.post('/ai/match-job', { resumeId, jobDescription });
+  const response = await API.post('/ai/match-job', { resumeId, jobDescription }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 
 const detectSkillGaps = async (resumeId, jobDescription) => {
-  const response = await API.post('/ai/skill-gaps', { resumeId, jobDescription });
+  const response = await API.post('/ai/skill-gaps', { resumeId, jobDescription }, AI_REQUEST_OPTIONS);
   return response.data;
 };
 

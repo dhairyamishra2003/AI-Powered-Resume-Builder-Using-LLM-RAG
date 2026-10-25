@@ -166,10 +166,14 @@ export function withPlaceholder(sectionName, value, sections = null, isPreview =
   }
 
   if (sectionName === 'skills') {
+    const val = value || {};
+    const rawSoft = val.soft || val.coreStrengths || val.softSkills || val.strengths || [];
+    const rawTech = val.technical || val.tech || [];
+    const rawLang = val.languages || val.spokenLanguages || [];
     return {
-      technical: Array.isArray(value?.technical) ? value.technical : [],
-      soft: Array.isArray(value?.soft) ? value.soft : [],
-      languages: Array.isArray(value?.languages) ? value.languages : [],
+      technical: Array.isArray(rawTech) ? rawTech : [],
+      soft: Array.isArray(rawSoft) ? rawSoft : [],
+      languages: Array.isArray(rawLang) ? rawLang : [],
     };
   }
 

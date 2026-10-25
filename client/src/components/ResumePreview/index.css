@@ -8,11 +8,57 @@
 
 .resume-preview__toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   padding: 10px 16px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+}
+
+.resume-preview__zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.resume-preview__zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+
+.resume-preview__zoom-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.resume-preview__zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.resume-preview__zoom-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  min-width: 42px;
+  text-align: center;
+  user-select: none;
 }
 
 .resume-preview__viewport {
@@ -26,15 +72,17 @@
 
 .resume-preview__stage {
   flex: 0 0 auto;
+  /* Width grows to fit multi-page canvases */
+  width: 794px;
 }
 
+/* The paper wrapper no longer has a fixed height — it grows naturally
+   to accommodate one or more A4 page containers stacked by MultiPageA4Canvas. */
 .resume-preview__paper {
   width: 794px;
   min-height: 1123px;
   overflow: visible;
-  background: #ffffff;
-  border-radius: 2px;
-  box-shadow: var(--shadow-md);
+  background: transparent;
   box-sizing: border-box;
 }
 
@@ -44,9 +92,16 @@
 .resume-preview__paper h3,
 .resume-preview__paper .section-title,
 .resume-preview__paper .experience-item,
+.resume-preview__paper .project-card,
 .resume-preview__paper li {
   break-inside: avoid;
   page-break-inside: avoid;
+}
+
+/* Individual A4 page cards rendered by MultiPageA4Canvas */
+.resume-preview__paper .a4-resume-canvas {
+  box-shadow: 0 2px 16px rgba(15, 23, 42, 0.13);
+  border-radius: 2px;
 }
 
 @media print {
@@ -58,5 +113,10 @@
     box-shadow: none !important;
     border-radius: 0 !important;
     margin: 0 !important;
+  }
+
+  .resume-preview__paper .a4-resume-canvas {
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 }

@@ -112,14 +112,14 @@ function LandingPage() {
             </div>
             <div className="agent-node agent-node-ats">
               <HiChartBar />
-              <span>ATS 92</span>
+              <span>ATS 82+</span>
             </div>
             <div className="agent-node agent-node-review">
               <HiShieldCheck />
               <span>Review</span>
             </div>
             <div className="score-panel-3d">
-              <div className="hero-score-ring">92</div>
+              <div className="hero-score-ring">82</div>
               <div>
                 <span>Match score</span>
                 <strong>Interview ready</strong>

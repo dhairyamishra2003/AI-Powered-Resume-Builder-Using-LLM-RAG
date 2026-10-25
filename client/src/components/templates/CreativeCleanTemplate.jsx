@@ -1,11 +1,37 @@
 import React from 'react';
-import { HiPaintBrush, HiBriefcase, HiAcademicCap, HiSparkles, HiFolder } from 'react-icons/hi2';
-import { A4Canvas, TwoColumnLayout, SectionTitle, ExperienceItem, ProjectCard, EducationItem, SummaryCard, ContactList } from './engine/LayoutEngine.jsx';
+import {
+  HiPaintBrush,
+  HiBriefcase,
+  HiAcademicCap,
+  HiSparkles,
+  HiFolder,
+  HiLanguage,
+  HiUserGroup,
+} from 'react-icons/hi2';
+
+import {
+  TwoPageResumeCanvas,
+  PageRunningHeader,
+  SectionTitle,
+  SkillBadges,
+  ExperienceItem,
+  ProjectCard,
+  EducationItem,
+  SummaryCard,
+  ContactList,
+} from './engine/LayoutEngine.jsx';
+
+import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
 
-function CreativeCleanTemplate({ sections, colors, isPreview = false }) {
+function CreativeCleanTemplate({
+  sections,
+  colors,
+  isPreview = false,
+}) {
   const normalizedSections = normalizeResumeSections(sections || {});
+
   const personalInfo = withPlaceholder('personalInfo', normalizedSections.personalInfo, normalizedSections, isPreview);
   const summary = withPlaceholder('summary', normalizedSections.summary, normalizedSections, isPreview);
   const experience = withPlaceholder('experience', normalizedSections.experience, normalizedSections, isPreview);
@@ -17,198 +43,433 @@ function CreativeCleanTemplate({ sections, colors, isPreview = false }) {
   const primaryColor = colors?.primary || '#6d28d9';
   const accentColor = colors?.accent || '#ec4899';
 
-  const techSkills = (skills.technical || []).filter((s) => s && s.trim());
-  const softSkills = (skills.soft || []).filter((s) => s && s.trim());
-  const languages = (skills.languages || []).filter((l) => l && l.trim());
+  const techSkills = (skills.technical || []).filter((s) => s && typeof s === 'string' && s.trim());
+  const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || [];
+  const softSkills = (rawSoft || []).filter((s) => s && typeof s === 'string' && s.trim());
+  const languages = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
 
-  const sidebarContent = (
-    <>
-      {/* CREATIVE SKILLS */}
-      {techSkills.length > 0 && (
-        <div>
-          <SectionTitle title="Skills & Tools" icon={HiPaintBrush} primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 4px' }}>
-            {techSkills.map((sk, i) => (
-              <span
-                key={i}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #d8b4fe',
-                  color: '#581c87',
-                  padding: '1.5px 6px',
-                  borderRadius: '10px',
-                  fontSize: '9px',
-                  fontWeight: 600,
-                  lineHeight: 1.25,
-                }}
-              >
-                {sk}
-              </span>
-            ))}
+  const typo = getTemplateTypography('creative-clean');
+  const sectionStyle = {
+    fontSize: typo.sectionTitle,
+    marginBottom: '6px',
+    paddingBottom: '3px',
+  };
+
+  // ── Header (Page 1 ONLY) ────────────────────────────────────────────────────
+  const header = (
+    <div
+      style={{
+        position: 'relative',
+        padding: '13px 20px 11px',
+        background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 58%, #fdf2f8 100%)',
+        borderBottom: `3.5px solid ${primaryColor}`,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '18px',
+        flexShrink: 0,
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        width: '100%',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          width: '90px',
+          height: '90px',
+          borderRadius: '50%',
+          background: '#f5d0fe',
+          opacity: 0.35,
+          right: '-28px',
+          top: '-42px',
+          pointerEvents: 'none',
+        }}
+      />
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            width: '46px',
+            height: '46px',
+            borderRadius: '12px',
+            background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: typo.headerIcon,
+            flexShrink: 0,
+            transform: 'rotate(-3deg)',
+            boxShadow: '0 3px 8px rgba(109, 40, 217, 0.22)',
+          }}
+        >
+          <HiPaintBrush />
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <h1
+            style={{
+              fontSize: typo.name,
+              fontWeight: 800,
+              color: '#4c1d95',
+              letterSpacing: '0.55px',
+              margin: 0,
+              lineHeight: 1.15,
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {personalInfo.fullName || (isPreview ? 'Alex Johnson' : 'Your Name')}
+          </h1>
+          <div
+            style={{
+              fontSize: typo.targetRole,
+              fontWeight: 700,
+              color: accentColor,
+              letterSpacing: '0.65px',
+              textTransform: 'uppercase',
+              marginTop: '3px',
+              lineHeight: 1.2,
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {personalInfo.targetRole || 'Creative Designer & Product Lead'}
           </div>
         </div>
-      )}
-
-      {/* CORE COMPETENCIES */}
-      {softSkills.length > 0 && (
-        <div>
-          <SectionTitle title="Core Strengths" primaryColor={primaryColor} accentColor={accentColor} />
-          <ul style={{ margin: 0, paddingLeft: '14px', fontSize: '9.5px', color: '#4c1d95', lineHeight: 1.45 }}>
-            {softSkills.map((sk, i) => <li key={i} style={{ marginBottom: '2px' }}>{sk}</li>)}
-          </ul>
-        </div>
-      )}
-
-      {/* EDUCATION */}
-      {validEducation.length > 0 && (
-        <div>
-          <SectionTitle title="Education" icon={HiAcademicCap} primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {validEducation.map((edu, idx) => (
-              <EducationItem
-                key={idx}
-                degree={edu.degree}
-                field={edu.field}
-                institution={edu.institution}
-                startDate={edu.startDate}
-                endDate={edu.endDate}
-                gpa={edu.gpa}
-                accentColor={primaryColor}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* LANGUAGES */}
-      {languages.length > 0 && (
-        <div>
-          <SectionTitle title="Languages" primaryColor={primaryColor} accentColor={accentColor} />
-          <ul style={{ margin: 0, paddingLeft: '14px', fontSize: '9.5px', color: '#4c1d95', lineHeight: 1.45 }}>
-            {languages.map((lang, i) => <li key={i} style={{ marginBottom: '2px' }}>{lang}</li>)}
-          </ul>
-        </div>
-      )}
-    </>
+      </div>
+      <ContactList
+        personalInfo={personalInfo}
+        align="right"
+        accentColor={primaryColor}
+        textColor="#4c1d95"
+        style={{ fontSize: typo.contact }}
+      />
+    </div>
   );
 
-  const mainContent = (
-    <>
-      {/* SUMMARY */}
-      {summary && summary.trim() && (
+  // ── Sidebar Sections (Page 1 with Smart Overflow Support) ───────────────────
+  const sidebarSections = [];
+
+  // Skills & Tools
+  if (techSkills.length > 0) {
+    sidebarSections.push({
+      id: 'tech-skills',
+      type: 'skills',
+      items: techSkills,
+      render: ({ isOverflow, items = techSkills }) => (
+        <div>
+          <SectionTitle
+            title={isOverflow ? 'Skills & Tools (Continued)' : 'Skills & Tools'}
+            icon={HiPaintBrush}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <SkillBadges
+            skills={items}
+            size="small"
+            textColor="#581c87"
+            borderColor="#c4b5fd"
+            style={{ gap: '6px 5px' }}
+            itemDataAttribute="data-sidebar-skill"
+          />
+        </div>
+      ),
+    });
+  }
+
+  // Core Strengths
+  if (softSkills.length > 0) {
+    sidebarSections.push({
+      id: 'core-strengths',
+      type: 'strengths',
+      items: softSkills,
+      render: ({ isOverflow, isSidebar = true }) => (
+        <div>
+          <SectionTitle
+            title={isOverflow ? 'Core Strengths (Continued)' : 'Core Strengths'}
+            icon={HiUserGroup}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div
+            style={
+              isSidebar
+                ? undefined
+                : {
+                    display: 'grid',
+                    gridTemplateColumns: softSkills.length > 3 ? 'repeat(2, minmax(0, 1fr))' : '1fr',
+                    gap: '4px 16px',
+                  }
+            }
+          >
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: '15px',
+                fontSize: typo.softSkills,
+                color: '#4c1d95',
+                lineHeight: 1.35,
+              }}
+            >
+              {softSkills.map((skill, idx) => (
+                <li key={idx} style={{ marginBottom: '3px', overflowWrap: 'anywhere' }}>
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+
+  // ── Logical Atomic Content Blocks ──────────────────────────────────────────
+  const blocks = [];
+
+  // 1. Summary
+  if (summary && summary.trim()) {
+    blocks.push({
+      id: 'summary',
+      type: 'summary',
+      render: () => (
         <SummaryCard
           text={summary}
-          borderColor={primaryColor}
+          borderColor={accentColor}
           backgroundColor="#faf5ff"
-          textColor="#3b0764"
-          style={{ borderLeftColor: primaryColor }}
+          textColor="#4c1d95"
+          style={{ padding: '7px 11px', fontSize: typo.summary, lineHeight: 1.45 }}
         />
-      )}
+      ),
+    });
+  }
 
-      {/* EXPERIENCE */}
-      {validExperience.length > 0 && (
+  // 2. Education (Immediately after Summary)
+  if (validEducation.length > 0) {
+    blocks.push({
+      id: 'education',
+      type: 'education',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
         <div>
-          <SectionTitle title="Design & Creative Experience" icon={HiBriefcase} primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {validExperience.map((exp, idx) => (
-              <ExperienceItem
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Education' : 'Education (Continued)'}
+            icon={HiAcademicCap}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {validEducation.map((edu, idx) => (
+              <div
                 key={idx}
-                role={exp.role}
-                company={exp.company}
-                startDate={exp.startDate}
-                endDate={exp.endDate}
-                current={exp.current}
-                bullets={exp.bullets}
-                accentColor={primaryColor}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* PROJECTS */}
-      {validProjects.length > 0 && (
-        <div>
-          <SectionTitle title="Featured Projects" icon={HiFolder} primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            {validProjects.map((proj, idx) => (
-              <ProjectCard
-                key={idx}
-                name={proj.name}
-                description={proj.description}
-                technologies={proj.technologies}
-                link={proj.link}
-                startDate={proj.startDate}
-                endDate={proj.endDate}
-                date={proj.date}
-                bullets={proj.bullets}
-                accentColor={primaryColor}
-                cardBg="#fcfaff"
-                borderColor="#f3e8ff"
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* CERTIFICATIONS / HONORS */}
-      {validCertifications.length > 0 && (
-        <div>
-          <SectionTitle title="Honors & Certifications" icon={HiSparkles} primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
-            {validCertifications.map((cert, idx) => (
-              <div key={idx} style={{ fontSize: '9.5px', color: '#3b0764', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
-                <strong>{cert.name}</strong> {cert.issuer && `— ${cert.issuer}`} {cert.date && `(${cert.date})`}
+                style={{
+                  padding: '6px 8px',
+                  background: '#ffffff',
+                  border: '1px solid #ede9fe',
+                  borderRadius: '5px',
+                }}
+              >
+                <EducationItem
+                  degree={edu.degree}
+                  field={edu.field}
+                  institution={edu.institution}
+                  startDate={edu.startDate}
+                  endDate={edu.endDate}
+                  gpa={edu.gpa}
+                  accentColor={primaryColor}
+                />
               </div>
             ))}
           </div>
         </div>
-      )}
-    </>
-  );
+      ),
+    });
+  }
+
+  // 3. Experience Items
+  if (validExperience.length > 0) {
+    validExperience.forEach((exp, idx) => {
+      blocks.push({
+        id: `exp-${idx}`,
+        type: 'experience',
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title={idx === 0 || !sectionStartedOnPrevPage ? 'Professional Experience' : 'Professional Experience (Continued)'}
+                icon={HiBriefcase}
+                primaryColor="#4c1d95"
+                accentColor={accentColor}
+                borderColor="#ddd6fe"
+                style={sectionStyle}
+              />
+            )}
+            <ExperienceItem
+              role={exp.role}
+              company={exp.company}
+              startDate={exp.startDate}
+              endDate={exp.endDate}
+              current={exp.current}
+              bullets={exp.bullets}
+              accentColor={accentColor}
+              dateBadge={true}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 4. Featured Projects
+  if (validProjects.length > 0) {
+    validProjects.forEach((proj, idx) => {
+      blocks.push({
+        id: `project-${idx}`,
+        type: 'projects',
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title={idx === 0 || !sectionStartedOnPrevPage ? 'Featured Projects' : 'Featured Projects (Continued)'}
+                icon={HiFolder}
+                primaryColor="#4c1d95"
+                accentColor={accentColor}
+                borderColor="#ddd6fe"
+                style={sectionStyle}
+              />
+            )}
+            <ProjectCard
+              name={proj.name}
+              description={proj.description}
+              technologies={proj.technologies}
+              link={proj.link}
+              startDate={proj.startDate}
+              endDate={proj.endDate}
+              date={proj.date}
+              bullets={proj.bullets}
+              accentColor={accentColor}
+              cardBg="#ffffff"
+              borderColor="#e9d5ff"
+              style={{
+                padding: '7px 10px',
+                borderRadius: '5px',
+                borderLeft: `3px solid ${primaryColor}`,
+              }}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 5. Certifications
+  if (validCertifications.length > 0) {
+    blocks.push({
+      id: 'certifications',
+      type: 'certifications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Certifications' : 'Certifications (Continued)'}
+            icon={HiSparkles}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: validCertifications.length > 3 ? 'repeat(2, minmax(0, 1fr))' : '1fr',
+              gap: '6px 12px',
+              fontSize: typo.certification,
+              color: '#4c1d95',
+              lineHeight: 1.35,
+            }}
+          >
+            {validCertifications.map((cert, idx) => (
+              <div key={idx} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                <span style={{ fontWeight: 700, color: '#4c1d95' }}>{cert.name}</span>
+                {cert.issuer && <span style={{ color: '#7c3aed' }}> — {cert.issuer}</span>}
+                {cert.date && <span style={{ color: '#a855f7' }}> ({cert.date})</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 6. Languages (immediately after Certifications in main content flow)
+  if (languages.length > 0) {
+    blocks.push({
+      id: 'languages',
+      type: 'languages',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Languages' : 'Languages (Continued)'}
+            icon={HiLanguage}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', fontSize: typo.language, color: '#4c1d95' }}>
+            {languages.map((language, idx) => (
+              <span
+                key={idx}
+                style={{
+                  background: '#faf5ff',
+                  border: '1px solid #d8b4fe',
+                  borderRadius: '3px',
+                  padding: '3px 8px',
+                  fontWeight: 500,
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {language}
+              </span>
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
 
   return (
-    <A4Canvas sections={normalizedSections} fontFamily="'Inter', system-ui, sans-serif">
-      {/* Top Header */}
-      <div
-        style={{
-          padding: '14px 24px',
-          background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
-          borderBottom: `3px solid ${primaryColor}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 800, color: primaryColor, letterSpacing: '0.6px', margin: 0, lineHeight: 1.15 }}>
-            {personalInfo.fullName || (isPreview ? 'Alex Johnson' : 'Your Name')}
-          </h1>
-          {(personalInfo.targetRole || isPreview) && (
-            <h2 style={{ fontSize: '12px', fontWeight: 700, color: accentColor, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: '2px', margin: 0 }}>
-              {personalInfo.targetRole || 'Creative Designer & Product Lead'}
-            </h2>
-          )}
-        </div>
-
-        {/* Contact List */}
-        <ContactList personalInfo={personalInfo} align="right" accentColor={primaryColor} textColor="#4c1d95" />
-      </div>
-
-      {/* Two Column Layout (Sidebar: 30%, Main: 70%) with Adaptive Height Distribution */}
-      <TwoColumnLayout
-        sidebar={sidebarContent}
-        main={mainContent}
-        sidebarBackground="#faf5ff"
-        sidebarBorder="1px solid #e9d5ff"
-        sidebarWidth="30%"
-      />
-    </A4Canvas>
+    <TwoPageResumeCanvas
+      header={header}
+      sidebarSections={sidebarSections}
+      page2Header={
+        <PageRunningHeader
+          fullName={personalInfo.fullName}
+          targetRole={personalInfo.targetRole}
+          primaryColor={primaryColor}
+          pageNum={2}
+          fontFamily="'Inter', system-ui, sans-serif"
+        />
+      }
+      blocks={blocks}
+      fontFamily="'Inter', system-ui, sans-serif"
+      sidebarWidth="238px"
+      lockSidebarWidth={true}
+      sidebarBackground="#faf5ff"
+      sidebarBorder="1px solid #e9d5ff"
+      sidebarPadding="12px 10px"
+      mainPadding="12px 14px"
+      page2Padding="16px 22px"
+      twoColumnGap={10}
+      blockGap={8}
+      disablePage2Sidebar={true}
+    />
   );
 }
 

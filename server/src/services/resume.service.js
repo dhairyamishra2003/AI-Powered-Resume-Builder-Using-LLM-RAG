@@ -1,60 +1,40 @@
 import mongoose from 'mongoose';
 import Resume from '../models/Resume.model.js';
 import { DEFAULT_TEMPLATE_ID, VALID_TEMPLATE_IDS } from '../constants/templates.js';
-
-// Strip invalid _id fields from subdocument arrays before saving.
-// The client generates temporary _id values that are not valid ObjectIds.
-const stripInvalidIds = (items) => items.map((item) => {
-  if (!item || typeof item !== 'object' || Array.isArray(item)) return item;
-  const { _id, ...rest } = item;
-  if (_id && mongoose.Types.ObjectId.isValid(_id)) {
-    return { _id, ...rest };
-  }
-  return rest;
-});
+import {
+  normalizeSections,
+  normalizeProjects,
+  normalizeExperience,
+  normalizeEducation,
+  normalizeSkills,
+  normalizeCertifications,
+  normalizePersonalInfo,
+  normalizeSummary,
+} from '../utils/sectionNormalizer.js';
 
 export const normalizeSectionData = (sectionName, sectionData) => {
-  if (sectionName === 'summary' && sectionData && typeof sectionData === 'object' && sectionData.text) {
-    return sectionData.text;
+  switch (sectionName) {
+    case 'projects':
+      return normalizeProjects(sectionData);
+    case 'experience':
+      return normalizeExperience(sectionData);
+    case 'education':
+      return normalizeEducation(sectionData);
+    case 'skills':
+      return normalizeSkills(sectionData);
+    case 'certifications':
+      return normalizeCertifications(sectionData);
+    case 'personalInfo':
+      return normalizePersonalInfo(sectionData);
+    case 'summary':
+      return normalizeSummary(sectionData);
+    default:
+      return sectionData;
   }
-
-  if (sectionName === 'certifications') {
-    const certs = Array.isArray(sectionData) ? sectionData : [sectionData];
-    return stripInvalidIds(certs.filter(Boolean).map((cert) => {
-      if (typeof cert === 'string') {
-        return { name: cert, issuer: '', date: '', link: '' };
-      }
-      if (cert && typeof cert === 'object' && !Array.isArray(cert)) {
-        return {
-          name: cert.name || cert.title || cert.certification || '',
-          issuer: cert.issuer || cert.organization || cert.provider || '',
-          date: cert.date || cert.issueDate || cert.issued || '',
-          link: cert.link || cert.url || cert.credentialUrl || '',
-        };
-      }
-      return { name: String(cert), issuer: '', date: '', link: '' };
-    }));
-  }
-
-  const arrayFields = ['experience', 'education', 'projects'];
-  if (arrayFields.includes(sectionName) && Array.isArray(sectionData)) {
-    return stripInvalidIds(sectionData);
-  }
-
-  return sectionData;
 };
 
-const sanitizeSections = (sections) => {
-  if (!sections) return sections;
-  const cleaned = { ...sections };
-  const sectionNames = ['experience', 'education', 'projects', 'certifications'];
-
-  for (const sectionName of sectionNames) {
-    if (cleaned[sectionName] !== undefined) {
-      cleaned[sectionName] = normalizeSectionData(sectionName, cleaned[sectionName]);
-    }
-  }
-  return cleaned;
+export const sanitizeSections = (sections) => {
+  return normalizeSections(sections || {});
 };
 
 const normalizeTemplateId = (templateId) => (
@@ -62,11 +42,14 @@ const normalizeTemplateId = (templateId) => (
 );
 
 export const createResume = async (userId, data = {}) => {
+  const sections = sanitizeSections(data.sections || {});
+  console.log("NORMALIZED RESUME SECTIONS:", JSON.stringify(sections, null, 2));
   const resume = await Resume.create({
     userId,
     title: data.title || 'Untitled Resume',
     templateId: normalizeTemplateId(data.templateId),
     targetRole: data.targetRole || '',
+    sections,
   });
   return resume;
 };
@@ -91,6 +74,7 @@ export const getResumeById = async (resumeId, userId) => {
 export const updateResume = async (resumeId, userId, updateData) => {
   if (updateData.sections) {
     updateData.sections = sanitizeSections(updateData.sections);
+    console.log("NORMALIZED RESUME SECTIONS:", JSON.stringify(updateData.sections, null, 2));
   }
   if ('templateId' in updateData) {
     updateData.templateId = normalizeTemplateId(updateData.templateId);
@@ -139,11 +123,13 @@ export const updateTemplate = async (resumeId, userId, templateId) => {
 };
 
 export const createFromUpload = async (userId, parsedSections, title = 'Uploaded Resume') => {
+  const sections = sanitizeSections(parsedSections || {});
+  console.log("NORMALIZED RESUME SECTIONS:", JSON.stringify(sections, null, 2));
   const resume = await Resume.create({
     userId,
     title,
     templateId: DEFAULT_TEMPLATE_ID,
-    sections: sanitizeSections(parsedSections),
+    sections,
   });
   return resume;
 };

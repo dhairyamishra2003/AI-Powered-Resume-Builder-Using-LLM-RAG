@@ -1,0 +1,19 @@
+.upload-data-import { margin-bottom: 12px; padding: 14px; border: 1px solid #ddd6fe; border-radius: 8px; background: #faf5ff; }
+.upload-data-import__copy h3 { margin: 0; color: #4c1d95; font-size: 15px; }
+.upload-data-import__copy p { margin: 5px 0 12px; color: #6b7280; font-size: 12px; line-height: 1.4; }
+.upload-data-import__input { display: none; }
+.upload-data-import__actions { display: flex; gap: 8px; }
+.upload-data-import__choose, .upload-data-import__import { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 11px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.upload-data-import__choose { color: #5b21b6; background: #ede9fe; }
+.upload-data-import__import { color: white; background: #7c3aed; }
+.upload-data-import__choose:disabled, .upload-data-import__import:disabled { cursor: not-allowed; opacity: .6; }
+.upload-data-import__file, .upload-data-import__error, .upload-data-import__success { margin: 10px 0 0; font-size: 12px; line-height: 1.4; }
+.upload-data-import__file { color: #475569; overflow-wrap: anywhere; }
+.upload-data-import__error { color: #b91c1c; }
+.upload-data-import__success { display: flex; gap: 6px; align-items: center; color: #166534; }
+.upload-data-import__progress { display: grid; gap: 6px; padding: 10px 0 0; margin: 0; list-style: none; color: #64748b; font-size: 12px; }
+.upload-data-import__progress li { display: flex; gap: 8px; align-items: center; }
+.upload-data-import__progress span { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; color: #6d28d9; background: #ede9fe; font-size: 11px; }
+.upload-data-import__progress .is-active { color: #5b21b6; font-weight: 700; }
+.upload-data-import__progress .is-active svg { animation: upload-data-spin 1s linear infinite; }
+@keyframes upload-data-spin { to { transform: rotate(360deg); } }

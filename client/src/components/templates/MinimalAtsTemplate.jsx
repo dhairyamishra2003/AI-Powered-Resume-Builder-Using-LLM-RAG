@@ -1,27 +1,55 @@
 import React from 'react';
-import { A4Canvas, OneColumnLayout, SectionTitle, ExperienceItem, EducationItem, DualSectionRow } from './engine/LayoutEngine.jsx';
+
+import {
+  TwoPageResumeCanvas,
+  PageRunningHeader,
+  SectionTitle,
+  ExperienceItem,
+  ProjectCard,
+  EducationItem,
+  SummaryCard,
+} from './engine/LayoutEngine.jsx';
+
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
+import { getTemplateTypography } from '../../config/resumeTypography.js';
 
-function MinimalAtsTemplate({ sections, isPreview = false }) {
+function MinimalAtsTemplate({
+  sections,
+  colors,
+  isPreview = false,
+}) {
   const normalizedSections = normalizeResumeSections(sections || {});
-  const personalInfo = withPlaceholder('personalInfo', normalizedSections.personalInfo, normalizedSections, isPreview);
-  const summary = withPlaceholder('summary', normalizedSections.summary, normalizedSections, isPreview);
-  const experience = withPlaceholder('experience', normalizedSections.experience, normalizedSections, isPreview);
-  const education = withPlaceholder('education', normalizedSections.education, normalizedSections, isPreview);
-  const skills = withPlaceholder('skills', normalizedSections.skills, normalizedSections, isPreview);
-  const projects = withPlaceholder('projects', normalizedSections.projects, normalizedSections, isPreview);
+
+  const personalInfo   = withPlaceholder('personalInfo',   normalizedSections.personalInfo,   normalizedSections, isPreview);
+  const summary        = withPlaceholder('summary',        normalizedSections.summary,        normalizedSections, isPreview);
+  const experience     = withPlaceholder('experience',     normalizedSections.experience,     normalizedSections, isPreview);
+  const education      = withPlaceholder('education',      normalizedSections.education,      normalizedSections, isPreview);
+  const skills         = withPlaceholder('skills',         normalizedSections.skills,         normalizedSections, isPreview);
+  const projects       = withPlaceholder('projects',       normalizedSections.projects,       normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
 
-  const techSkills = (skills.technical || []).filter((s) => s && s.trim());
-  const softSkills = (skills.soft || []).filter((s) => s && s.trim());
-  const languages = (skills.languages || []).filter((l) => l && l.trim());
-  const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
-  const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
-  const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
-  const validCertifications = (certifications || []).filter((c) => c && c.name);
+  const primary = colors?.primary || '#0f172a';
+  const secondary = colors?.accent || '#334155';
+  const muted = '#64748b';
+  const typo = getTemplateTypography('minimal-ats');
 
-  // Contact elements for ATS-friendly inline row
+  const techSkills          = (skills.technical || []).filter((s) => s && typeof s === 'string' && s.trim());
+  const rawSoft             = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || [];
+  const softSkills          = (rawSoft          || []).filter((s) => s && typeof s === 'string' && s.trim());
+  const languages           = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
+  const validExperience     = (experience    || []).filter((e) => e && (e.role   || e.company));
+  const validProjects       = (projects      || []).filter((p) => p && (p.name   || p.description));
+  const validEducation      = (education     || []).filter((e) => e && (e.degree || e.institution));
+  const validCertifications = (certifications|| []).filter((c) => c && c.name);
+
+  const sectionStyle = {
+    fontSize: typo.sectionTitle,
+    marginBottom: '6px',
+    paddingBottom: '3px',
+    fontFamily: "Georgia, 'Times New Roman', serif",
+  };
+
   const contactParts = [
     personalInfo.phone,
     personalInfo.email,
@@ -30,151 +58,355 @@ function MinimalAtsTemplate({ sections, isPreview = false }) {
     personalInfo.portfolio ? personalInfo.portfolio.replace(/^https?:\/\/(www\.)?/i, '') : '',
   ].filter(Boolean);
 
-  return (
-    <A4Canvas sections={normalizedSections} fontFamily="Georgia, 'Times New Roman', serif">
-      <OneColumnLayout>
-        {/* ATS Clean Centered Header */}
-        <div style={{ textAlign: 'center', borderBottom: '2px solid #0f172a', paddingBottom: '9px', flexShrink: 0 }}>
-          <h1 style={{ fontSize: '22px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', margin: 0, color: '#0f172a', lineHeight: 1.15 }}>
-            {personalInfo.fullName || (isPreview ? 'Candidate Name' : 'Your Name')}
-          </h1>
-          {personalInfo.targetRole && (
-            <div style={{ fontSize: '12px', fontStyle: 'italic', color: '#334155', marginTop: '2px' }}>
-              {personalInfo.targetRole}
-            </div>
-          )}
-          {contactParts.length > 0 && (
-            <div style={{ fontSize: '9.5px', color: '#475569', marginTop: '4px', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '6px 10px', fontFamily: "'Inter', sans-serif" }}>
-              {contactParts.map((item, idx) => (
-                <span key={idx} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  {idx > 0 && <span style={{ marginRight: '6px', color: '#94a3b8' }}>•</span>}
-                  <span>{item}</span>
-                </span>
-              ))}
-            </div>
-          )}
+  // ── Header (Page 1 ONLY) ────────────────────────────────────────────────────
+  const header = (
+    <header
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        gap: '20px',
+        padding: '20px 26px 12px',
+        borderBottom: `2.5px solid ${primary}`,
+        boxSizing: 'border-box',
+        width: '100%',
+        background: '#ffffff',
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}
+    >
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: typo.name,
+            lineHeight: 1.1,
+            fontWeight: 800,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            color: primary,
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {personalInfo.fullName || (isPreview ? 'Dhairya Mishra' : 'Your Name')}
+        </h1>
+
+        {(personalInfo.targetRole || isPreview) && (
+          <div
+            style={{
+              marginTop: '4px',
+              fontSize: typo.targetRole,
+              fontStyle: 'italic',
+              lineHeight: 1.25,
+              fontWeight: 600,
+              color: secondary,
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {personalInfo.targetRole || 'Executive Professional'}
+          </div>
+        )}
+      </div>
+
+      {contactParts.length > 0 && (
+        <div
+          style={{
+            textAlign: 'right',
+            color: muted,
+            fontSize: typo.contact,
+            lineHeight: 1.45,
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {contactParts.map((item, idx) => (
+            <div key={idx} style={{ overflowWrap: 'anywhere' }}>{item}</div>
+          ))}
         </div>
+      )}
+    </header>
+  );
 
-        {/* SUMMARY */}
-        {summary && summary.trim() && (
-          <div>
-            <SectionTitle title="Professional Summary" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-            <p style={{ fontSize: '10px', color: '#334155', lineHeight: 1.45, margin: 0, textAlign: 'justify' }}>
-              {summary}
-            </p>
-          </div>
-        )}
+  // ── Logical Atomic Content Blocks ──────────────────────────────────────────
+  const blocks = [];
 
-        {/* SKILLS */}
-        {(techSkills.length > 0 || softSkills.length > 0 || languages.length > 0) && (
-          <div>
-            <SectionTitle title="Technical & Core Competencies" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-            <div style={{ fontSize: '9.5px', color: '#334155', lineHeight: 1.45, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {techSkills.length > 0 && <div><strong>Technical Skills:</strong> {techSkills.join(', ')}</div>}
-              {softSkills.length > 0 && <div><strong>Core Competencies:</strong> {softSkills.join(', ')}</div>}
-              {languages.length > 0 && <div><strong>Languages:</strong> {languages.join(', ')}</div>}
-            </div>
-          </div>
-        )}
-
-        {/* EXPERIENCE */}
-        {validExperience.length > 0 && (
-          <div>
-            <SectionTitle title="Professional Experience" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {validExperience.map((exp, idx) => (
-                <ExperienceItem
-                  key={idx}
-                  role={exp.role}
-                  company={exp.company}
-                  startDate={exp.startDate}
-                  endDate={exp.endDate}
-                  current={exp.current}
-                  bullets={exp.bullets}
-                  accentColor="#0f172a"
-                  dateBadge={false}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* PROJECTS */}
-        {validProjects.length > 0 && (
-          <div>
-            <SectionTitle title="Key Projects" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              {validProjects.map((proj, idx) => {
-                const pBullets = Array.isArray(proj.bullets)
-                  ? proj.bullets.filter((b) => b && typeof b === 'string' && b.trim())
-                  : [];
-                const linkText = proj.link ? proj.link.replace(/^https?:\/\//i, '') : '';
-                return (
-                  <div key={idx} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#0f172a' }}>
-                        {proj.name}
-                        {proj.description && <span style={{ fontWeight: 'normal', color: '#475569', marginLeft: '6px', fontSize: '10px' }}>— {proj.description}</span>}
-                      </span>
-                      {linkText && <span style={{ fontSize: '9px', color: '#334155', fontFamily: "'Inter', sans-serif" }}>{linkText}</span>}
-                    </div>
-                    {proj.technologies && proj.technologies.length > 0 && (
-                      <div style={{ fontSize: '9px', color: '#475569', fontStyle: 'italic', marginTop: '1px' }}>
-                        Technologies: {proj.technologies.join(', ')}
-                      </div>
-                    )}
-                    {pBullets.length > 0 && (
-                      <ul style={{ margin: '2px 0 0 16px', padding: 0, fontSize: '9.5px', color: '#334155', lineHeight: 1.35 }}>
-                        {pBullets.map((b, i) => <li key={i}>{b}</li>)}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* EDUCATION & CERTIFICATIONS ROW */}
-        {(validEducation.length > 0 || validCertifications.length > 0) && (
-          <DualSectionRow
-            left={
-              validEducation.length > 0 ? (
-                <div>
-                  <SectionTitle title="Education" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {validEducation.map((edu, idx) => (
-                      <div key={idx} style={{ fontSize: '10px', lineHeight: 1.35 }}>
-                        <div style={{ fontWeight: 'bold', color: '#0f172a' }}>
-                          {edu.degree} {edu.field && <span>in {edu.field}</span>}
-                        </div>
-                        <div style={{ color: '#475569', fontSize: '9.5px' }}>
-                          {edu.institution} {edu.startDate && `(${edu.startDate} – ${edu.endDate})`} {edu.gpa && `• GPA: ${edu.gpa}`}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null
-            }
-            right={
-              validCertifications.length > 0 ? (
-                <div>
-                  <SectionTitle title="Certifications" primaryColor="#0f172a" accentColor="#0f172a" borderBottom={true} borderColor="#0f172a" />
-                  <ul style={{ margin: 0, paddingLeft: '15px', fontSize: '9.5px', color: '#334155', lineHeight: 1.4 }}>
-                    {validCertifications.map((cert, idx) => (
-                      <li key={idx} style={{ marginBottom: '2px' }}>
-                        <strong>{cert.name}</strong> {cert.issuer && `— ${cert.issuer}`} {cert.date && `(${cert.date})`}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null
-            }
+  // 1. Summary
+  if (summary && summary.trim()) {
+    blocks.push({
+      id: 'summary',
+      type: 'summary',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Professional Summary"
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
           />
-        )}
-      </OneColumnLayout>
-    </A4Canvas>
+          <p
+            style={{
+              margin: 0,
+              fontSize: typo.summary,
+              color: secondary,
+              lineHeight: 1.5,
+              textAlign: 'justify',
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {summary}
+          </p>
+        </div>
+      ),
+    });
+  }
+
+  // 2. Skills / Technical Skills (Immediately after Summary, before Education)
+  if (techSkills.length > 0) {
+    blocks.push({
+      id: 'skills',
+      type: 'skills',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Technical Skills"
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ fontSize: typo.technicalSkills, color: secondary, lineHeight: 1.55, overflowWrap: 'anywhere' }}>
+            {techSkills.join(' • ')}
+          </div>
+        </div>
+      ),
+    });
+  } else if (softSkills.length > 0) {
+    blocks.push({
+      id: 'skills',
+      type: 'skills',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Core Strengths"
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ fontSize: typo.softSkills || typo.technicalSkills, color: secondary, lineHeight: 1.55, overflowWrap: 'anywhere' }}>
+            {softSkills.join(' • ')}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 3. Education (Following Skills)
+  if (validEducation.length > 0) {
+    blocks.push({
+      id: 'education',
+      type: 'education',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Education' : 'Education (Continued)'}
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {validEducation.map((edu, idx) => (
+              <EducationItem
+                key={idx}
+                degree={edu.degree}
+                field={edu.field}
+                institution={edu.institution}
+                startDate={edu.startDate}
+                endDate={edu.endDate}
+                gpa={edu.gpa}
+                accentColor={primary}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 4. Experience Items
+  if (validExperience.length > 0) {
+    validExperience.forEach((exp, idx) => {
+      blocks.push({
+        id: `exp-${idx}`,
+        type: 'experience',
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title={idx === 0 || !sectionStartedOnPrevPage ? 'Professional Experience' : 'Professional Experience (Continued)'}
+                primaryColor={primary}
+                accentColor={primary}
+                borderColor={primary}
+                style={sectionStyle}
+              />
+            )}
+            <ExperienceItem
+              role={exp.role}
+              company={exp.company}
+              startDate={exp.startDate}
+              endDate={exp.endDate}
+              current={exp.current}
+              bullets={exp.bullets}
+              accentColor={primary}
+              dateBadge={false}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 5. Projects (1st project pinned to Page 1, remaining on Page 2)
+  if (validProjects.length > 0) {
+    validProjects.forEach((proj, idx) => {
+      blocks.push({
+        id: `project-${idx}`,
+        type: 'projects',
+        forcePage: idx === 0 ? 1 : 2,
+        pageBreakBefore: idx === 1,
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title={idx === 0 || !sectionStartedOnPrevPage ? 'Key Projects' : 'Key Projects (Continued)'}
+                primaryColor={primary}
+                accentColor={primary}
+                borderColor={primary}
+                style={sectionStyle}
+              />
+            )}
+            <ProjectCard
+              name={proj.name}
+              description={proj.description}
+              technologies={proj.technologies}
+              link={proj.link}
+              startDate={proj.startDate}
+              endDate={proj.endDate}
+              date={proj.date}
+              bullets={proj.bullets}
+              accentColor={primary}
+              cardBg="#ffffff"
+              borderColor="#e2e8f0"
+              style={{
+                padding: '6px 0',
+                border: 'none',
+                borderBottom: '1px solid #f1f5f9',
+              }}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 6. Certifications
+  if (validCertifications.length > 0) {
+    blocks.push({
+      id: 'certifications',
+      type: 'certifications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Certifications' : 'Certifications (Continued)'}
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: '16px',
+              color: secondary,
+              fontSize: typo.certification,
+              lineHeight: 1.45,
+            }}
+          >
+            {validCertifications.map((cert, idx) => (
+              <li key={idx} style={{ marginBottom: '3px', overflowWrap: 'anywhere' }}>
+                <strong>{cert.name}</strong>
+                {cert.issuer && ` — ${cert.issuer}`}
+                {cert.date && ` (${cert.date})`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ),
+    });
+  }
+
+  // 7. Core Strengths (Dedicated section after Certifications)
+  if (softSkills.length > 0 && techSkills.length > 0) {
+    blocks.push({
+      id: 'core-strengths',
+      type: 'strengths',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Core Strengths' : 'Core Strengths (Continued)'}
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ fontSize: typo.softSkills || typo.technicalSkills, color: secondary, lineHeight: 1.55, overflowWrap: 'anywhere' }}>
+            {softSkills.join(' • ')}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 8. Languages
+  if (languages.length > 0) {
+    blocks.push({
+      id: 'languages',
+      type: 'languages',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Languages"
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ fontSize: typo.language, color: secondary, overflowWrap: 'anywhere' }}>
+            {languages.join(' • ')}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  return (
+    <TwoPageResumeCanvas
+      header={header}
+      page2Header={
+        <PageRunningHeader
+          fullName={personalInfo.fullName}
+          targetRole={personalInfo.targetRole}
+          primaryColor={primary}
+          pageNum={2}
+          fontFamily="Georgia, 'Times New Roman', serif"
+        />
+      }
+      blocks={blocks}
+      fontFamily="Georgia, 'Times New Roman', serif"
+      mainPadding="14px 26px"
+      page2Padding="16px 26px"
+      blockGap={8}
+    />
   );
 }
 

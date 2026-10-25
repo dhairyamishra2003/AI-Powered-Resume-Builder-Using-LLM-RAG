@@ -13,8 +13,8 @@ import JobDescriptionInput from '../JobDescriptionInput';
 import AtsScoreCircle from '../AtsScoreCircle';
 import AtsChecklistItem from '../AtsChecklistItem';
 import SkillGapCard from '../SkillGapCard';
-import ATS_METRICS from '../../constants/atsMetrics.js';
-import { HiExclamationTriangle, HiLightBulb } from 'react-icons/hi2';
+import ATS_METRICS, { calculateAtsScoreFromBreakdown } from '../../constants/atsMetrics.js';
+import { HiExclamationTriangle, HiLightBulb, HiCheckCircle, HiWrenchScrewdriver } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 function AtsScorePanel() {
@@ -22,6 +22,12 @@ function AtsScorePanel() {
   const [jobDescription, setJobDescription] = useState(resume.jobDescription || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const atsScore = resume.atsScore;
+
+  // Calculate the final score directly from the displayed breakdown values
+  // using ATS_METRICS weights (guaranteeing exact alignment between breakdown and circle score)
+  const displayedScore = atsScore?.breakdown
+    ? calculateAtsScoreFromBreakdown(atsScore.breakdown)
+    : (atsScore?.overall || 0);
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim()) {
@@ -33,7 +39,7 @@ function AtsScorePanel() {
     setIsAnalyzing(true);
     try {
       updateField('jobDescription', jobDescription);
-      const result = await getAtsScore(resume._id, jobDescription);
+      const result = await getAtsScore(resume._id, jobDescription, resume.sections, resume.targetRole);
       updateAtsScore(result);
       toast.success(result.source === 'fallback' ? 'ATS analysis complete with built-in scorer' : 'ATS analysis complete!');
     } catch (error) {
@@ -64,7 +70,7 @@ function AtsScorePanel() {
         <>
           {/* Overall Score */}
           <div className="flex-center p-sm">
-            <AtsScoreCircle score={atsScore.overall || 0} />
+            <AtsScoreCircle score={displayedScore} />
           </div>
 
           {/* Metric Breakdown */}
@@ -80,7 +86,7 @@ function AtsScorePanel() {
                     label={metric.label}
                     score={data.score ?? data}
                     fix={data.fix || data.suggestion || ''}
-                    weight={metric.weight}
+                    weight={`${metric.weight}%`}
                   />
                 );
               })}
@@ -112,6 +118,40 @@ function AtsScorePanel() {
                 {atsScore.presentKeywords.map((keyword, index) => (
                   <span key={index} className="keyword-tag-present">
                     {keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Matched Skills */}
+          {atsScore.matchedSkills && atsScore.matchedSkills.length > 0 && (
+            <div className="flex-col gap-sm">
+              <div className="flex-row items-center gap-xs">
+                <HiCheckCircle className="text-purple" />
+                <h3 className="section-title">Matched Skills</h3>
+              </div>
+              <div className="flex-row flex-wrap gap-xs">
+                {atsScore.matchedSkills.map((skill, index) => (
+                  <span key={index} className="keyword-tag-present">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Missing Skills */}
+          {atsScore.missingSkills && atsScore.missingSkills.length > 0 && (
+            <div className="flex-col gap-sm">
+              <div className="flex-row items-center gap-xs">
+                <HiWrenchScrewdriver className="text-purple" />
+                <h3 className="section-title">Missing Skills</h3>
+              </div>
+              <div className="flex-row flex-wrap gap-xs">
+                {atsScore.missingSkills.map((skill, index) => (
+                  <span key={index} className="keyword-tag">
+                    {skill}
                   </span>
                 ))}
               </div>

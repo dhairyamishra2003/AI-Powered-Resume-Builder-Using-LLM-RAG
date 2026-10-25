@@ -17,10 +17,13 @@ export function normalizeSkills(skills) {
   }
 
   if (skills && typeof skills === 'object') {
+    const rawTech = skills.technical || skills.tech || [];
+    const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || [];
+    const rawLang = skills.languages || skills.spokenLanguages || [];
     return {
-      technical: Array.isArray(skills.technical) ? skills.technical : [],
-      soft: Array.isArray(skills.soft) ? skills.soft : [],
-      languages: Array.isArray(skills.languages) ? skills.languages : [],
+      technical: Array.isArray(rawTech) ? rawTech : [],
+      soft: Array.isArray(rawSoft) ? rawSoft : [],
+      languages: Array.isArray(rawLang) ? rawLang : [],
     };
   }
 

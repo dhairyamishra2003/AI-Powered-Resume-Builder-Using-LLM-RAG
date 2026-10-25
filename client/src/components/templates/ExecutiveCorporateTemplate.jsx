@@ -1,5 +1,25 @@
 import React from 'react';
-import { A4Canvas, TwoColumnLayout, SectionTitle, ExperienceItem, ProjectCard, EducationItem, SummaryCard, ContactList } from './engine/LayoutEngine.jsx';
+import {
+  HiBriefcase,
+  HiAcademicCap,
+  HiFolder,
+  HiSparkles,
+  HiLanguage,
+  HiUserGroup,
+} from 'react-icons/hi2';
+
+import {
+  TwoPageResumeCanvas,
+  PageRunningHeader,
+  SectionTitle,
+  ExperienceItem,
+  ProjectCard,
+  EducationItem,
+  SummaryCard,
+  ContactList,
+} from './engine/LayoutEngine.jsx';
+
+import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
 
@@ -16,41 +36,316 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
   const primaryColor = colors?.primary || '#1e1b4b';
   const accentColor = colors?.accent || '#d97706';
 
-  const techSkills = (skills.technical || []).filter((s) => s && s.trim());
-  const softSkills = (skills.soft || []).filter((s) => s && s.trim());
+  const rawTech = [
+    ...(Array.isArray(skills.technical) ? skills.technical : []),
+    ...(Array.isArray(skills.tools) ? skills.tools : []),
+    ...(Array.isArray(skills.frameworks) ? skills.frameworks : []),
+    ...(Array.isArray(skills.databases) ? skills.databases : []),
+    ...(Array.isArray(skills.libraries) ? skills.libraries : []),
+  ];
+  const techSkills = [...new Set(rawTech.map((s) => (typeof s === 'string' ? s.trim() : String(s || '').trim())).filter(Boolean))];
+
+  const rawSoft = Array.isArray(skills.soft) ? skills.soft : (skills.coreStrengths || skills.softSkills || skills.strengths || []);
+  const softSkills = [...new Set(rawSoft.map((s) => (typeof s === 'string' ? s.trim() : String(s || '').trim())).filter(Boolean))];
+
+  const languages = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
+
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
 
-  const sidebarContent = (
-    <>
-      {/* EXECUTIVE CORE COMPETENCIES */}
-      {(techSkills.length > 0 || softSkills.length > 0) && (
-        <div>
-          <SectionTitle title="Executive Skills" primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '9.5px', color: '#334155' }}>
-            {techSkills.map((sk, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: accentColor, display: 'inline-block', flexShrink: 0 }} />
-                <span>{sk}</span>
+  const allSkillsList = [
+    ...techSkills.map((name) => ({ name, type: 'tech' })),
+    ...softSkills.map((name) => ({ name, type: 'soft' })),
+  ];
+
+  const typo = getTemplateTypography('executive-corporate');
+  const sectionTitleStyle = {
+    fontSize: typo.sectionTitle,
+    marginBottom: '6px',
+    paddingBottom: '3px',
+    fontFamily: "Georgia, 'Times New Roman', serif",
+  };
+
+  // ── Header (Page 1 ONLY) ────────────────────────────────────────────────────
+  const header = (
+    <div
+      style={{
+        background: primaryColor,
+        color: '#ffffff',
+        padding: '16px 24px 14px',
+        borderBottom: `3.5px solid ${accentColor}`,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexShrink: 0,
+        boxSizing: 'border-box',
+        width: '100%',
+        gap: '16px',
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}
+    >
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <h1
+          style={{
+            fontSize: typo.name,
+            fontWeight: 'bold',
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            margin: 0,
+            color: '#ffffff',
+            lineHeight: 1.15,
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {personalInfo.fullName || (isPreview ? 'Executive Candidate' : 'Your Name')}
+        </h1>
+        {(personalInfo.targetRole || isPreview) && (
+          <h2
+            style={{
+              fontSize: typo.targetRole,
+              fontStyle: 'italic',
+              color: '#fef3c7',
+              letterSpacing: '0.8px',
+              marginTop: '3px',
+              margin: '3px 0 0 0',
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {personalInfo.targetRole || 'Chief Executive Officer / Vice President'}
+          </h2>
+        )}
+      </div>
+      <ContactList
+        personalInfo={personalInfo}
+        align="right"
+        accentColor="#fbbf24"
+        textColor="#e2e8f0"
+        style={{ fontSize: typo.contact }}
+      />
+    </div>
+  );
+
+  // Helper to render compact vertical list of skills in sidebar
+  const renderSkillList = (skillArray = [], measureItems = false, isSidebar = true) => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: isSidebar ? 'column' : 'row',
+        flexWrap: isSidebar ? 'nowrap' : 'wrap',
+        gap: isSidebar ? '5px' : '8px 16px',
+        fontSize: typo.technicalSkills,
+        color: '#334155',
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
+      {(skillArray || []).map((sk, i) => {
+        const skillName = typeof sk === 'string' ? sk : (sk?.name || String(sk || ''));
+        const skillType = typeof sk === 'object' && sk?.type ? sk.type : 'soft';
+        if (!skillName) return null;
+        return (
+          <div
+            key={`sk-${i}`}
+            {...(measureItems ? { 'data-sidebar-skill': '' } : {})}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '6px',
+              width: isSidebar ? '100%' : 'auto',
+              boxSizing: 'border-box',
+              minWidth: 0,
+            }}
+          >
+            <span
+              style={{
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
+                background: skillType === 'tech' ? accentColor : primaryColor,
+                display: 'inline-block',
+                flexShrink: 0,
+                marginTop: '5px',
+              }}
+            />
+            <span
+              style={{
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                lineHeight: 1.35,
+                fontWeight: 500,
+                flex: isSidebar ? 1 : undefined,
+                minWidth: 0,
+                boxSizing: 'border-box',
+              }}
+            >
+              {skillName}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // ── Page 1 Sidebar Sections ─────────────────────────────────────────────────
+  const sidebarSections = [];
+
+  // 1. Technical Competencies
+  if (techSkills.length > 0) {
+    sidebarSections.push({
+      id: 'tech-skills',
+      type: 'skills',
+      items: techSkills.map((name) => ({ name, type: 'tech' })),
+      render: ({ isOverflow, items = techSkills.map((name) => ({ name, type: 'tech' })) }) => (
+        <div style={{ width: '100%', boxSizing: 'border-box' }}>
+          <SectionTitle
+            title={isOverflow ? 'Technical Competencies (Continued)' : 'Technical Competencies'}
+            icon={HiBriefcase}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          {renderSkillList(items, true)}
+        </div>
+      ),
+    });
+  }
+
+
+
+  // ── Page 2 Sidebar (Visible on Page 2 with remaining skills + Languages at bottom) ──
+  if (languages.length > 0) {
+    sidebarSections.push({
+      id: 'languages',
+      type: 'languages',
+      render: ({ isOverflow }) => (
+        <div style={{ width: '100%', boxSizing: 'border-box' }}>
+          <SectionTitle
+            title={isOverflow ? 'Languages (Continued)' : 'Languages'}
+            icon={HiLanguage}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: typo.language, color: '#334155' }}>
+            {languages.map((lang, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: accentColor, flexShrink: 0 }} />
+                <span style={{ overflowWrap: 'anywhere', lineHeight: 1.35, fontWeight: 500 }}>{lang}</span>
               </div>
             ))}
-            {softSkills.map((sk, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: primaryColor, display: 'inline-block', flexShrink: 0 }} />
-                <span>{sk}</span>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // Page 2 continuation is supplied by the shared measured sidebar engine.
+  const page2Skills = [];
+  const hasPage2Sidebar = false;
+
+  const page2Sidebar = hasPage2Sidebar ? (
+    <div style={{ width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      {page2Skills.length > 0 && (
+        <div style={{ width: '100%', boxSizing: 'border-box', paddingTop: '4px' }}>
+          {renderSkillList(page2Skills)}
+        </div>
+      )}
+
+      {languages.length > 0 && (
+        <div style={{ width: '100%', boxSizing: 'border-box' }}>
+          <SectionTitle
+            title="Languages"
+            icon={HiLanguage}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              fontSize: typo.language,
+              color: '#334155',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            {languages.map((lang, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minWidth: 0,
+                }}
+              >
+                <span
+                  style={{
+                    width: '4px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    background: accentColor,
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ overflowWrap: 'anywhere', lineHeight: 1.35, fontWeight: 500 }}>
+                  {lang}
+                </span>
               </div>
             ))}
           </div>
         </div>
       )}
+    </div>
+  ) : null;
 
-      {/* EDUCATION */}
-      {validEducation.length > 0 && (
+  // ── Main Content Blocks ───────────────────────────────────────────────────
+  const blocks = [];
+
+  // 1. Executive Summary
+  if (summary && summary.trim()) {
+    blocks.push({
+      id: 'summary',
+      type: 'summary',
+      render: () => (
+        <SummaryCard
+          text={summary}
+          borderColor={accentColor}
+          backgroundColor="#fcfcfd"
+          textColor="#334155"
+          style={{
+            fontStyle: 'italic',
+            borderLeftColor: accentColor,
+            fontSize: typo.summary,
+            lineHeight: 1.55,
+          }}
+        />
+      ),
+    });
+  }
+
+  // 2. Education (Immediately after Summary)
+  if (validEducation.length > 0) {
+    blocks.push({
+      id: 'education',
+      type: 'education',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
         <div>
-          <SectionTitle title="Education" primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <SectionTitle
+            title="Education"
+            icon={HiAcademicCap}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
             {validEducation.map((edu, idx) => (
               <EducationItem
                 key={idx}
@@ -65,123 +360,199 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
             ))}
           </div>
         </div>
-      )}
+      ),
+    });
+  }
 
-      {/* CREDENTIALS / CERTIFICATIONS */}
-      {validCertifications.length > 0 && (
+  // 2. Leadership Experience
+  if (validExperience.length > 0) {
+    validExperience.forEach((exp, idx) => {
+      blocks.push({
+        id: `experience-${idx}`,
+        type: 'experience',
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title="Executive Leadership Experience"
+                icon={HiBriefcase}
+                primaryColor={primaryColor}
+                accentColor={accentColor}
+                style={sectionTitleStyle}
+              />
+            )}
+            <ExperienceItem
+              role={exp.role}
+              company={exp.company}
+              startDate={exp.startDate}
+              endDate={exp.endDate}
+              current={exp.current}
+              bullets={exp.bullets}
+              accentColor={accentColor}
+              dateBadge={true}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 3. Strategic Initiatives (Projects)
+  if (validProjects.length > 0) {
+    validProjects.forEach((proj, idx) => {
+      blocks.push({
+        id: `initiative-${idx}`,
+        type: 'projects',
+        render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+          <div>
+            {(idx === 0 || isFirstOfThisSectionOnPage) && (
+              <SectionTitle
+                title="Strategic Initiatives & Key Portfolios"
+                icon={HiFolder}
+                primaryColor={primaryColor}
+                accentColor={accentColor}
+                style={sectionTitleStyle}
+              />
+            )}
+            <ProjectCard
+              name={proj.name}
+              description={proj.description}
+              technologies={proj.technologies}
+              link={proj.link}
+              startDate={proj.startDate}
+              endDate={proj.endDate}
+              date={proj.date}
+              bullets={proj.bullets}
+              accentColor={accentColor}
+              cardBg="#fcfcfd"
+              borderColor="#e2e8f0"
+              style={{
+                borderLeft: `3px solid ${primaryColor}`,
+                padding: '7px 10px',
+              }}
+            />
+          </div>
+        ),
+      });
+    });
+  }
+
+  // 4. Credentials & Honors (Certifications — Main Content)
+  if (validCertifications.length > 0) {
+    blocks.push({
+      id: 'certifications',
+      type: 'certifications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
         <div>
-          <SectionTitle title="Credentials" primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '9.5px', color: '#334155' }}>
+          <SectionTitle
+            title="Credentials & Honors"
+            icon={HiSparkles}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: typo.certification, color: '#334155' }}>
             {validCertifications.map((cert, idx) => (
-              <div key={idx}>
-                <div style={{ fontWeight: 700, color: '#0f172a' }}>{cert.name}</div>
-                {cert.issuer && <div style={{ color: '#64748b', fontSize: '9px' }}>{cert.issuer} {cert.date && `(${cert.date})`}</div>}
+              <div key={idx} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', overflowWrap: 'anywhere' }}>{cert.name}</div>
+                {cert.issuer && (
+                  <div style={{ color: '#64748b', fontSize: '9.8px', overflowWrap: 'anywhere' }}>
+                    {cert.issuer} {cert.date && `(${cert.date})`}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
-      )}
-    </>
-  );
+      ),
+    });
+  }
 
-  const mainContent = (
-    <>
-      {/* EXECUTIVE SUMMARY */}
-      {summary && summary.trim() && (
-        <SummaryCard
-          text={summary}
-          borderColor={accentColor}
-          backgroundColor="#fcfcfd"
-          textColor="#334155"
-          style={{ fontStyle: 'italic', borderLeftColor: accentColor }}
-        />
-      )}
-
-      {/* LEADERSHIP EXPERIENCE */}
-      {validExperience.length > 0 && (
+  // 5. Core Strengths (Main Content — Directly below Credentials & Honors)
+  if (softSkills.length > 0) {
+    blocks.push({
+      id: 'core-strengths',
+      type: 'strengths',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
         <div>
-          <SectionTitle title="Leadership Experience" primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {validExperience.map((exp, idx) => (
-              <ExperienceItem
-                key={idx}
-                role={exp.role}
-                company={exp.company}
-                startDate={exp.startDate}
-                endDate={exp.endDate}
-                current={exp.current}
-                bullets={exp.bullets}
-                accentColor={accentColor}
-              />
-            ))}
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Core Strengths' : 'Core Strengths (Continued)'}
+            icon={HiUserGroup}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '6px 14px',
+              fontSize: typo.softSkills || typo.technicalSkills,
+              color: '#334155',
+              paddingTop: '2px',
+            }}
+          >
+            {softSkills.map((sk, idx) => {
+              const skillName = typeof sk === 'string' ? sk : (sk?.name || String(sk || ''));
+              if (!skillName) return null;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    minWidth: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '4px',
+                      height: '4px',
+                      borderRadius: '50%',
+                      background: accentColor,
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ overflowWrap: 'anywhere', lineHeight: 1.35, fontWeight: 500 }}>
+                    {skillName}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
-
-      {/* STRATEGIC INITIATIVES & PROJECTS */}
-      {validProjects.length > 0 && (
-        <div>
-          <SectionTitle title="Strategic Initiatives" primaryColor={primaryColor} accentColor={accentColor} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            {validProjects.map((proj, idx) => (
-              <ProjectCard
-                key={idx}
-                name={proj.name}
-                description={proj.description}
-                technologies={proj.technologies}
-                link={proj.link}
-                startDate={proj.startDate}
-                endDate={proj.endDate}
-                date={proj.date}
-                bullets={proj.bullets}
-                accentColor={accentColor}
-                cardBg="#fcfcfd"
-                borderColor="#e2e8f0"
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </>
-  );
+      ),
+    });
+  }
 
   return (
-    <A4Canvas sections={normalizedSections} fontFamily="Georgia, 'Times New Roman', serif">
-      {/* Top Banner Header */}
-      <div
-        style={{
-          background: primaryColor,
-          color: '#ffffff',
-          padding: '14px 24px',
-          borderBottom: `3px solid ${accentColor}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 'bold', letterSpacing: '0.8px', textTransform: 'uppercase', margin: 0, color: '#ffffff', lineHeight: 1.15 }}>
-            {personalInfo.fullName || (isPreview ? 'Executive Candidate' : 'Your Name')}
-          </h1>
-          {(personalInfo.targetRole || isPreview) && (
-            <h2 style={{ fontSize: '12px', fontStyle: 'italic', color: '#e2e8f0', letterSpacing: '0.8px', marginTop: '2px', margin: 0 }}>
-              {personalInfo.targetRole || 'Chief Executive Officer / VP'}
-            </h2>
-          )}
-        </div>
-
-        {/* Contact details */}
-        <ContactList personalInfo={personalInfo} align="right" accentColor="#fbbf24" textColor="#cbd5e1" />
-      </div>
-
-      {/* Two Column Layout (Sidebar: 30%, Main: 70%) with Adaptive Height Distribution */}
-      <TwoColumnLayout
-        sidebar={sidebarContent}
-        main={mainContent}
-        sidebarWidth="30%"
-      />
-    </A4Canvas>
+    <TwoPageResumeCanvas
+      header={header}
+      sidebarSections={sidebarSections}
+      page2Sidebar={null}
+      page2Header={
+        <PageRunningHeader
+          fullName={personalInfo.fullName}
+          targetRole={personalInfo.targetRole}
+          primaryColor={primaryColor}
+          pageNum={2}
+          fontFamily="Georgia, 'Times New Roman', serif"
+        />
+      }
+      blocks={blocks}
+      fontFamily="Georgia, 'Times New Roman', serif"
+      sidebarWidth="238px"
+      lockSidebarWidth={true}
+      sidebarBackground="#f8fafc"
+      sidebarBorder="1px solid #e2e8f0"
+      sidebarPadding="12px 10px"
+      mainPadding="12px 16px"
+      page2Padding="16px 22px"
+      twoColumnGap={10}
+      blockGap={8}
+    />
   );
 }
 

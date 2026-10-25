@@ -45,15 +45,32 @@ export const loginUser = async (req, res, next) => {
 
 export const googleAuth = async (req, res, next) => {
   try {
+    console.log('[Auth:BE] OAuth callback received — /auth/google');
     const { credential } = req.body;
 
     if (!credential) {
+      console.warn('[Auth:BE] No credential in request body');
       return res.status(400).json({ success: false, message: 'Google credential is required.' });
     }
 
+    console.log('[Auth:BE] Verifying Google ID token and exchanging for user profile');
     const result = await authService.googleLogin(credential);
+
+    console.log('[Auth:BE] Session/token created — sending success response', {
+      userId: result.user?.id,
+      email: result.user?.email,
+    });
+
     return res.json({ success: true, data: result });
   } catch (error) {
+    console.error('[Auth:BE] Google auth error:', error.message);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        code: error.code || 'AUTH_ERROR',
+      });
+    }
     next(error);
   }
 };

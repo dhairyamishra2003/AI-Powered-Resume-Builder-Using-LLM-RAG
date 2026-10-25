@@ -1,16 +1,17 @@
 import { Router } from 'express';
 import {
   createResume, getResumes, getResume,
-  updateResume, updateSection, updateTemplate, deleteResume, uploadResume,
+  updateResume, updateSection, updateTemplate, deleteResume, uploadResume, importResume,
 } from '../controllers/resume.controller.js';
 import authenticate from '../middleware/auth.middleware.js';
-import upload from '../middleware/upload.middleware.js';
+import upload, { importUpload } from '../middleware/upload.middleware.js';
 
 const router = Router();
 
 router.use(authenticate);
 
 router.post('/upload', upload.single('file'), uploadResume);
+router.post('/import', importUpload.single('file'), importResume);
 router.post('/', createResume);
 router.get('/', getResumes);
 router.get('/:id', getResume);
