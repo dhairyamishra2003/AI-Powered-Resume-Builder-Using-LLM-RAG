@@ -43,7 +43,54 @@ This document describes the logical component architecture of the AI-Powered Res
 
 ## 2. Logical architecture
 
-See [`system-architecture.svg`](./system-architecture.svg) for the overview diagram. The architecture is grouped into four zones:
+flowchart TD
+    A["User / Browser"] --> B["React + Vite UI"]
+    B --> C["Resume State & API Client"]
+    C --> D["Express REST API"]
+
+    D --> E["Resume Controller & Service"]
+    E --> F["Validation & Section Normalization"]
+
+    F -->|Valid resume data| G[("MongoDB")]
+    F -->|Invalid data| H["Validation Error Response"]
+    H --> B
+
+    D --> I["Resume Import Pipeline"]
+    I --> J["Parse PDF / DOCX / TXT / JSON"]
+    J --> K["AI Extraction when required"]
+    K --> L["Google Gemini API"]
+    L --> M["Map Extracted Data to Resume Sections"]
+    M --> F
+
+    E --> N["ATS Scoring"]
+    N --> O["ATS Results"]
+    O --> B
+
+    E --> P["AI + RAG Service"]
+    P -->|Retrieve context when enabled| Q[("Vector Store / Chroma")]
+    Q --> P
+    P -->|AI workflow when configured| L
+
+    B --> R["Template Renderer & Resume Preview"]
+    R --> S["Browser PDF Export"]
+    S --> T["Download Resume PDF"]
+
+    G -->|Load saved resume| E
+    E -->|Resume data / API response| C
+
+    classDef client fill:#172554,stroke:#60a5fa,color:#eff6ff,stroke-width:1.5px
+    classDef backend fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:1.5px
+    classDef external fill:#7c2d12,stroke:#fb923c,color:#fff7ed,stroke-width:1.5px
+    classDef storage fill:#3f3f46,stroke:#a1a1aa,color:#fafafa,stroke-width:1.5px
+    classDef error fill:#7f1d1d,stroke:#f87171,color:#fef2f2,stroke-width:1.5px
+
+    class A,B,C,R,S,T,O client
+    class D,E,F,I,J,K,M,N,P backend
+    class L external
+    class G,Q storage
+    class H error
+
+for the overview diagram. The architecture is grouped into four zones:
 
 - **Client:** React/Vite UI, resume state, API client, template rendering, preview, and PDF export.
 - **Backend API:** Node.js/Express endpoints and controller/service layers.
