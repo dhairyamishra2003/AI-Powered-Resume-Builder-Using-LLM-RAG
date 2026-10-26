@@ -1870,3 +1870,127 @@ export function DualSectionRow({
     </div>
   );
 }
+
+// Standardized Publication / Research Paper Item Component
+export function PublicationItem({
+  title,
+  publisher,
+  authors,
+  date,
+  link,
+  description,
+  accentColor = '#2563eb',
+  fontScale = 1,
+  style = {},
+}) {
+  const cleanLink = link
+    ? link.replace(/^https?:\/\//i, '').replace(/\/$/, '')
+    : '';
+
+  return (
+    <div
+      className="publication-item"
+      style={{
+        marginBottom: '6px',
+        breakInside: 'avoid',
+        pageBreakInside: 'avoid',
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          gap: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: scaledFont(resumeTypography.jobTitle || 11.5, fontScale),
+              color: '#0f172a',
+            }}
+          >
+            {title}
+          </span>
+          {publisher && (
+            <span
+              style={{
+                fontStyle: 'italic',
+                color: '#475569',
+                marginLeft: '6px',
+                fontSize: scaledFont(resumeTypography.companyName || 11, fontScale),
+              }}
+            >
+              — {publisher}
+            </span>
+          )}
+        </div>
+        {date && (
+          <span
+            style={{
+              fontSize: scaledFont(resumeTypography.dateBadge || 10, fontScale),
+              color: '#64748b',
+              flexShrink: 0,
+              fontWeight: 600,
+            }}
+          >
+            {date}
+          </span>
+        )}
+      </div>
+
+      {authors && (
+        <div
+          style={{
+            fontSize: scaledFont(resumeTypography.bullet || 10.5, fontScale),
+            color: '#64748b',
+            marginTop: '1px',
+          }}
+        >
+          <span style={{ fontWeight: 500 }}>Authors: </span>
+          {authors}
+        </div>
+      )}
+
+      {description && (
+        <div
+          style={{
+            fontSize: scaledFont(resumeTypography.bullet || 10.5, fontScale),
+            color: '#334155',
+            marginTop: '2px',
+            lineHeight: 1.35,
+          }}
+        >
+          {description}
+        </div>
+      )}
+
+      {cleanLink && (
+        <div
+          style={{
+            fontSize: scaledFont(resumeTypography.contact || 10, fontScale),
+            marginTop: '2px',
+          }}
+        >
+          <a
+            href={link.startsWith('http') ? link : `https://${link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: accentColor,
+              textDecoration: 'none',
+              fontWeight: 600,
+            }}
+          >
+            {cleanLink}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}

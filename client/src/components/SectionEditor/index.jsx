@@ -15,6 +15,7 @@ import EducationForm from '../EducationForm';
 import SkillsForm from '../SkillsForm';
 import ProjectsForm from '../ProjectsForm';
 import CertificationsForm from '../CertificationsForm';
+import PublicationsForm from '../PublicationsForm';
 import SummaryForm from '../SummaryForm';
 import UploadDataImport from '../UploadDataImport';
 import { HiChevronRight } from 'react-icons/hi2';
@@ -38,6 +39,8 @@ function SectionEditor() {
         return <ProjectsForm />;
       case 'certifications':
         return <CertificationsForm />;
+      case 'publications':
+        return <PublicationsForm />;
       default:
         return null;
     }

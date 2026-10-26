@@ -8,6 +8,7 @@ import {
   HiWrenchScrewdriver,
   HiLanguage,
   HiUserGroup,
+  HiBookOpen,
 } from 'react-icons/hi2';
 
 import {
@@ -20,6 +21,7 @@ import {
   EducationItem,
   SummaryCard,
   ContactList,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 
 import { getTemplateTypography } from '../../config/resumeTypography.js';
@@ -35,6 +37,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
   const skills = withPlaceholder('skills', normalizedSections.skills, normalizedSections, isPreview);
   const projects = withPlaceholder('projects', normalizedSections.projects, normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
+  const publications = withPlaceholder('publications', normalizedSections.publications, normalizedSections, isPreview);
 
   const primaryColor = colors?.primary || '#0f172a';
   const accentColor = colors?.accent || '#2563eb';
@@ -47,6 +50,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
+  const validPublications = (publications || []).filter((pub) => pub && (pub.title || pub.publisher));
 
   const typo = getTemplateTypography('software-engineer');
   const sectionTitleStyle = {
@@ -304,6 +308,39 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
               </li>
             ))}
           </ul>
+        </div>
+      ),
+    });
+  }
+
+  // Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Research Papers & Publications"
+            icon={HiBookOpen}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={accentColor}
+              />
+            ))}
+          </div>
         </div>
       ),
     });

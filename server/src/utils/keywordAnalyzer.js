@@ -117,8 +117,17 @@ const normalizeText = (text) => {
   const sortedAliases = Object.entries(SKILL_ALIASES)
     .sort((a, b) => b[0].length - a[0].length);
   for (const [alias, canonical] of sortedAliases) {
-    const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    t = t.replace(new RegExp(`\\b${escaped}\\b`, 'g'), canonical);
+    try {
+      const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      t = t.replace(new RegExp(`\\b${escaped}\\b`, 'g'), canonical);
+    } catch {
+      try {
+        const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        t = t.replace(new RegExp(escaped, 'g'), canonical);
+      } catch {
+        // Safe fallback: continue
+      }
+    }
   }
 
   return t.replace(/\s+/g, ' ').trim();

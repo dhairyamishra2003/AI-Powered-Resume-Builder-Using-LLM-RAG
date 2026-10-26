@@ -7,6 +7,7 @@ import {
   HiFolder,
   HiLanguage,
   HiUserGroup,
+  HiBookOpen,
 } from 'react-icons/hi2';
 
 import {
@@ -19,6 +20,7 @@ import {
   EducationItem,
   SummaryCard,
   ContactList,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 
 import { getTemplateTypography } from '../../config/resumeTypography.js';
@@ -39,6 +41,7 @@ function CreativeCleanTemplate({
   const skills = withPlaceholder('skills', normalizedSections.skills, normalizedSections, isPreview);
   const projects = withPlaceholder('projects', normalizedSections.projects, normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
+  const publications = withPlaceholder('publications', normalizedSections.publications, normalizedSections, isPreview);
 
   const primaryColor = colors?.primary || '#6d28d9';
   const accentColor = colors?.accent || '#ec4899';
@@ -51,6 +54,7 @@ function CreativeCleanTemplate({
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
+  const validPublications = (publications || []).filter((pub) => pub && (pub.title || pub.publisher));
 
   const typo = getTemplateTypography('creative-clean');
   const sectionStyle = {
@@ -407,7 +411,41 @@ function CreativeCleanTemplate({
     });
   }
 
-  // 6. Languages (immediately after Certifications in main content flow)
+  // 6. Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Research Papers & Publications' : 'Research Papers & Publications (Continued)'}
+            icon={HiBookOpen}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={primaryColor}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 7. Languages (immediately after Certifications/Publications in main content flow)
   if (languages.length > 0) {
     blocks.push({
       id: 'languages',

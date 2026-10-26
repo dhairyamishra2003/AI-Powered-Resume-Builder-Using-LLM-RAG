@@ -6,8 +6,7 @@
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ../scripts/dev.ps1",
     "dev:ui": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "test": "esbuild tests/templates.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-tests.mjs --external:react --external:react-dom && node tests/dist/run-tests.mjs"
+    "test": "esbuild tests/templates.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-tests.mjs --external:react --external:react-dom && node tests/dist/run-tests.mjs && esbuild tests/consistency.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-consistency.mjs --external:react --external:react-dom && node tests/dist/run-consistency.mjs"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",

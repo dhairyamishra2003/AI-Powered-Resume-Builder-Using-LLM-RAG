@@ -59,12 +59,12 @@ export const BASE_TYPOGRAPHY = {
 
   // Experience
   experience: 12,
-  experienceRole: 12,
+  experienceRole: 15,
   experienceDate: 12,
-  bullet: 9,
+  bullet: 10.6,
 
   // Projects
-  projectTitle: 10,
+  projectTitle: 12,
   projectDescription: 8,
   projectMeta: 11,
   projectBadge: 11.5,
@@ -167,16 +167,16 @@ export const resumeTypography = {
  * proportionately under the central RESUME_FONT_SCALE control.
  */
 export const TEMPLATE_TYPOGRAPHY_BASES = {
-'aiml-engineer': {
-  name: 24,
-  targetRole: 12,
-  sectionTitle: 15,
-  contact: 9.5,
-  summary: 8.5,
-  technicalSkills: 10.5,
-  certification: 15.5,
-  headerIcon: 22,
-},
+  'aiml-engineer': {
+    name: 24,
+    targetRole: 12,
+    sectionTitle: 15,
+    contact: 9.5,
+    summary: 8.5,
+    technicalSkills: 10.5,
+    certification: 15.5,
+    headerIcon: 22,
+  },
   'software-engineer': {
     name: 22,
     targetRole: 10.5,
@@ -227,7 +227,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     sectionTitle: 18,
     contact: 9.5,
     summary: 14.8,
-    technicalSkills: 16,
+    technicalSkills: 15,
     softSkills: 11.5,
     certification: 12.5,
     language: 15.5,

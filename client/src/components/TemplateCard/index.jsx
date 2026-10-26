@@ -91,6 +91,16 @@ const BASE_SAMPLE_DATA = {
     { name: 'AWS Certified Solutions Architect – Professional', issuer: 'Amazon Web Services', date: '2023' },
     { name: 'Google Cloud Professional Cloud Architect', issuer: 'Google Cloud', date: '2022' },
   ],
+  publications: [
+    {
+      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: 'Independent Research / Presented at International Conference on Technology for SDGs',
+      authors: 'Dhairya Mishra',
+      date: '2026',
+      link: '',
+      description: 'Studied multi-agent collaboration architectures, autonomous task decomposition, planning, memory, and proposed scalable LLM-driven orchestration for intelligent task automation.',
+    },
+  ],
 };
 
 const TEMPLATE_SAMPLE_DATA = {

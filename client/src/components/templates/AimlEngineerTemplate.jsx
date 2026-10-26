@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   HiCpuChip,
   HiSparkles,
@@ -7,6 +7,7 @@ import {
   HiFolder,
   HiLanguage,
   HiUserGroup,
+  HiBookOpen,
 } from 'react-icons/hi2';
 
 import {
@@ -19,6 +20,7 @@ import {
   EducationItem,
   SummaryCard,
   ContactList,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 
 import { getTemplateTypography } from '../../config/resumeTypography.js';
@@ -74,6 +76,12 @@ function AimlEngineerTemplate({
     normalizedSections,
     isPreview
   );
+  const publications = withPlaceholder(
+    'publications',
+    normalizedSections.publications,
+    normalizedSections,
+    isPreview
+  );
 
   const primaryColor = colors?.primary || '#0f766e';
   const accentColor = colors?.accent || '#0d9488';
@@ -99,6 +107,9 @@ function AimlEngineerTemplate({
   );
   const validCertifications = (certifications || []).filter(
     (c) => c && c.name
+  );
+  const validPublications = (publications || []).filter(
+    (pub) => pub && (pub.title || pub.publisher)
   );
 
   const typo = getTemplateTypography('aiml-engineer');
@@ -385,6 +396,40 @@ function AimlEngineerTemplate({
               </li>
             ))}
           </ul>
+        </div>
+      ),
+    });
+  }
+
+  // Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Research Papers & Publications"
+            icon={HiBookOpen}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            borderColor={primaryColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={accentColor}
+              />
+            ))}
+          </div>
         </div>
       ),
     });

@@ -46,7 +46,7 @@ export const updateResume = async (req, res, next) => {
 export const updateSection = async (req, res, next) => {
   try {
     const { section } = req.params;
-    const validSections = ['personalInfo', 'summary', 'experience', 'education', 'skills', 'projects', 'certifications'];
+    const validSections = ['personalInfo', 'summary', 'experience', 'education', 'skills', 'projects', 'certifications', 'publications'];
     if (!validSections.includes(section)) {
       return res.status(400).json({ success: false, message: `Invalid section: ${section}` });
     }

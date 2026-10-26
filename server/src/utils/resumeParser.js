@@ -17,6 +17,10 @@ const extractTextFromPdf = async (buffer) => {
   return fullText.trim();
 };
 
+export const escapeRegExp = (str = '') => {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 export const extractFallbackSections = (text = '') => {
   const cleanText = (text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const lines = cleanText.split('\n').map((l) => l.trim()).filter(Boolean);
@@ -67,6 +71,7 @@ export const extractFallbackSections = (text = '') => {
     { type: 'skills', regex: /^(?:technical\s+skills|technical\s+competencies|core\s+strengths|skills\s*&?\s*competencies|skills|technologies|tools\s*&?\s*technologies)\b/i },
     { type: 'projects', regex: /^(?:key\s+projects|technical\s+projects|academic\s+projects|personal\s+projects|projects|strategic\s+initiatives)\b/i },
     { type: 'certifications', regex: /^(?:certifications?|certificates?|licenses?\s*&?\s*certifications?|credentials?\s*&?\s*honors?|honors?\s*&?\s*awards?)\b/i },
+    { type: 'publications', regex: /^(?:publications?|research\s+papers?|research\s+publications?|papers?|scholarly\s+work|patents?\s*&?\s*publications?)\b/i },
     { type: 'languages', regex: /^(?:languages?|known\s+languages?)\b/i },
   ];
 
@@ -111,7 +116,14 @@ export const extractFallbackSections = (text = '') => {
     'Power BI', 'Tableau', 'Excel', 'Make.com', 'Automation', 'Jupyter', 'VS Code'
   ];
 
-  const matchedTech = COMMON_TECH.filter((tech) => new RegExp(`(?:^|[^a-zA-Z0-9])${tech.replace('.', '\\.')}(?:[^a-zA-Z0-9]|$)`, 'i').test(cleanText));
+  const matchedTech = COMMON_TECH.filter((tech) => {
+    try {
+      const escaped = escapeRegExp(tech);
+      return new RegExp(`(?:^|[^a-zA-Z0-9])${escaped}(?:[^a-zA-Z0-9]|$)`, 'i').test(cleanText);
+    } catch {
+      return false;
+    }
+  });
 
   const extractedFromSkillSection = [];
   skillLines.forEach((sl) => {
@@ -133,7 +145,14 @@ export const extractFallbackSections = (text = '') => {
     'Cross-functional Communication',
     'System Architecture',
     'Agile & Scrum Delivery',
-  ].filter((s) => new RegExp(`\\b${s.split(' ')[0]}\\b`, 'i').test(cleanText));
+  ].filter((s) => {
+    try {
+      const escaped = escapeRegExp(s.split(' ')[0]);
+      return new RegExp(`\\b${escaped}\\b`, 'i').test(cleanText);
+    } catch {
+      return false;
+    }
+  });
 
   if (softSkills.length < 3) {
     softSkills.push('Problem Solving', 'Team Collaboration', 'Strategic Thinking');
@@ -256,6 +275,27 @@ export const extractFallbackSections = (text = '') => {
     }
   });
 
+  // 9. Publications & Research Papers Extraction
+  const pubLines = getSectionLines('publications');
+  const publications = [];
+  pubLines.forEach((line) => {
+    const cleaned = line.replace(/^[•\-\*·▪\s]+/, '').trim();
+    if (cleaned.length > 5 && !/^(publications?|research\s+papers?|papers?)$/i.test(cleaned)) {
+      const dateMatch = cleaned.match(/\b(20\d{2})\b/);
+      const doiMatch = cleaned.match(/\b(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)\b/);
+      const urlMatch = cleaned.match(/https?:\/\/[^\s]+/i);
+      const parts = cleaned.split(/[-–—|:]/).map((p) => p.trim()).filter(Boolean);
+      publications.push({
+        title: parts[0] || cleaned,
+        publisher: parts[1] || '',
+        authors: '',
+        date: dateMatch ? dateMatch[1] : '',
+        link: doiMatch ? `https://doi.org/${doiMatch[1]}` : (urlMatch ? urlMatch[0] : ''),
+        description: parts.slice(2).join(' ') || '',
+      });
+    }
+  });
+
   return {
     personalInfo: {
       fullName: fullName || 'Candidate',
@@ -276,6 +316,7 @@ export const extractFallbackSections = (text = '') => {
     },
     projects: projects.slice(0, 8),
     certifications: certifications.slice(0, 8),
+    publications: publications.slice(0, 8),
   };
 };
 

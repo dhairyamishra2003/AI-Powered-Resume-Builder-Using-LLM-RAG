@@ -36,6 +36,12 @@ export const importedSectionsSchema = z.object({
   certifications: z.array(z.union([stringValue, z.object({
     name: stringValue.optional(), issuer: stringValue.optional(), date: stringValue.optional(), link: stringValue.optional(),
   }).passthrough()])).max(50).optional(),
+  publications: z.array(z.union([stringValue, z.object({
+    title: stringValue.optional(), name: stringValue.optional(), publisher: stringValue.optional(), venue: stringValue.optional(),
+    authors: stringValue.optional(), date: stringValue.optional(), year: stringValue.optional(), link: stringValue.optional(),
+    doi: stringValue.optional(), url: stringValue.optional(), description: stringValue.optional(), abstract: stringValue.optional(),
+  }).passthrough()])).max(50).optional(),
+  researchPapers: z.array(z.any()).optional(),
   achievements: stringArray.optional(),
 }).passthrough();
 
@@ -58,6 +64,7 @@ const mapImportedSections = (sections) => ({
     name: item.name || item.title || '',
     link: item.link || item.githubUrl || item.liveUrl || '',
   })),
+  publications: sections.publications || sections.researchPapers || [],
 });
 
 const xmlText = (xml) => xml

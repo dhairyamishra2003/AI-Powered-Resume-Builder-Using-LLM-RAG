@@ -10,6 +10,7 @@ import {
   normalizeCertifications,
   normalizePersonalInfo,
   normalizeSummary,
+  normalizePublications,
 } from '../utils/sectionNormalizer.js';
 
 export const normalizeSectionData = (sectionName, sectionData) => {
@@ -24,6 +25,8 @@ export const normalizeSectionData = (sectionName, sectionData) => {
       return normalizeSkills(sectionData);
     case 'certifications':
       return normalizeCertifications(sectionData);
+    case 'publications':
+      return normalizePublications(sectionData);
     case 'personalInfo':
       return normalizePersonalInfo(sectionData);
     case 'summary':

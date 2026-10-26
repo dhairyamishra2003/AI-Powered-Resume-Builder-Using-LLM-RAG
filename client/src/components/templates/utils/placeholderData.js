@@ -59,6 +59,10 @@ export const PLACEHOLDER_SECTIONS = {
     technical: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'PostgreSQL', 'AWS', 'Docker', 'Kubernetes', 'GraphQL'],
     soft: ['Problem Solving', 'Team Leadership', 'Agile/Scrum', 'Technical Mentoring', 'Cross-functional Collaboration'],
     languages: ['English (Native)', 'Spanish (Conversational)'],
+    tools: ['Git', 'Docker', 'Kubernetes', 'Postman', 'VS Code'],
+    frameworks: ['React', 'Node.js', 'Express', 'Next.js'],
+    databases: ['PostgreSQL', 'MongoDB', 'Redis'],
+    libraries: ['Redux', 'TailwindCSS', 'Jest'],
   },
   projects: [
     {
@@ -90,6 +94,16 @@ export const PLACEHOLDER_SECTIONS = {
     { name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: '2023' },
     { name: 'Google Professional Cloud Developer', issuer: 'Google Cloud', date: '2022' },
   ],
+  publications: [
+    {
+      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: 'Independent Research / Presented at International Conference on Technology for SDGs',
+      authors: 'Dhairya Mishra',
+      date: '2026',
+      link: '',
+      description: 'Studied multi-agent collaboration architectures, autonomous task decomposition, planning, memory, and proposed scalable LLM-driven orchestration for intelligent task automation.',
+    },
+  ],
 };
 
 /**
@@ -104,19 +118,17 @@ export function hasAnyUserData(sections) {
   if (Array.isArray(sections.education) && sections.education.some((e) => e.degree || e.institution)) return true;
   if (Array.isArray(sections.projects) && sections.projects.some((pr) => pr.name)) return true;
   if (Array.isArray(sections.certifications) && sections.certifications.some((c) => c.name)) return true;
+  if (Array.isArray(sections.publications) && sections.publications.some((pub) => pub.title)) return true;
   const s = sections.skills;
   if (s) {
     if (Array.isArray(s.technical) && s.technical.length > 0) return true;
     if (Array.isArray(s.soft) && s.soft.length > 0) return true;
     if (Array.isArray(s.languages) && s.languages.length > 0) return true;
+    if (Array.isArray(s.tools) && s.tools.length > 0) return true;
   }
   return false;
 }
 
-/**
- * Returns a section's value if it has meaningful content,
- * otherwise returns the placeholder ONLY if the whole resume is blank.
- */
 /**
  * Returns a section's value.
  * Placeholder/sample data is ONLY returned when isPreview is explicitly true
@@ -161,7 +173,7 @@ export function withPlaceholder(sectionName, value, sections = null, isPreview =
     return (typeof value === 'string') ? value : '';
   }
 
-  if (['experience', 'education', 'projects', 'certifications'].includes(sectionName)) {
+  if (['experience', 'education', 'projects', 'certifications', 'publications'].includes(sectionName)) {
     return Array.isArray(value) ? value : [];
   }
 
@@ -170,10 +182,19 @@ export function withPlaceholder(sectionName, value, sections = null, isPreview =
     const rawSoft = val.soft || val.coreStrengths || val.softSkills || val.strengths || [];
     const rawTech = val.technical || val.tech || [];
     const rawLang = val.languages || val.spokenLanguages || [];
+    const rawTools = val.tools || [];
+    const rawFrameworks = val.frameworks || [];
+    const rawDatabases = val.databases || [];
+    const rawLibraries = val.libraries || [];
+
     return {
       technical: Array.isArray(rawTech) ? rawTech : [],
       soft: Array.isArray(rawSoft) ? rawSoft : [],
       languages: Array.isArray(rawLang) ? rawLang : [],
+      tools: Array.isArray(rawTools) ? rawTools : [],
+      frameworks: Array.isArray(rawFrameworks) ? rawFrameworks : [],
+      databases: Array.isArray(rawDatabases) ? rawDatabases : [],
+      libraries: Array.isArray(rawLibraries) ? rawLibraries : [],
     };
   }
 

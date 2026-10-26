@@ -35,6 +35,29 @@ const certificationSchema = new mongoose.Schema({
   link: { type: String, default: '' },
 }, { _id: true });
 
+const publicationSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  publisher: { type: String, default: '' },
+  authors: { type: String, default: '' },
+  date: { type: String, default: '' },
+  link: { type: String, default: '' },
+  description: { type: String, default: '' },
+}, { _id: true });
+
+const customSectionItemSchema = new mongoose.Schema({
+  title: { type: String, default: '' },
+  subtitle: { type: String, default: '' },
+  date: { type: String, default: '' },
+  description: { type: String, default: '' },
+  bullets: [{ type: String }],
+}, { _id: true });
+
+const customSectionSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  title: { type: String, default: '' },
+  items: [customSectionItemSchema],
+}, { _id: true });
+
 const atsBreakdownSchema = new mongoose.Schema({
   keywordMatch: { type: Number, default: 0 },
   formatting: { type: Number, default: 0 },
@@ -81,6 +104,8 @@ const resumeSchema = new mongoose.Schema(
         location: { type: String, default: '' },
         linkedIn: { type: String, default: '' },
         portfolio: { type: String, default: '' },
+        github: { type: String, default: '' },
+        targetRole: { type: String, default: '' },
       },
       summary: { type: String, default: '' },
       experience: [experienceSchema],
@@ -89,9 +114,16 @@ const resumeSchema = new mongoose.Schema(
         technical: [{ type: String }],
         soft: [{ type: String }],
         languages: [{ type: String }],
+        tools: [{ type: String }],
+        frameworks: [{ type: String }],
+        databases: [{ type: String }],
+        libraries: [{ type: String }],
       },
       projects: [projectSchema],
       certifications: [certificationSchema],
+      publications: [publicationSchema],
+      customSections: [customSectionSchema],
+      sectionOrder: [{ type: String }],
     },
     atsScore: {
       overall: { type: Number, default: 0 },

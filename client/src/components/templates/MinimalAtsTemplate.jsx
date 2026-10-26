@@ -8,6 +8,7 @@ import {
   ProjectCard,
   EducationItem,
   SummaryCard,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
@@ -28,6 +29,7 @@ function MinimalAtsTemplate({
   const skills         = withPlaceholder('skills',         normalizedSections.skills,         normalizedSections, isPreview);
   const projects       = withPlaceholder('projects',       normalizedSections.projects,       normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
+  const publications   = withPlaceholder('publications',   normalizedSections.publications,   normalizedSections, isPreview);
 
   const primary = colors?.primary || '#0f172a';
   const secondary = colors?.accent || '#334155';
@@ -42,6 +44,7 @@ function MinimalAtsTemplate({
   const validProjects       = (projects      || []).filter((p) => p && (p.name   || p.description));
   const validEducation      = (education     || []).filter((e) => e && (e.degree || e.institution));
   const validCertifications = (certifications|| []).filter((c) => c && c.name);
+  const validPublications   = (publications  || []).filter((pub) => pub && (pub.title || pub.publisher));
 
   const sectionStyle = {
     fontSize: typo.sectionTitle,
@@ -345,7 +348,40 @@ function MinimalAtsTemplate({
     });
   }
 
-  // 7. Core Strengths (Dedicated section after Certifications)
+  // Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Research Papers & Publications"
+            primaryColor={primary}
+            accentColor={primary}
+            borderColor={primary}
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={primary}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 7. Core Strengths (Dedicated section after Certifications/Publications)
   if (softSkills.length > 0 && techSkills.length > 0) {
     blocks.push({
       id: 'core-strengths',

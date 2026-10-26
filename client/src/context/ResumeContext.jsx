@@ -23,9 +23,10 @@ const initialResume = {
     summary: '',
     experience: [],
     education: [],
-    skills: { technical: [], soft: [], languages: [] },
+    skills: { technical: [], soft: [], languages: [], tools: [], frameworks: [], databases: [], libraries: [] },
     projects: [],
     certifications: [],
+    publications: [],
   },
   atsScore: null,
 };
@@ -75,12 +76,12 @@ function ResumeProvider({ children }) {
 
   const getCompletionPercentage = () => {
     const checks = [
-      resume.sections.personalInfo.fullName,
-      resume.sections.personalInfo.email,
+      resume.sections.personalInfo?.fullName,
+      resume.sections.personalInfo?.email,
       resume.sections.summary,
-      resume.sections.experience.length > 0,
-      resume.sections.education.length > 0,
-      resume.sections.skills.technical.length > 0,
+      resume.sections.experience?.length > 0,
+      resume.sections.education?.length > 0,
+      resume.sections.skills?.technical?.length > 0,
     ];
     const filled = checks.filter(Boolean).length;
     return Math.round((filled / checks.length) * 100);

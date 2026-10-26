@@ -352,6 +352,10 @@ export const normalizeSkills = (skills) => {
     technical: [],
     soft: [],
     languages: [],
+    tools: [],
+    frameworks: [],
+    databases: [],
+    libraries: [],
   };
 
   if (!skills) return result;
@@ -368,13 +372,13 @@ export const normalizeSkills = (skills) => {
 
   if (typeof skills === 'object') {
     // Technical skills
-    const techCandidate = skills.technical ?? skills.tech ?? skills.hard ?? skills.tools ?? skills.frameworks;
+    const techCandidate = skills.technical ?? skills.tech ?? skills.hard;
     if (techCandidate) {
       result.technical = toStringArray(techCandidate);
     }
 
-    // Soft skills
-    const softCandidate = skills.soft ?? skills.interpersonal ?? skills.softSkills;
+    // Soft skills / Core Strengths
+    const softCandidate = skills.soft ?? skills.interpersonal ?? skills.softSkills ?? skills.coreStrengths ?? skills.strengths;
     if (softCandidate) {
       result.soft = toStringArray(softCandidate);
     }
@@ -385,21 +389,24 @@ export const normalizeSkills = (skills) => {
       result.languages = toStringArray(langCandidate);
     }
 
-    // Gather any additional specialized skill categories (e.g. backend, frontend, devops) into technical
-    const recognizedKeys = new Set(['technical', 'tech', 'hard', 'tools', 'frameworks', 'soft', 'interpersonal', 'softSkills', 'languages', 'spokenLanguages']);
-    for (const [key, val] of Object.entries(skills)) {
-      if (!recognizedKeys.has(key) && val) {
-        const extra = toStringArray(val);
-        if (extra.length > 0) {
-          result.technical = [...result.technical, ...extra];
-        }
-      }
+    if (skills.tools) result.tools = toStringArray(skills.tools);
+    if (skills.frameworks) result.frameworks = toStringArray(skills.frameworks);
+    if (skills.databases) result.databases = toStringArray(skills.databases);
+    if (skills.libraries) result.libraries = toStringArray(skills.libraries);
+
+    // If technical was empty, combine from tools and frameworks
+    if (result.technical.length === 0 && (result.tools.length > 0 || result.frameworks.length > 0)) {
+      result.technical = [...result.tools, ...result.frameworks];
     }
 
     // Deduplicate within arrays
     result.technical = [...new Set(result.technical)];
     result.soft = [...new Set(result.soft)];
     result.languages = [...new Set(result.languages)];
+    result.tools = [...new Set(result.tools)];
+    result.frameworks = [...new Set(result.frameworks)];
+    result.databases = [...new Set(result.databases)];
+    result.libraries = [...new Set(result.libraries)];
   }
 
   return result;
@@ -510,12 +517,73 @@ export const normalizeSummary = (summary) => {
 };
 
 /**
+ * Normalizes a single publication / research paper item:
+ * { title, publisher, authors, date, link, description }
+ */
+export const normalizePublicationItem = (item) => {
+  if (!item) return null;
+
+  if (typeof item === 'string') {
+    const trimmed = item.trim();
+    if (!trimmed) return null;
+    return {
+      title: trimmed,
+      publisher: '',
+      authors: '',
+      date: '',
+      link: '',
+      description: '',
+    };
+  }
+
+  if (typeof item === 'object' && !Array.isArray(item)) {
+    const raw = stripInvalidId(item);
+    const title = String(raw.title || raw.name || raw.paperTitle || '').trim();
+    const publisher = String(raw.publisher || raw.journal || raw.conference || raw.venue || '').trim();
+    const authors = String(raw.authors || raw.author || '').trim();
+    const date = String(raw.date || raw.year || raw.publicationDate || '').trim();
+    const link = String(raw.link || raw.url || raw.doi || '').trim();
+    const description = String(raw.description || raw.abstract || raw.summary || '').trim();
+
+    const result = {
+      title: title || 'Research Publication',
+      publisher,
+      authors,
+      date,
+      link,
+      description,
+    };
+    if (raw._id) result._id = raw._id;
+    return result;
+  }
+
+  return null;
+};
+
+export const normalizePublications = (publications) => {
+  if (!publications) return [];
+  if (typeof publications === 'string') {
+    const normalized = normalizePublicationItem(publications);
+    return normalized ? [normalized] : [];
+  }
+  if (Array.isArray(publications)) {
+    return publications.map(normalizePublicationItem).filter(Boolean);
+  }
+  if (typeof publications === 'object') {
+    const normalized = normalizePublicationItem(publications);
+    return normalized ? [normalized] : [];
+  }
+  return [];
+};
+
+/**
  * Normalizes all sections conforming to Mongoose Resume.sections schema.
  * Preserves all actual information extracted from uploaded resumes.
  */
 export const normalizeSections = (sections = {}) => {
   const raw = (sections && typeof sections === 'object') ? sections : {};
   return {
+    ...raw,
     personalInfo: normalizePersonalInfo(raw.personalInfo),
     summary: normalizeSummary(raw.summary),
     experience: normalizeExperience(raw.experience),
@@ -523,5 +591,8 @@ export const normalizeSections = (sections = {}) => {
     skills: normalizeSkills(raw.skills),
     projects: normalizeProjects(raw.projects),
     certifications: normalizeCertifications(raw.certifications),
+    publications: normalizePublications(raw.publications || raw.researchPapers || raw.papers || raw.researchPublications),
+    customSections: Array.isArray(raw.customSections) ? raw.customSections : [],
+    sectionOrder: Array.isArray(raw.sectionOrder) ? raw.sectionOrder : [],
   };
 };

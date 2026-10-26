@@ -6,6 +6,7 @@ import {
   HiSparkles,
   HiLanguage,
   HiUserGroup,
+  HiBookOpen,
 } from 'react-icons/hi2';
 
 import {
@@ -17,6 +18,7 @@ import {
   EducationItem,
   SummaryCard,
   ContactList,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 
 import { getTemplateTypography } from '../../config/resumeTypography.js';
@@ -32,6 +34,7 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
   const skills = withPlaceholder('skills', normalizedSections.skills, normalizedSections, isPreview);
   const projects = withPlaceholder('projects', normalizedSections.projects, normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
+  const publications = withPlaceholder('publications', normalizedSections.publications, normalizedSections, isPreview);
 
   const primaryColor = colors?.primary || '#1e1b4b';
   const accentColor = colors?.accent || '#d97706';
@@ -52,6 +55,7 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
 
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
+  const validPublications = (publications || []).filter((pub) => pub && (pub.title || pub.publisher));
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
 
@@ -457,10 +461,43 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
                 <div style={{ fontWeight: 700, color: '#0f172a', overflowWrap: 'anywhere' }}>{cert.name}</div>
                 {cert.issuer && (
                   <div style={{ color: '#64748b', fontSize: '9.8px', overflowWrap: 'anywhere' }}>
-                    {cert.issuer} {cert.date && `(${cert.date})`}
+                     {cert.issuer} {cert.date && `(${cert.date})`}
                   </div>
                 )}
               </div>
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Research Papers & Publications' : 'Research Papers & Publications (Continued)'}
+            icon={HiBookOpen}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={accentColor}
+              />
             ))}
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   HiSparkles,
   HiLanguage,
   HiUserGroup,
+  HiBookOpen,
 } from 'react-icons/hi2';
 import {
   TwoPageResumeCanvas,
@@ -18,6 +19,7 @@ import {
   EducationItem,
   SummaryCard,
   ContactList,
+  PublicationItem,
 } from './engine/LayoutEngine.jsx';
 import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
@@ -32,6 +34,7 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
   const skills = withPlaceholder('skills', normalizedSections.skills, normalizedSections, isPreview);
   const projects = withPlaceholder('projects', normalizedSections.projects, normalizedSections, isPreview);
   const certifications = withPlaceholder('certifications', normalizedSections.certifications, normalizedSections, isPreview);
+  const publications = withPlaceholder('publications', normalizedSections.publications, normalizedSections, isPreview);
 
   const primaryColor = colors?.primary || '#0f172a';
   const accentColor = colors?.accent || '#2563eb';
@@ -44,6 +47,7 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));
   const validCertifications = (certifications || []).filter((c) => c && c.name);
+  const validPublications = (publications || []).filter((pub) => pub && (pub.title || pub.publisher));
 
   const typo = getTemplateTypography('modern-professional');
   const sectionTitleStyle = {
@@ -401,7 +405,40 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
     });
   }
 
-  // Languages (Requirement 2.B: On Page 2, position immediately after Certifications in main content flow)
+  // Research Papers & Publications
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Research Papers & Publications' : 'Research Papers & Publications (Continued)'}
+            icon={HiBookOpen}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={accentColor}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // Languages (Requirement 2.B: On Page 2, position immediately after Certifications/Publications in main content flow)
   if (languages.length > 0) {
     blocks.push({
       id: 'languages',

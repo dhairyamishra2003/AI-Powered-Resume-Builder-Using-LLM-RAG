@@ -2,7 +2,16 @@
 // sectionTypes.js - Resume Section Definitions
 // ============================================
 
-import { HiUser, HiBriefcase, HiAcademicCap, HiSparkles, HiWrenchScrewdriver, HiDocumentText, HiTrophy } from 'react-icons/hi2';
+import {
+  HiUser,
+  HiBriefcase,
+  HiAcademicCap,
+  HiSparkles,
+  HiWrenchScrewdriver,
+  HiDocumentText,
+  HiTrophy,
+  HiBookOpen,
+} from 'react-icons/hi2';
 
 const SECTION_TYPES = [
   { id: 'personalInfo', label: 'Personal Info', icon: HiUser },
@@ -12,6 +21,7 @@ const SECTION_TYPES = [
   { id: 'skills', label: 'Skills', icon: HiWrenchScrewdriver },
   { id: 'projects', label: 'Projects', icon: HiSparkles },
   { id: 'certifications', label: 'Certifications', icon: HiTrophy },
+  { id: 'publications', label: 'Research Papers & Publications', icon: HiBookOpen },
 ];
 
 export default SECTION_TYPES;

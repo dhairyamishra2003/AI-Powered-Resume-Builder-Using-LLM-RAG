@@ -299,6 +299,16 @@ const LONG_DATA = {
       date: '2020',
     },
   ],
+  publications: [
+    {
+      title: 'Graph-Guided Speculative Decoding for Large Language Models',
+      publisher: 'NeurIPS 2023',
+      authors: 'Dr. Elizabeth Montgomery, et al.',
+      date: '2023',
+      link: 'https://doi.org/10.48550/arXiv.2310.00000',
+      description: 'Distributed speculative sampling verification framework.',
+    },
+  ],
 };
 
 // 4. Edge Cases: Long unbroken URLs, wrapped badges, missing optional fields
@@ -487,6 +497,16 @@ for (const [templateId, Component] of Object.entries(TEMPLATES_MAP)) {
       // Check certifications
       for (const cert of data.certifications) {
         assert.ok(containsText(cert.name), `${testLabel}: Missing certification name '${cert.name}'`);
+      }
+
+      // Check publications (if present)
+      if (Array.isArray(data.publications) && data.publications.length > 0) {
+        for (const pub of data.publications) {
+          assert.ok(containsText(pub.title), `${testLabel}: Missing publication title '${pub.title}'`);
+          if (pub.publisher) {
+            assert.ok(containsText(pub.publisher), `${testLabel}: Missing publication publisher '${pub.publisher}'`);
+          }
+        }
       }
 
       // 5. Verify Section Ordering: Summary -> Education -> Experience -> Projects -> Certifications
