@@ -7,7 +7,7 @@ $nodePath = (Get-Command node -ErrorAction Stop).Source
 
 # Start the API as a child of this development session, then keep Vite in the
 # foreground. This avoids Node's child_process spawn issue on this Windows host.
-$serverProcess = Start-Process -FilePath $nodePath -ArgumentList 'server.js' -WorkingDirectory $serverDirectory -WindowStyle Hidden -PassThru
+$serverProcess = Start-Process -FilePath $nodePath -ArgumentList '--watch', '--watch-path=src', 'server.js' -WorkingDirectory $serverDirectory -WindowStyle Hidden -PassThru
 
 try {
   Write-Host "Started backend (PID $($serverProcess.Id)) on http://127.0.0.1:5000"
