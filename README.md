@@ -126,7 +126,6 @@ For a release, verify:
 - No secrets, local configuration, or temporary artifacts are included in the release commit.
 
 
-![AI-Powered Resume Builder system architecture](docs/system-architecture.svg)
 
 ### Architecture at a glance
 
