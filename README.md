@@ -4,19 +4,189 @@
 
 The AI-Powered Resume Builder combines editable resume templates, structured resume data, deterministic ATS scoring, AI-assisted resume import, and browser-based PDF export in one workflow.
 
-## Contents
+## System Architecture
 
-- [Overview](#overview)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Technology Stack](#technology-stack)
-- [Repository Structure](#repository-structure)
-- [Local Development](#local-development)
-- [Resume Import Flow](#resume-import-flow)
-- [Testing and Validation](#testing-and-validation)
-- [Deployment Checklist](#deployment-checklist)
-- [Security](#security)
-- [Troubleshooting](#troubleshooting)
+> For detailed component boundaries, data contracts, and architectural decisions, see the dedicated [System Architecture Documentation](docs/SYSTEM_ARCHITECTURE.md).
+
+```mermaid
+flowchart TD
+    %% Styling Classes (Dark-Theme Optimized)
+    classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef server fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#f8fafc;
+    classDef process fill:#042f2e,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef scoring fill:#2e1065,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
+    classDef ai fill:#172554,stroke:#60a5fa,stroke-width:2px,color:#f8fafc;
+    classDef storage fill:#1c1917,stroke:#fbbf24,stroke-width:2px,color:#f8fafc;
+    classDef error fill:#450a0a,stroke:#f87171,stroke-width:2px,color:#fecaca;
+
+    subgraph CLIENT ["Client Tier (Browser)"]
+        User["👤 User / Browser"]
+        ReactUI["⚛️ React + Vite UI<br/>(Editor, Form Controls & Document View)"]
+        ClientState["🔄 Resume State and API Client<br/>(Client State & HTTP Bridge)"]
+        Preview["👁️ Template Renderer and Resume Preview<br/>(Dynamic Template Component)"]
+        PDFExport["📄 Browser PDF Export<br/>(html2canvas & jsPDF)"]
+    end
+
+    subgraph GATEWAY ["API Gateway & Routing"]
+        ExpressAPI["⚡ Express REST API<br/>(Authentication, Multer Uploads & CORS)"]
+    end
+
+    subgraph BACKEND ["Backend Services & Logic"]
+        ResumeCtrl["💼 Resume Controller and Service<br/>(CRUD, Versioning & Business Rules)"]
+        ImportPipe["📥 Resume Import Pipeline<br/>(File Parsing & Upload Processing)"]
+        GeminiExtract["🤖 Gemini API Extraction<br/>(AI-Assisted Extraction where configured)"]
+        SectionMap["📋 Section Mapping & Validation<br/>(Map to Canonical Resume Structure)"]
+        Norm["⚙️ Section Normalization<br/>(Canonical Resume Schema Validation)"]
+        ATS["🎯 ATS Scoring<br/>(Deterministic Scoring & Keyword Engine)"]
+    end
+
+    subgraph INTELLIGENCE ["AI & Retrieval Services (Optional / Conditional)"]
+        RAG["🧠 AI + RAG Service<br/>(Prompt Context Enrichment)"]
+        VectorStore["📚 Vector Store / Chroma<br/>(Optional Context Embeddings)"]
+        GeminiGen["🤖 Gemini API Generation<br/>(AI-Assisted Writing & Analysis)"]
+    end
+
+    subgraph PERSISTENCE ["Persistence Tier"]
+        MongoDB[("🗄️ MongoDB Persistence<br/>(Resumes, Versions & User Accounts)")]
+    end
+
+    subgraph ERRORS ["Error & Fallback Handling"]
+        ValidationError["⚠️ Validation / Parse Error<br/>(400 Bad Request / 422 Unprocessable)"]
+    end
+
+    %% Flow 1: Resume Editing, Preview & PDF Export
+    User -->|"1. Edits resume sections"| ReactUI
+    ReactUI -->|"Updates local resume state"| ClientState
+    ClientState -->|"Supplies active sections"| Preview
+    User -->|"Triggers PDF export"| Preview
+    Preview -->|"Captures rendered layout"| PDFExport
+    PDFExport -->|"Downloads resume PDF"| User
+
+    %% Flow 2: Save and Persistence
+    ClientState -->|"Dispatches save / update request"| ExpressAPI
+    ExpressAPI -->|"Routes save request"| ResumeCtrl
+    ResumeCtrl -->|"Validates sections"| Norm
+    Norm -->|"Valid canonical schema"| MongoDB
+    MongoDB -->|"Persisted resume record"| ResumeCtrl
+    ResumeCtrl -->|"200 OK / saved snapshot"| ExpressAPI
+    ExpressAPI -->|"Rehydrates active resume state"| ClientState
+    Norm -.->|"Validation failure"| ValidationError
+
+    %% Flow 3: Resume Import Pipeline
+    User -->|"2. Uploads file (PDF/DOCX/TXT/JSON)"| ReactUI
+    ReactUI -->|"POST /api/resume/import (multipart)"| ExpressAPI
+    ExpressAPI -->|"Routes raw file stream"| ImportPipe
+    ImportPipe -->|"Optional: Raw text for AI extraction"| GeminiExtract
+    GeminiExtract -->|"Structured JSON candidate"| ImportPipe
+    ImportPipe -->|"Parsed text / candidate data"| SectionMap
+    SectionMap -->|"Normalized section candidates"| Norm
+    Norm -->|"Populates form for user review"| ClientState
+    ImportPipe -.->|"Unsupported / corrupt file"| ValidationError
+    ValidationError -.->|"Returns error status (400/422)"| ExpressAPI
+    ExpressAPI -.->|"Displays error notification"| ReactUI
+
+    %% Flow 4: ATS Scoring
+    User -->|"3. Requests ATS evaluation"| ReactUI
+    ReactUI -->|"POST /api/ats/score"| ExpressAPI
+    ExpressAPI -->|"Job description & resume content"| ATS
+    ATS -->|"Deterministic score & analysis"| ExpressAPI
+    ExpressAPI -->|"Renders ATS results"| ReactUI
+
+    %% Flow 5: AI + RAG Workflows
+    ResumeCtrl -.->|"Enrichment query (if configured)"| RAG
+    RAG -.->|"Retrieve nearest context"| VectorStore
+    VectorStore -.->|"Retrieved context documents"| RAG
+    RAG -.->|"Augmented prompt"| GeminiGen
+    GeminiGen -.->|"Enriched content suggestion"| ResumeCtrl
+
+    %% Class Assignments
+    class User,ReactUI,ClientState,Preview,PDFExport client;
+    class ExpressAPI,ResumeCtrl server;
+    class ImportPipe,GeminiExtract,SectionMap,Norm process;
+    class ATS scoring;
+    class RAG,VectorStore,GeminiGen ai;
+    class MongoDB storage;
+    class ValidationError error;
+```
+
+### Component Responsibilities
+
+| Component | Responsibility | Boundary |
+|---|---|---|
+| **React + Vite UI** | Presents the builder, section editor, template picker, preview, and download controls. | Runs in the user's browser. |
+| **Resume State & API Client** | Holds the active resume and editing/save-state metadata used by the builder; issues HTTP requests. | Client-side state; persistence occurs through API calls. |
+| **Template Renderer & Preview** | Renders resume section data into the selected visual template layout in real-time. | Client browser presentation layer. |
+| **Browser PDF Exporter** | Captures the rendered resume DOM using `html2canvas` and generates a downloadable PDF via `jsPDF`. | Runs entirely in the browser; no server rendering dependency. |
+| **Express REST API** | Handles incoming requests, enforces CORS, validates authentication tokens, and coordinates uploads. | Server-side entry point. |
+| **Resume Controller & Service** | Orchestrates resume CRUD operations, version snapshots, and business workflows. | Backend application layer. |
+| **Resume Import Pipeline** | Receives uploaded files (PDF, DOCX, TXT, JSON), parses raw content, invokes AI extraction, and maps sections. | Server-side in-memory processing. |
+| **Section Normalization** | Validates and sanitizes resume section data against canonical application schemas. | Server-side domain layer. |
+| **ATS Scoring** | Produces deterministic ATS scoring and actionable keyword feedback from resume and job inputs. | Server-side deterministic engine. |
+| **AI + RAG Service** | Coordinates retrieval from vector storage and enriches LLM prompts with relevant context. | Optional server-side service. |
+| **MongoDB Persistence** | Persists resume data, version histories, and user account credentials. | Database tier. |
+| **Gemini API** | Provides cloud LLM capabilities for structured import extraction and content generation where configured. | External provider; requires API key. |
+
+### Primary Data Flows
+
+#### 1. Resume Editing and Persistence
+1. The user edits a structured section in the frontend.
+2. Client state reflects the edit, and the save flow calls the Express REST API.
+3. The backend routes the request through the resume controller and service layer.
+4. Section normalization verifies data integrity and schema compliance.
+5. The server persists the updated resume to MongoDB and returns the updated document.
+6. The client rehydrates the editor with the saved state.
+
+#### 2. Importing an Existing Resume
+1. The user uploads a supported resume file (PDF, DOCX, TXT, or JSON).
+2. The backend validates the upload and parses the document text in memory.
+3. When configured, the Gemini API extracts raw text into structured section candidates.
+4. Parsed fields are validated and mapped to the canonical resume section structure.
+5. The editor displays the editable fields for user review and correction.
+6. The normal save flow persists the approved resume data to MongoDB.
+
+#### 3. Template Rendering and PDF Export
+1. The client passes resume sections and template metadata to the selected template component.
+2. The template renders the resume in the browser preview.
+3. Browser PDF export captures the rendered layout using `html2canvas`.
+4. `jsPDF` compiles the captured layout into a multi-page PDF document.
+5. The user downloads the generated PDF directly in the browser.
+
+#### 4. ATS Scoring and AI Workflows
+1. ATS scoring runs deterministic server-side algorithms against resume content and target job criteria.
+2. For AI-assisted writing or generation, the controller invokes the RAG service.
+3. When the vector store is initialized, RAG queries Chroma for relevant domain context.
+4. The enriched prompt is forwarded to the Gemini API, and suggested improvements are returned.
+5. If RAG or Gemini is unconfigured, the system gracefully degrades to core functionality.
+
+### Architectural Decisions and Constraints
+
+- **Structured data first:** Resume sections are represented as data rather than being hardcoded into template JSX.
+- **Separate content from presentation:** The template renderer controls visual styling; resume records supply raw content.
+- **Client-side PDF generation:** PDF export uses client-side rendering via `html2canvas` and `jsPDF`, removing server rendering bottlenecks.
+- **Review before persistence:** Imported resumes are mapped into editable form fields so users can verify accuracy before saving.
+- **Graceful degradation:** AI extraction and RAG retrieval are optional; core editing, rendering, scoring, and export operate without external AI credentials.
+
+### Configuration and Deployment Boundaries
+
+A production deployment typically requires:
+- Frontend API base URL configured to point to the backend server.
+- Backend allowed origin (`CORS_ORIGIN`) matching the frontend deployment URL.
+- MongoDB connection string configured for production persistence.
+- Optional Gemini API key (`GEMINI_API_KEY`) for AI-assisted import extraction and content generation.
+- Optional Google Sign-In credentials when Google authentication is enabled.
+
+Consult `.env.example` files in `client/` and `server/` for exact variable names.
+
+### Operational Verification
+
+Before releasing changes:
+- Verify authentication flows (email and Google Sign-In if enabled).
+- Test resume creation, section editing, saving, and reloading.
+- Test resume import with each supported format (PDF, DOCX, TXT, JSON).
+- Confirm template rendering and page layout fidelity across templates.
+- Check PDF download for proper page breaks, typography, and visual completeness.
+- Validate ATS scoring and AI workflows when configured.
+- Ensure no credentials, `.env` files, or temporary files are committed.
 
 ## Overview
 
@@ -34,187 +204,6 @@ Users can create a resume from editable sections or import an existing file, rev
 - **Resume persistence and versions** — save and reload resumes through the API; version endpoints are present in the resume service.
 - **AI prompt enrichment** — a retrieval-augmented generation (RAG) service can provide relevant context from a vector store to supported generation and analysis workflows.
 - **Development diagnostics** — HTTP/ATS timing logs and validation utilities help diagnose issues.
-
-## System Architecture — AI-Powered Resume Builder
-
-## 1. Purpose
-
-This document describes the logical component architecture of the AI-Powered Resume Builder. It explains the boundaries between the browser-based editor, API, application services, persistence, and external AI/authentication providers.
-
-## 2. Logical architecture
-
-flowchart TD
-    A["User / Browser"] --> B["React + Vite UI"]
-    B --> C["Resume State & API Client"]
-    C --> D["Express REST API"]
-
-    D --> E["Resume Controller & Service"]
-    E --> F["Validation & Section Normalization"]
-
-    F -->|Valid resume data| G[("MongoDB")]
-    F -->|Invalid data| H["Validation Error Response"]
-    H --> B
-
-    D --> I["Resume Import Pipeline"]
-    I --> J["Parse PDF / DOCX / TXT / JSON"]
-    J --> K["AI Extraction when required"]
-    K --> L["Google Gemini API"]
-    L --> M["Map Extracted Data to Resume Sections"]
-    M --> F
-
-    E --> N["ATS Scoring"]
-    N --> O["ATS Results"]
-    O --> B
-
-    E --> P["AI + RAG Service"]
-    P -->|Retrieve context when enabled| Q[("Vector Store / Chroma")]
-    Q --> P
-    P -->|AI workflow when configured| L
-
-    B --> R["Template Renderer & Resume Preview"]
-    R --> S["Browser PDF Export"]
-    S --> T["Download Resume PDF"]
-
-    G -->|Load saved resume| E
-    E -->|Resume data / API response| C
-
-    classDef client fill:#172554,stroke:#60a5fa,color:#eff6ff,stroke-width:1.5px
-    classDef backend fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:1.5px
-    classDef external fill:#7c2d12,stroke:#fb923c,color:#fff7ed,stroke-width:1.5px
-    classDef storage fill:#3f3f46,stroke:#a1a1aa,color:#fafafa,stroke-width:1.5px
-    classDef error fill:#7f1d1d,stroke:#f87171,color:#fef2f2,stroke-width:1.5px
-
-    class A,B,C,R,S,T,O client
-    class D,E,F,I,J,K,M,N,P backend
-    class L external
-    class G,Q storage
-    class H error
-
-for the overview diagram. The architecture is grouped into four zones:
-
-- **Client:** React/Vite UI, resume state, API client, template rendering, preview, and PDF export.
-- **Backend API:** Node.js/Express endpoints and controller/service layers.
-- **Data layer:** MongoDB-backed application records and the configured vector store used for retrieval.
-- **External services:** Google Gemini for AI-enabled workflows and Google identity services when Google sign-in is enabled.
-
-## 3. Component responsibilities
-
-| Component | Responsibility | Boundary |
-|---|---|---|
-| React/Vite frontend | Presents the builder, section editor, template picker, preview, and download controls. | Runs in the user's browser. |
-| Resume context/state | Holds the active resume and editing/save-state metadata used by the builder. | Client-side state; persistence is performed through API calls. |
-| API client | Sends resume, authentication, import, and related requests to the server. | HTTP boundary between browser and backend. |
-| Express API | Routes requests to controllers and returns responses. | Server-side entry point. |
-| Resume controller/service/model | Handles resume operations and persistence-related workflows. | Backend owns validation, business operations, and database access. |
-| Import pipeline | Receives files, validates/parses content, uses AI extraction where needed, and maps content into normalized resume sections. | Import does not imply persistence until the regular save flow runs. |
-| ATS service | Produces deterministic ATS scoring from supported resume/job inputs. | Scoring logic runs on the server. |
-| RAG service | Retrieves relevant context from a vector store for supported prompts. | Optional/conditional capability; availability depends on initialization and configuration. |
-| MongoDB | Stores application data through backend models/services. | Persistent data store. |
-| Gemini API | Supports configured AI extraction/generation workflows. | External provider; requires server-side configuration. |
-| Google sign-in | Supports Google authentication when enabled. | External identity provider. |
-| Browser PDF exporter | Captures the rendered resume and generates the downloadable PDF. | Runs in the browser; not a separate PDF microservice. |
-
-## 4. Primary flows
-
-### 4.1 Resume editing and persistence
-
-1. The user edits a structured section in the frontend.
-2. Client state reflects the edit and the save flow calls the backend API.
-3. The backend receives the request and routes it through the resume controller/service layer.
-4. The server persists the updated resume through its data/model layer.
-5. The client can retrieve the saved resume to rehydrate the editor.
-
-### 4.2 Importing an existing resume
-
-1. The browser uploads a supported file.
-2. The backend validates the upload and parses the supported document format.
-3. The configured workflow performs AI extraction when required.
-4. Parsed/extracted fields are validated and mapped to the canonical resume section structure.
-5. The editor shows the editable result for user review.
-6. The normal save flow persists the approved resume data.
-
-### 4.3 Template rendering and PDF export
-
-1. The client passes resume sections and selected template metadata to the chosen template component.
-2. The selected template renders the resume in the browser preview.
-3. The browser-side export path captures the rendered page(s) and creates a PDF.
-4. The user downloads the resulting file.
-
-### 4.4 ATS and retrieval-assisted AI workflows
-
-- ATS scoring uses deterministic server-side logic for supported inputs.
-- A supported AI workflow may call the RAG service for relevant context.
-- When the vector store is initialized, RAG returns matching document context for the prompt.
-- If RAG is unavailable, retrieval may return empty context; the caller's behavior depends on the workflow.
-
-## 5. Architectural decisions and constraints
-
-- **Structured data first:** Resume sections are represented as data rather than being hardcoded into template JSX.
-- **Separate content from presentation:** The template renderer controls layout; resume records provide content.
-- **Server-side provider credentials:** AI and persistence credentials should remain in backend environment configuration.
-- **Browser-side PDF generation:** PDF export uses the rendered template, making preview/export verification important after template changes.
-- **Import requires review:** Extracted fields are mapped into the editable form so users can correct content before saving.
-- **RAG is conditional:** Retrieval availability depends on vector-store setup and initialization; it should not be assumed to be active in every environment.
-
-## 6. Configuration and deployment boundaries
-
-A production deployment typically needs the frontend and backend URLs configured consistently, a production MongoDB connection, backend AI credentials for enabled workflows, Google sign-in settings if enabled, and an allowed-origin setting that matches the deployed frontend. Consult the current `.env.example` files and hosting configuration for exact variable names and deployment topology.
-
-## 7. Operational verification
-
-For a release, verify:
-
-- Authentication flow(s) enabled in the target environment.
-- Resume create, edit, save, and reload.
-- Resume import with each supported file type used by the application.
-- Correct template rendering and section order.
-- PDF page boundaries, content completeness, and download behavior.
-- ATS scoring and relevant AI/RAG paths when configured.
-- No secrets, local configuration, or temporary artifacts are included in the release commit.
-
-
-
-### Architecture at a glance
-
-| Layer | Responsibilities |
-|---|---|
-| **Presentation — React/Vite** | Builder screens, section forms, template selection, resume preview, browser-side PDF export. |
-| **Client state and API access** | Maintains the active resume state and sends requests to the backend through the API service. |
-| **Application API — Node.js/Express** | Receives HTTP requests and routes them to the relevant controller/service. |
-| **Resume domain** | Normalizes section data and manages resume create, read, update, and version-related operations. |
-| **Import pipeline** | Validates an uploaded file, parses supported formats, uses AI extraction when required, and maps validated results into editable sections. |
-| **ATS and AI/RAG services** | Runs deterministic ATS scoring and, where configured, enriches AI workflows with retrieved context. |
-| **Persistence and providers** | MongoDB stores application records; Gemini, Google sign-in, and the vector store are used by the relevant configured workflows. |
-
-### Key request flows
-
-**Edit and save a resume**
-
-1. The user edits a section in the React application.
-2. Client state updates and the normal save flow sends resume data to the Express API.
-3. The backend validates/normalizes the request and persists the resume through the resume service.
-4. The editor can reload the saved resume through the API.
-
-**Import an existing resume**
-
-1. The user uploads a supported file from the resume editor.
-2. The API validates and parses the file; AI extraction is used when the import workflow requires it.
-3. Extracted fields are normalized and mapped into the existing resume section model.
-4. The user reviews the editable fields; persistence occurs through the normal resume save flow.
-
-**Preview and export**
-
-1. The client passes the current resume sections and selected template to the template renderer.
-2. The browser renders the resume preview.
-3. PDF export captures the rendered page layout and creates the downloadable PDF in the browser.
-
-**AI-assisted retrieval**
-
-1. A supported AI workflow forms a query for relevant context.
-2. The RAG service searches the configured vector store when initialized.
-3. Retrieved context can be included in the relevant AI prompt. If RAG is unavailable, the service can return empty context and the calling workflow may continue without it, depending on that workflow.
-
-> **Implementation note:** This is a component-level architecture, not a deployment topology. Actual enabled providers and environment-variable names are controlled by the code and the `.env.example` files in the repository.
 
 ## Technology Stack
 
@@ -252,13 +241,13 @@ Building AI-Powered Resume Builder/
 │       └── utils/            # Normalization and shared utilities
 ├── scripts/                  # Validation and repository utilities
 ├── docs/
-│   └── system-architecture.svg
+│   └── SYSTEM_ARCHITECTURE.md# Comprehensive architecture documentation
 └── README.md
 ```
 
 Some directories or files may differ by branch; use the checked-out repository as the source of truth.
 
-## Local Development
+## Setup
 
 ### 1. Prerequisites
 
