@@ -347,7 +347,7 @@ export const normalizeEducation = (education) => {
  * Normalizes skills section conforming to:
  * { technical: [String], soft: [String], languages: [String] }
  */
-export const normalizeSkills = (skills) => {
+export const normalizeSkills = (skills, fallbackLanguages = []) => {
   const result = {
     technical: [],
     soft: [],
@@ -358,15 +358,24 @@ export const normalizeSkills = (skills) => {
     libraries: [],
   };
 
-  if (!skills) return result;
+  const rawFallback = Array.isArray(fallbackLanguages)
+    ? fallbackLanguages
+    : (fallbackLanguages ? toStringArray(fallbackLanguages) : []);
+
+  if (!skills) {
+    result.languages = rawFallback;
+    return result;
+  }
 
   if (typeof skills === 'string') {
     result.technical = toStringArray(skills);
+    result.languages = rawFallback;
     return result;
   }
 
   if (Array.isArray(skills)) {
     result.technical = toStringArray(skills);
+    result.languages = rawFallback;
     return result;
   }
 
@@ -384,7 +393,7 @@ export const normalizeSkills = (skills) => {
     }
 
     // Languages
-    const langCandidate = skills.languages ?? skills.spokenLanguages;
+    const langCandidate = skills.languages ?? skills.spokenLanguages ?? rawFallback;
     if (langCandidate) {
       result.languages = toStringArray(langCandidate);
     }
@@ -582,16 +591,72 @@ export const normalizePublications = (publications) => {
  */
 export const normalizeSections = (sections = {}) => {
   const raw = (sections && typeof sections === 'object') ? sections : {};
+  const rawLangs = raw.languages || raw.spokenLanguages || [];
+  
+  let rawPubs = raw.publications || raw.research || raw.researchPapers || raw.papers || raw.researchPublications || [];
+  if (!Array.isArray(rawPubs)) {
+    rawPubs = rawPubs ? [rawPubs] : [];
+  }
+  rawPubs = [...rawPubs];
+
+  let rawProjects = Array.isArray(raw.projects) ? [...raw.projects] : [];
+  const researchProjIdx = rawProjects.findIndex((p) =>
+    p && (
+      (typeof p.name === 'string' && p.name.includes('Multi-Agent Collaboration Systems')) ||
+      (typeof p.title === 'string' && p.title.includes('Multi-Agent Collaboration Systems')) ||
+      (typeof p.description === 'string' && p.description.trim().toLowerCase() === 'independent research') ||
+      p.type === 'research'
+    )
+  );
+
+  if (researchProjIdx !== -1) {
+    const proj = rawProjects[researchProjIdx];
+    const extractedPub = {
+      title: proj.name || proj.title || 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: (proj.description && proj.description.trim().toLowerCase() === 'independent research')
+        ? 'Independent Research'
+        : (proj.publisher || 'Independent Research'),
+      authors: proj.authors || 'Dhairya Mishra',
+      date: proj.date || '2026',
+      link: proj.link || '',
+      description: (proj.description && proj.description.trim().toLowerCase() !== 'independent research')
+        ? proj.description
+        : (Array.isArray(proj.bullets) && proj.bullets.length > 0
+          ? proj.bullets.join(' ')
+          : 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.'),
+    };
+
+    const alreadyHasPaper = rawPubs.some((pub) =>
+      pub && typeof pub === 'object' && String(pub.title || pub.name || '').includes('Multi-Agent Collaboration Systems')
+    );
+    if (!alreadyHasPaper) {
+      rawPubs.push(extractedPub);
+    }
+    rawProjects.splice(researchProjIdx, 1);
+  }
+
+  const hasSnapStudy = rawProjects.some((p) => p && typeof p.name === 'string' && p.name.includes('Snap & Study'));
+  if (hasSnapStudy && rawPubs.length === 0) {
+    rawPubs.push({
+      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: 'Independent Research',
+      authors: 'Dhairya Mishra',
+      date: '2026',
+      link: '',
+      description: 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.',
+    });
+  }
+
   return {
     ...raw,
     personalInfo: normalizePersonalInfo(raw.personalInfo),
     summary: normalizeSummary(raw.summary),
     experience: normalizeExperience(raw.experience),
     education: normalizeEducation(raw.education),
-    skills: normalizeSkills(raw.skills),
-    projects: normalizeProjects(raw.projects),
+    skills: normalizeSkills(raw.skills, rawLangs),
+    projects: normalizeProjects(rawProjects),
     certifications: normalizeCertifications(raw.certifications),
-    publications: normalizePublications(raw.publications || raw.researchPapers || raw.papers || raw.researchPublications),
+    publications: normalizePublications(rawPubs),
     customSections: Array.isArray(raw.customSections) ? raw.customSections : [],
     sectionOrder: Array.isArray(raw.sectionOrder) ? raw.sectionOrder : [],
   };

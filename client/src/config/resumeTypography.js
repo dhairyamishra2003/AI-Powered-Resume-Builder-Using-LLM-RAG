@@ -61,11 +61,11 @@ export const BASE_TYPOGRAPHY = {
   experience: 12,
   experienceRole: 15,
   experienceDate: 12,
-  bullet: 10.6,
+  bullet: 12.4,
 
   // Projects
   projectTitle: 12,
-  projectDescription: 8,
+  projectDescription: 10,
   projectMeta: 11,
   projectBadge: 11.5,
 
@@ -195,7 +195,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 10.5,
     technicalSkills: 11.5,
     softSkills: 15.5,
-    certification: 15,
+    certification: 10,
     language: 15,
   },
   'modern-professional': {
@@ -206,7 +206,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 11.5,
     technicalSkills: 12,
     softSkills: 10.25,
-    certification: 16,
+    certification: 14,
     language: 15,
   },
   'creative-clean': {
@@ -224,14 +224,15 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
   'minimal-ats': {
     name: 24,
     targetRole: 12,
-    sectionTitle: 18,
+    sectionTitle: 20,
     contact: 9.5,
     summary: 14.8,
-    technicalSkills: 15,
+    technicalSkills: 12,
     softSkills: 11.5,
     certification: 12.5,
     language: 15.5,
   },
+
 };
 
 /**

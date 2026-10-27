@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Resume from '../models/Resume.model.js';
-import { DEFAULT_TEMPLATE_ID, VALID_TEMPLATE_IDS } from '../constants/templates.js';
+import { DEFAULT_TEMPLATE_ID, VALID_TEMPLATE_IDS, resolveTemplateId } from '../constants/templates.js';
 import {
   normalizeSections,
   normalizeProjects,
@@ -40,9 +40,7 @@ export const sanitizeSections = (sections) => {
   return normalizeSections(sections || {});
 };
 
-const normalizeTemplateId = (templateId) => (
-  VALID_TEMPLATE_IDS.includes(templateId) ? templateId : DEFAULT_TEMPLATE_ID
-);
+const normalizeTemplateId = (templateId) => resolveTemplateId(templateId);
 
 export const createResume = async (userId, data = {}) => {
   const sections = sanitizeSections(data.sections || {});

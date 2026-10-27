@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DEFAULT_TEMPLATE_ID } from '../constants/templates.js';
 
 const resumeVersionSchema = new mongoose.Schema(
   {
@@ -27,7 +28,7 @@ const resumeVersionSchema = new mongoose.Schema(
     },
     templateId: {
       type: String,
-      default: 'classic',
+      default: DEFAULT_TEMPLATE_ID,
     },
     atsScore: {
       type: Number,

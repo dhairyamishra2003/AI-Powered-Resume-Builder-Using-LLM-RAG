@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { deleteResume, getResumes } from '../../services/resumeService.js';
-import TEMPLATES from '../../constants/templates.js';
+import TEMPLATES, { resolveTemplateId } from '../../constants/templates.js';
 import { HiClock, HiDocumentText, HiSparkles, HiTrash } from 'react-icons/hi2';
 
 function DashboardPage() {
@@ -44,7 +44,10 @@ function DashboardPage() {
     year: 'numeric',
   });
 
-  const getTemplate = (id) => TEMPLATES.find((template) => template.id === id) || TEMPLATES[0];
+  const getTemplate = (id) => {
+    const canonical = resolveTemplateId(id);
+    return TEMPLATES.find((template) => template.id === canonical) || TEMPLATES[0];
+  };
 
   return (
     <DashboardLayout>

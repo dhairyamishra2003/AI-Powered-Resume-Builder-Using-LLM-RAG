@@ -57,6 +57,16 @@ Parse the resume and extract ALL information into this EXACT JSON format:\r
       "date": "YYYY-MM",\r
       "link": ""\r
     }\r
+  ],\r
+  "publications": [\r
+    {\r
+      "title": "Publication / Research Paper Title",\r
+      "publisher": "Journal / Conference / Venue / Independent Research",\r
+      "authors": "Author Name(s)",\r
+      "date": "YYYY or YYYY-MM",\r
+      "link": "",\r
+      "description": "Abstract, research methodology, key findings or contribution"\r
+    }\r
   ]\r
 }\r
 \r

@@ -7,11 +7,12 @@
 
 import { useContext } from 'react';
 import { ResumeContext } from '../../context/ResumeContext.jsx';
-import TEMPLATES from '../../constants/templates.js';
+import TEMPLATES, { resolveTemplateId } from '../../constants/templates.js';
 import TemplateCard from '../TemplateCard';
 
 function TemplateSelector() {
   const { resume, updateTemplate } = useContext(ResumeContext);
+  const activeTemplateId = resolveTemplateId(resume.templateId);
 
   return (
     <div style={{ padding: '16px' }}>
@@ -25,7 +26,7 @@ function TemplateSelector() {
           <TemplateCard
             key={template.id}
             template={template}
-            isActive={resume.templateId === template.id}
+            isActive={activeTemplateId === template.id}
             onSelect={() => updateTemplate(template.id)}
           />
         ))}

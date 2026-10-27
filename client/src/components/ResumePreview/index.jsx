@@ -1,7 +1,7 @@
 import './index.css';
 import React, { useContext, useRef, useState } from 'react';
 import { ResumeContext } from '../../context/ResumeContext.jsx';
-import TEMPLATES from '../../constants/templates.js';
+import TEMPLATES, { resolveTemplateId } from '../../constants/templates.js';
 import ModernProfessionalTemplate from '../templates/ModernProfessionalTemplate.jsx';
 import MinimalAtsTemplate from '../templates/MinimalAtsTemplate.jsx';
 import ExecutiveCorporateTemplate from '../templates/ExecutiveCorporateTemplate.jsx';
@@ -20,7 +20,8 @@ function ResumePreview() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [zoom, setZoom] = useState(1);
 
-  const template = TEMPLATES.find((item) => item.id === resume.templateId || item.layout === resume.templateId) || TEMPLATES[0];
+  const canonicalTemplateId = resolveTemplateId(resume.templateId);
+  const template = TEMPLATES.find((item) => item.id === canonicalTemplateId || item.layout === canonicalTemplateId) || TEMPLATES[0];
   const colors = template.colors;
 
   const renderTemplate = (isExport = false) => {

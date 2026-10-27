@@ -373,7 +373,41 @@ function CreativeCleanTemplate({
     });
   }
 
-  // 5. Certifications
+  // 5. Research Papers & Publications (Immediately after Projects and before Certifications)
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
+        <div>
+          <SectionTitle
+            title={!sectionStartedOnPrevPage ? 'Research Papers & Publications' : 'Research Papers & Publications (Continued)'}
+            icon={HiBookOpen}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={primaryColor}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 6. Certifications
   if (validCertifications.length > 0) {
     blocks.push({
       id: 'certifications',
@@ -404,40 +438,6 @@ function CreativeCleanTemplate({
                 {cert.issuer && <span style={{ color: '#7c3aed' }}> — {cert.issuer}</span>}
                 {cert.date && <span style={{ color: '#a855f7' }}> ({cert.date})</span>}
               </div>
-            ))}
-          </div>
-        </div>
-      ),
-    });
-  }
-
-  // 6. Research Papers & Publications
-  if (validPublications.length > 0) {
-    blocks.push({
-      id: 'publications',
-      type: 'publications',
-      render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
-        <div>
-          <SectionTitle
-            title={!sectionStartedOnPrevPage ? 'Research Papers & Publications' : 'Research Papers & Publications (Continued)'}
-            icon={HiBookOpen}
-            primaryColor="#4c1d95"
-            accentColor={accentColor}
-            borderColor="#ddd6fe"
-            style={sectionStyle}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {validPublications.map((pub, idx) => (
-              <PublicationItem
-                key={idx}
-                title={pub.title}
-                publisher={pub.publisher}
-                authors={pub.authors}
-                date={pub.date}
-                link={pub.link}
-                description={pub.description}
-                accentColor={primaryColor}
-              />
             ))}
           </div>
         </div>

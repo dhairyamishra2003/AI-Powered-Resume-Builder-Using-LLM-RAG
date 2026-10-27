@@ -1,0 +1,305 @@
+{
+  "_id": "6adf4ecb65195625bc37dcb8",
+  "userId": "6a5b84c31c4029b9394c9496",
+  "title": "Dhairya Resume 2026",
+  "templateId": "modern-professional",
+  "targetRole": "",
+  "jobDescription": "",
+  "sections": {
+    "personalInfo": {
+      "fullName": "DHAIRYA MISHRA",
+      "email": "dhairyam698@gmail.com",
+      "phone": "+91 - 6264516970",
+      "location": "Satna, Madhya Pradesh",
+      "linkedIn": "linkedin.com/in/dhairya-mishra-",
+      "portfolio": "github.com/dhairyamishra2003"
+    },
+    "skills": {
+      "technical": [
+        "Python",
+        "C++",
+        "C",
+        "Java",
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "SQL",
+        "Scikit-learn",
+        "PyTorch",
+        "TensorFlow",
+        "Keras",
+        "Deep Learning",
+        "Supervised Learning",
+        "Unsupervised Learning",
+        "Regression",
+        "Classification",
+        "Feature Engineering",
+        "Model Evaluation",
+        "Pandas",
+        "NumPy",
+        "Matplotlib",
+        "Data Cleaning",
+        "Exploratory Data Analysis (EDA)",
+        "Data Analysis",
+        "Data Visualization",
+        "spaCy",
+        "NLTK",
+        "Tokenization",
+        "Stopword Removal",
+        "Stemming",
+        "NLP",
+        "LLMs",
+        "RAG",
+        "LangChain",
+        "LangGraph",
+        "AI Agents",
+        "Gemini API",
+        "Prompt Engineering",
+        "Generative AI",
+        "AI Automation",
+        "Agentic AI",
+        "Multi-Agent Systems",
+        "MCP",
+        "Flask",
+        "Node.js",
+        "Express.js",
+        "React.js",
+        "Spring Boot",
+        "REST APIs",
+        "Backend Services",
+        "HTML5",
+        "CSS3",
+        "SVG",
+        "MySQL",
+        "MongoDB",
+        "PostgreSQL",
+        "SQLite",
+        "Computer Vision",
+        "CNNs",
+        "Semantic Search",
+        "Information Retrieval",
+        "Vector Retrieval",
+        "Intelligent Automation",
+        "Robotics Process Automation (RPA)",
+        "Automation Anywhere",
+        "Make.com",
+        "Docker",
+        "Kubernetes",
+        "CI/CD",
+        "API Development",
+        "System Design",
+        "Power BI",
+        "Tableau",
+        "Microsoft Excel",
+        "Git",
+        "GitHub",
+        "VS Code",
+        "Google Colab",
+        "Jupyter Notebook",
+        "Windows",
+        "Linux",
+        "Kali Linux",
+        "macOS"
+      ],
+      "soft": [
+        "Problem Solving",
+        "Analytical Thinking",
+        "Team Collaboration",
+        "Communication",
+        "Quick Learner"
+      ],
+      "languages": [
+        "English",
+        "Hindi"
+      ],
+      "tools": [],
+      "frameworks": [],
+      "databases": [],
+      "libraries": []
+    },
+    "summary": "AI Engineer with hands-on experience building Generative AI, LLM, RAG, multi-agent, and machine learning systems. Experienced in Python, LangChain, LangGraph, AI Agents, semantic search, vector retrieval, Computer Vision, and model evaluation, with full-stack development using React, Node.js, Express.js, and REST APIs. Built AI applications for recruitment automation, resume intelligence, and real-time workflow orchestration, with practical experience developing CNN-based computer vision solutions during a Machine Learning internship.",
+    "experience": [
+      {
+        "company": "FODRIX",
+        "role": "Machine Learning Intern",
+        "startDate": "2026-01",
+        "endDate": "2026-05",
+        "current": false,
+        "bullets": [
+          "Engineered a CNN-based deep learning system for automated image selection and quality assessment.",
+          "Developed and evaluated image-quality assessment workflows for a real-world computer vision problem.",
+          "Applied Python, deep learning, and model evaluation techniques to image-quality assessment workflows."
+        ],
+        "_id": "6adf4ecb65195625bc37dcb9"
+      }
+    ],
+    "education": [
+      {
+        "institution": "AKS University, Satna, Madhya Pradesh",
+        "degree": "Bachelor of Technology (B.Tech)",
+        "field": "Artificial Intelligence & Data Science",
+        "startDate": "2023",
+        "endDate": "2027",
+        "gpa": "8.37",
+        "_id": "6adf4ecb65195625bc37dcba"
+      },
+      {
+        "institution": "CCBP 4.0 Academy – NxtWave",
+        "degree": "",
+        "field": "AI & Machine Learning; Full-Stack Development; Data Analytics & MLOps",
+        "startDate": "",
+        "endDate": "",
+        "gpa": "",
+        "_id": "6adf4ecb65195625bc37dcbb"
+      }
+    ],
+    "projects": [
+      {
+        "name": "AgentFlow AI – Agentic AI Operations Automation Platform",
+        "description": "Designed and developed a scalable Agentic AI platform for intelligent workflow execution, validation, recovery, and real-time monitoring.",
+        "technologies": [
+          "React",
+          "React Flow",
+          "Node.js",
+          "Express.js",
+          "PostgreSQL",
+          "MongoDB",
+          "Redis",
+          "BullMQ",
+          "Socket.IO",
+          "JWT"
+        ],
+        "link": "",
+        "bullets": [
+          "Engineered a Planner–Executor–Validator–Recovery multi-agent architecture with Redis/BullMQ queues, automated retries, and fault-tolerant workflow execution.",
+          "Implemented REST APIs and backend services for AI-agent execution, workflow orchestration, authentication, and real-time status tracking.",
+          "Developed a real-time workflow dashboard using React Flow and Socket.IO for execution monitoring and operator notifications."
+        ],
+        "_id": "6adf4ecb65195625bc37dcbc"
+      },
+      {
+        "name": "AI-Powered Resume Builder – Using SDD, LLM & RAG",
+        "description": "Designed and developed an AI-powered resume platform using LLMs, RAG, NLP, prompt engineering, and semantic search.",
+        "technologies": [
+          "React 19",
+          "Vite",
+          "Tailwind CSS",
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "LangChain",
+          "LangGraph",
+          "Google Gemini API"
+        ],
+        "link": "",
+        "bullets": [
+          "Engineered a LangGraph AI assistant with 5 specialized tools for resume updates, STAR bullet generation, ATS scoring, summary generation, and knowledge-base search.",
+          "Implemented semantic search and vector retrieval using Gemini embeddings and cosine similarity over a 68-document knowledge base.",
+          "Developed 6 specialized retrieval functions for ATS analysis, bullet generation, summary generation, resume review, job matching, and skill-gap analysis."
+        ],
+        "_id": "6adf4ecb65195625bc37dcbd"
+      },
+      {
+        "name": "Snap & Study — AI Vision Study Assistant",
+        "description": "Built a multimodal AI study assistant that analyzes question images, identifies the subject/topic, and generates step-by-step solutions.",
+        "technologies": [
+          "Python",
+          "Streamlit",
+          "Google Gemini Vision",
+          "Twilio"
+        ],
+        "link": "",
+        "bullets": [
+          "Implemented interactive follow-up chat, context-aware explanations, study-note generation, and downloadable results.",
+          "Added specialized reasoning and verification workflows for mathematics and sentence-ordering/parajumble problems; deployed the application on Streamlit Community Cloud."
+        ],
+        "_id": "6adf4ecb65195625bc37dcbe"
+      }
+    ],
+    "certifications": [
+      {
+        "name": "AI Workflows & Automation Workshop Using Make.com",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2026",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcbf"
+      },
+      {
+        "name": "MCP Mega Workshop Project",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2025",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc0"
+      },
+      {
+        "name": "LLMs & Agents",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2025",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc1"
+      },
+      {
+        "name": "Introduction to Generative AI",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2025",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc2"
+      },
+      {
+        "name": "Introduction to Databases",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2025",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc3"
+      },
+      {
+        "name": "Build Your Own Dynamic Website",
+        "issuer": "CCBP 4.0 Academy, NxtWave",
+        "date": "2025",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc4"
+      },
+      {
+        "name": "Research Methodology",
+        "issuer": "Udemy",
+        "date": "2026-04",
+        "link": "",
+        "_id": "6adf4ecb65195625bc37dcc5"
+      }
+    ],
+    "publications": [
+      {
+        "title": "Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation",
+        "publisher": "Independent Research",
+        "authors": "Dhairya Mishra",
+        "date": "2026",
+        "link": "",
+        "description": "Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.",
+        "_id": "6adf56f01b0d3a1dbcaf7a9d"
+      }
+    ],
+    "customSections": [],
+    "sectionOrder": []
+  },
+  "atsScore": {
+    "overall": 0,
+    "missingKeywords": [],
+    "suggestions": [],
+    "breakdown": {
+      "keywordMatch": 0,
+      "formatting": 0,
+      "sectionCompleteness": 0,
+      "bulletQuality": 0,
+      "summaryStrength": 0,
+      "skillCoverage": 0,
+      "quantification": 0,
+      "actionVerbs": 0,
+      "length": 0,
+      "contactInfo": 0
+    }
+  },
+  "isActive": true,
+  "createdAt": "2026-10-26T12:59:55.730Z",
+  "updatedAt": "2026-10-26T13:34:40.018Z",
+  "__v": 0
+}

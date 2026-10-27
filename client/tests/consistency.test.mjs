@@ -217,19 +217,19 @@ console.log('  ✓ PASSED: Empty optional fields render safely without placehold
 // -------------------------------------------------------------
 console.log('\n>>> Test 7 & 10: Approved Layout & Section Ordering Checks');
 
-// Creative Clean: Page 2 sidebar removed, Languages immediately after Certifications/Publications
+// Creative Clean: Page 2 sidebar removed, Publications before Certifications, Languages last
 const ccHtml = renderToString(React.createElement(CreativeCleanTemplate, { sections: normalized1, isPreview: false }));
 const ccCertIdx = ccHtml.indexOf('Certifications');
 const ccPubIdx = ccHtml.indexOf('Research Papers &amp; Publications');
 const ccLangIdx = ccHtml.indexOf('Languages');
-assert.ok(ccCertIdx < ccPubIdx, 'Creative Clean: Certifications must precede Publications');
-assert.ok(ccPubIdx < ccLangIdx, 'Creative Clean: Publications must precede Languages');
+assert.ok(ccPubIdx < ccCertIdx, 'Creative Clean: Publications must precede Certifications');
+assert.ok(ccCertIdx < ccLangIdx, 'Creative Clean: Certifications must precede Languages');
 
 const ccPage2Match = ccHtml.match(/data-resume-page="2"[\s\S]*$/);
 if (ccPage2Match) {
   assert.ok(!ccPage2Match[0].includes('data-sidebar-block'), 'Creative Clean: Page 2 must not contain sidebar blocks');
 }
-console.log('  ✓ PASSED: Creative Clean preserves approved main content order: Certifications -> Publications -> Languages');
+console.log('  ✓ PASSED: Creative Clean preserves approved main content order: Publications -> Certifications -> Languages');
 
 // Modern Professional: Page 2 sidebar removed, Languages after Certifications/Publications
 const mpHtml = renderToString(React.createElement(ModernProfessionalTemplate, { sections: normalized1, isPreview: false }));
@@ -252,6 +252,69 @@ assert.ok(ecCredIdx < ecPubIdx, 'Executive: Credentials & Honors must precede Pu
 assert.ok(ecPubIdx < ecCoreIdx, 'Executive: Publications must precede Core Strengths');
 console.log('  ✓ PASSED: Executive Corporate preserves approved layout: Credentials & Honors -> Publications -> Core Strengths');
 
+// -------------------------------------------------------------
+// Test 7: Focused Regression - Creative Clean Research Section Order & Data Contract
+// -------------------------------------------------------------
+console.log('\n>>> Test 11: Creative Clean Template Research Section Regression');
+const researchTestResume = {
+  personalInfo: { fullName: 'Dhairya Mishra', email: 'dhairya@example.com' },
+  summary: 'AI researcher specializing in agentic systems and task automation.',
+  experience: [
+    {
+      company: 'Autonomous AI Labs',
+      role: 'Agentic AI Research Intern',
+      startDate: '2025-06',
+      endDate: '2025-12',
+      bullets: ['Researched multi-agent collaboration frameworks.'],
+    },
+  ],
+  projects: [
+    {
+      name: 'Snap & Study — AI Vision Study Assistant',
+      description: 'AI vision study assistant powered by multimodal LLMs.',
+      technologies: ['React', 'Python', 'OpenCV'],
+    },
+  ],
+  publications: [
+    {
+      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: 'Independent Research',
+      date: '2026',
+      description: 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication.',
+    },
+  ],
+  certifications: [{ name: 'AWS Certified AI Practitioner', issuer: 'Amazon Web Services', date: '2025' }],
+  education: [{ institution: 'Tech University', degree: 'B.Tech in Computer Science', startDate: '2021', endDate: '2025' }],
+  skills: { technical: ['Python', 'Multi-Agent Systems', 'LLMs'], soft: ['Research', 'Problem Solving'], languages: ['English'] },
+};
+
+// 1. Verify normalizeResumeSections supports publications and preserves all required fields
+const normResearch = normalizeResumeSections(researchTestResume);
+assert.equal(normResearch.publications.length, 1, 'normalizeResumeSections must preserve publications array');
+assert.equal(normResearch.publications[0].title, 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation', 'Title must be preserved');
+assert.equal(normResearch.publications[0].publisher, 'Independent Research', 'Publisher must be preserved');
+assert.equal(normResearch.publications[0].date, '2026', 'Date must be preserved');
+assert.ok(normResearch.publications[0].description.includes('Studied multi-agent collaboration architectures'), 'Description must be preserved');
+console.log('  ✓ PASSED: normalizeResumeSections supports publications key and preserves title, publisher, date, description');
+
+// 2. Verify Creative Clean renders Research Paper in required position: after Snap & Study and before Certifications
+const ccResearchHtml = renderToString(React.createElement(CreativeCleanTemplate, { sections: normResearch, isPreview: false }));
+const ccSnapIndex = ccResearchHtml.indexOf('Snap &amp; Study');
+const ccPubIndex = ccResearchHtml.indexOf('Multi-Agent Collaboration Systems');
+const ccCertIndex = ccResearchHtml.indexOf('Certifications');
+
+assert.ok(ccSnapIndex !== -1, 'Snap & Study project must be rendered');
+assert.ok(ccPubIndex !== -1, 'Research paper title must be rendered');
+assert.ok(ccCertIndex !== -1, 'Certifications section must be rendered');
+assert.ok(ccResearchHtml.includes('Independent Research'), 'Publisher must be rendered in Creative Clean');
+assert.ok(ccResearchHtml.includes('Studied multi-agent collaboration architectures'), 'Description must be rendered in Creative Clean');
+
+assert.ok(ccSnapIndex < ccPubIndex, `Creative Clean: Research Paper (idx ${ccPubIndex}) must appear AFTER Snap & Study project (idx ${ccSnapIndex})`);
+assert.ok(ccPubIndex < ccCertIndex, `Creative Clean: Research Paper (idx ${ccPubIndex}) must appear BEFORE Certifications (idx ${ccCertIndex})`);
+
+console.log('  ✓ PASSED: Creative Clean renders Research Paper immediately after Projects (Snap & Study) and before Certifications');
+
 console.log('\n================================================================');
-console.log('ALL 10 REGRESSION & CONSISTENCY CRITERIA FULLY VERIFIED!');
+console.log('ALL 11 REGRESSION & CONSISTENCY CRITERIA FULLY VERIFIED!');
 console.log('================================================================\n');
+

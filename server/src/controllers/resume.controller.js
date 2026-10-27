@@ -46,7 +46,7 @@ export const updateResume = async (req, res, next) => {
 export const updateSection = async (req, res, next) => {
   try {
     const { section } = req.params;
-    const validSections = ['personalInfo', 'summary', 'experience', 'education', 'skills', 'projects', 'certifications', 'publications'];
+    const validSections = ['personalInfo', 'summary', 'experience', 'education', 'skills', 'projects', 'certifications', 'publications', 'customSections', 'sectionOrder'];
     if (!validSections.includes(section)) {
       return res.status(400).json({ success: false, message: `Invalid section: ${section}` });
     }
@@ -124,9 +124,13 @@ export const uploadResume = async (req, res, next) => {
     // ── Step 2: AI parsing with automatic resilient heuristic fallback ──
     let parsedSections;
     try {
-      parsedSections = await aiService.parseResume({ resumeText: trimmedText });
+      const parsePromise = aiService.parseResume({ resumeText: trimmedText });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AI parsing timeout (12s)')), 12000)
+      );
+      parsedSections = await Promise.race([parsePromise, timeoutPromise]);
     } catch (aiError) {
-      console.warn('[Upload] AI parsing encountered an issue, seamlessly applying heuristic fallback parser:', aiError.message);
+      console.warn('[Upload] AI parsing encountered an issue or timed out, seamlessly applying heuristic fallback parser:', aiError.message);
       parsedSections = extractFallbackSections(trimmedText);
     }
 
@@ -191,6 +195,9 @@ export const importResume = async (req, res, next) => {
       }
       if ((!sections.certifications || sections.certifications.length === 0) && fallback.certifications?.length > 0) {
         sections.certifications = fallback.certifications;
+      }
+      if ((!sections.publications || sections.publications.length === 0) && fallback.publications?.length > 0) {
+        sections.publications = fallback.publications;
       }
     } catch (error) {
       console.warn('[Resume import] AI extraction unavailable or timed out, seamlessly using deterministic extractor:', error.message);

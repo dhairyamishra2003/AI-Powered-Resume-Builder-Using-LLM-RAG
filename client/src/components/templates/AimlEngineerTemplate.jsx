@@ -363,7 +363,41 @@ function AimlEngineerTemplate({
     });
   }
 
-  // 5. Certifications & Accreditations
+  // 5. Research Papers & Publications (Immediately after Projects and before Certifications)
+  if (validPublications.length > 0) {
+    blocks.push({
+      id: 'publications',
+      type: 'publications',
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Research Papers & Publications"
+            icon={HiBookOpen}
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            borderColor={primaryColor}
+            style={sectionTitleStyle}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {validPublications.map((pub, idx) => (
+              <PublicationItem
+                key={idx}
+                title={pub.title}
+                publisher={pub.publisher}
+                authors={pub.authors}
+                date={pub.date}
+                link={pub.link}
+                description={pub.description}
+                accentColor={accentColor}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // 6. Certifications & Accreditations
   if (validCertifications.length > 0) {
     blocks.push({
       id: 'certifications',
@@ -396,40 +430,6 @@ function AimlEngineerTemplate({
               </li>
             ))}
           </ul>
-        </div>
-      ),
-    });
-  }
-
-  // Research Papers & Publications
-  if (validPublications.length > 0) {
-    blocks.push({
-      id: 'publications',
-      type: 'publications',
-      render: () => (
-        <div>
-          <SectionTitle
-            title="Research Papers & Publications"
-            icon={HiBookOpen}
-            primaryColor={primaryColor}
-            accentColor={accentColor}
-            borderColor={primaryColor}
-            style={sectionTitleStyle}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {validPublications.map((pub, idx) => (
-              <PublicationItem
-                key={idx}
-                title={pub.title}
-                publisher={pub.publisher}
-                authors={pub.authors}
-                date={pub.date}
-                link={pub.link}
-                description={pub.description}
-                accentColor={accentColor}
-              />
-            ))}
-          </div>
         </div>
       ),
     });

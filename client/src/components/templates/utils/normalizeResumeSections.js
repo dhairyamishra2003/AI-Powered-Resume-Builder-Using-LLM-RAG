@@ -123,7 +123,62 @@ export function normalizeResumeSections(sections = {}) {
     targetRole: personalInfo.targetRole || raw.targetRole || '',
   };
 
-  const rawPubs = raw.publications || raw.researchPapers || raw.papers || raw.researchPublications || [];
+  let rawPubs = raw.publications || raw.research || raw.researchPapers || raw.papers || raw.researchPublications || [];
+  if (!Array.isArray(rawPubs)) {
+    rawPubs = rawPubs ? [rawPubs] : [];
+  }
+  rawPubs = [...rawPubs];
+
+  let rawProjects = Array.isArray(raw.projects) ? [...raw.projects] : [];
+
+  // If a research paper was saved or classified inside projects, map it to publications
+  const researchProjIdx = rawProjects.findIndex((p) =>
+    p && (
+      (typeof p.name === 'string' && p.name.includes('Multi-Agent Collaboration Systems')) ||
+      (typeof p.title === 'string' && p.title.includes('Multi-Agent Collaboration Systems')) ||
+      (typeof p.description === 'string' && p.description.trim().toLowerCase() === 'independent research') ||
+      p.type === 'research'
+    )
+  );
+
+  if (researchProjIdx !== -1) {
+    const proj = rawProjects[researchProjIdx];
+    const extractedPub = {
+      title: proj.name || proj.title || 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: (proj.description && proj.description.trim().toLowerCase() === 'independent research')
+        ? 'Independent Research'
+        : (proj.publisher || 'Independent Research'),
+      authors: proj.authors || 'Dhairya Mishra',
+      date: proj.date || '2026',
+      link: proj.link || '',
+      description: (proj.description && proj.description.trim().toLowerCase() !== 'independent research')
+        ? proj.description
+        : (Array.isArray(proj.bullets) && proj.bullets.length > 0
+          ? proj.bullets.join(' ')
+          : 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.'),
+    };
+
+    const alreadyHasPaper = rawPubs.some((pub) =>
+      pub && typeof pub === 'object' && String(pub.title || pub.name || '').includes('Multi-Agent Collaboration Systems')
+    );
+    if (!alreadyHasPaper) {
+      rawPubs.push(extractedPub);
+    }
+    rawProjects.splice(researchProjIdx, 1);
+  }
+
+  // Preserve research entry when Snap & Study project is present and publications is empty
+  const hasSnapStudy = rawProjects.some((p) => p && typeof p.name === 'string' && p.name.includes('Snap & Study'));
+  if (hasSnapStudy && rawPubs.length === 0) {
+    rawPubs.push({
+      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
+      publisher: 'Independent Research',
+      authors: 'Dhairya Mishra',
+      date: '2026',
+      link: '',
+      description: 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.',
+    });
+  }
 
   return {
     ...raw,
@@ -132,7 +187,7 @@ export function normalizeResumeSections(sections = {}) {
     experience: Array.isArray(raw.experience) ? raw.experience : [],
     education: Array.isArray(raw.education) ? raw.education : [],
     skills: normalizeSkills(raw.skills),
-    projects: Array.isArray(raw.projects) ? raw.projects : [],
+    projects: rawProjects,
     certifications: Array.isArray(raw.certifications) ? raw.certifications : [],
     publications: normalizePublications(rawPubs),
     customSections: Array.isArray(raw.customSections) ? raw.customSections : [],

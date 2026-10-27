@@ -6,6 +6,8 @@
 // ============================================
 
 import { createContext, useState } from 'react';
+import { resolveTemplateId } from '../constants/templates.js';
+import { normalizeResumeSections } from '../components/templates/utils/normalizeResumeSections.js';
 
 const ResumeContext = createContext(null);
 
@@ -62,9 +64,11 @@ function ResumeProvider({ children }) {
   };
 
   const loadResume = (resumeData) => {
+    if (!resumeData) return;
     setResume({
       ...resumeData,
-      templateId: resumeData.templateId || 'modern-professional',
+      templateId: resolveTemplateId(resumeData.templateId),
+      sections: normalizeResumeSections(resumeData.sections || {}),
     });
     setHasChanges(false);
   };
