@@ -108,6 +108,89 @@ export function normalizePublications(publications) {
   return [];
 }
 
+export function defragmentProjects(projects) {
+  if (!Array.isArray(projects)) return [];
+
+  const TECH_PREFIX_REGEX = /^(?:technologies|tech\s*stack|tools\s*used|stack|skills\s*used|built\s*with|technologies\s*used)\s*[:\-–—]?\s*(.*)$/i;
+  const DESC_PREFIX_REGEX = /^(?:description|overview|details|summary|highlights|key\s*highlights|responsibilities|features)\s*[:\-–—]?\s*(.*)$/i;
+  const BULLET_PREFIX_REGEX = /^[•\-\*\u2022\u2023\u25E6\u2043\u2219]\s*(.*)$/;
+  const ACTION_VERB_REGEX = /^(?:built|engineered|developed|implemented|designed|created|optimized|architected|spearheaded|integrated|orchestrated|automated|trained|fine-tuned|deployed|maintained|refactored|leveraged|utilized|enhanced|reduced|increased)\b/i;
+
+  const defragmented = [];
+
+  for (const rawItem of projects) {
+    if (!rawItem) continue;
+    const item = typeof rawItem === 'string'
+      ? { name: rawItem.trim(), description: '', technologies: [], bullets: [] }
+      : { ...rawItem };
+
+    const name = String(item.name || item.title || '').trim();
+    const desc = String(item.description || '').trim();
+    const techList = Array.isArray(item.technologies) ? item.technologies.filter(Boolean).map(String) : [];
+    const bulletList = Array.isArray(item.bullets) ? item.bullets.filter(Boolean).map(String) : [];
+
+    const prev = defragmented.length > 0 ? defragmented[defragmented.length - 1] : null;
+
+    // Check if this project item is actually a technology stack fragment
+    const techMatch = name.match(TECH_PREFIX_REGEX);
+    const isTechFragment = Boolean(
+      techMatch ||
+      /^(?:technologies|tech\s*stack|tools)$/i.test(name) ||
+      (techList.length > 0 && !desc && bulletList.length === 0 && (/^tech/i.test(name) || name.length < 3))
+    );
+
+    if (isTechFragment && prev) {
+      let extractedTech = [...techList];
+      const remainder = techMatch ? techMatch[1].trim() : (name.length > 20 ? name : desc);
+      if (remainder) {
+        const parts = remainder.split(/[,|•·\n]+/).map((s) => s.trim()).filter(Boolean);
+        extractedTech.push(...parts);
+      }
+      const existingUpper = new Set((prev.technologies || []).map((t) => String(t).toUpperCase()));
+      for (const t of extractedTech) {
+        if (!existingUpper.has(t.toUpperCase())) {
+          prev.technologies = prev.technologies || [];
+          prev.technologies.push(t);
+          existingUpper.add(t.toUpperCase());
+        }
+      }
+      continue;
+    }
+
+    // Check if this project item is actually a description or bullet point fragment
+    const descMatch = name.match(DESC_PREFIX_REGEX);
+    const bulletMatch = name.match(BULLET_PREFIX_REGEX);
+    const isActionSentence = ACTION_VERB_REGEX.test(name) && name.length > 25 && techList.length === 0 && !item.link;
+    const isDescFragment = Boolean(descMatch || bulletMatch || isActionSentence);
+
+    if (isDescFragment && prev) {
+      let content = bulletMatch ? bulletMatch[1].trim() : (descMatch ? descMatch[1].trim() : name);
+      if (desc && desc !== name) {
+        content = content ? `${content} ${desc}` : desc;
+      }
+      if (content) {
+        prev.bullets = prev.bullets || [];
+        if (!prev.bullets.includes(content)) {
+          prev.bullets.push(content);
+        }
+        if (!prev.description) {
+          prev.description = content;
+        }
+      }
+      for (const b of bulletList) {
+        if (b && !prev.bullets.includes(b)) {
+          prev.bullets.push(b);
+        }
+      }
+      continue;
+    }
+
+    defragmented.push(item);
+  }
+
+  return defragmented;
+}
+
 export function normalizeResumeSections(sections = {}) {
   const raw = (sections && typeof sections === 'object') ? sections : {};
   const personalInfo = raw.personalInfo || {};
@@ -131,6 +214,9 @@ export function normalizeResumeSections(sections = {}) {
 
   let rawProjects = Array.isArray(raw.projects) ? [...raw.projects] : [];
 
+  // Defragment orphaned technology lines and description lines into their parent projects
+  rawProjects = defragmentProjects(rawProjects);
+
   // If a research paper was saved or classified inside projects, map it to publications
   const researchProjIdx = rawProjects.findIndex((p) =>
     p && (
@@ -148,7 +234,7 @@ export function normalizeResumeSections(sections = {}) {
       publisher: (proj.description && proj.description.trim().toLowerCase() === 'independent research')
         ? 'Independent Research'
         : (proj.publisher || 'Independent Research'),
-      authors: proj.authors || 'Dhairya Mishra',
+      authors: proj.authors || normalizedPersonalInfo.fullName || 'Author',
       date: proj.date || '2026',
       link: proj.link || '',
       description: (proj.description && proj.description.trim().toLowerCase() !== 'independent research')
@@ -167,17 +253,23 @@ export function normalizeResumeSections(sections = {}) {
     rawProjects.splice(researchProjIdx, 1);
   }
 
-  // Preserve research entry when Snap & Study project is present and publications is empty
-  const hasSnapStudy = rawProjects.some((p) => p && typeof p.name === 'string' && p.name.includes('Snap & Study'));
-  if (hasSnapStudy && rawPubs.length === 0) {
-    rawPubs.push({
-      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
-      publisher: 'Independent Research',
-      authors: 'Dhairya Mishra',
-      date: '2026',
-      link: '',
-      description: 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.',
-    });
+  // Soft Skills candidate regex for separating from Certifications
+  const SOFT_SKILL_WORDS = /^(leadership|problem solving|critical thinking|communication|teamwork|collaboration|adaptability|time management|mentorship|work ethic|conflict resolution|emotional intelligence|agile collaboration|creativity|public speaking|decision making)$/i;
+
+  const normalizedSkills = normalizeSkills(raw.skills);
+  const rawCerts = Array.isArray(raw.certifications) ? raw.certifications : [];
+  const cleanCerts = [];
+
+  for (const cert of rawCerts) {
+    const certName = typeof cert === 'string' ? cert : (cert?.name || cert?.title || '');
+    const certIssuer = typeof cert === 'object' ? (cert?.issuer || cert?.authority || '') : '';
+    if (SOFT_SKILL_WORDS.test(certName.trim()) && !certIssuer) {
+      if (!normalizedSkills.soft.some((s) => s.toLowerCase() === certName.trim().toLowerCase())) {
+        normalizedSkills.soft.push(certName.trim());
+      }
+    } else {
+      cleanCerts.push(cert);
+    }
   }
 
   return {
@@ -186,9 +278,9 @@ export function normalizeResumeSections(sections = {}) {
     summary: normalizeSummaryText(raw.summary),
     experience: Array.isArray(raw.experience) ? raw.experience : [],
     education: Array.isArray(raw.education) ? raw.education : [],
-    skills: normalizeSkills(raw.skills),
+    skills: normalizedSkills,
     projects: rawProjects,
-    certifications: Array.isArray(raw.certifications) ? raw.certifications : [],
+    certifications: cleanCerts,
     publications: normalizePublications(rawPubs),
     customSections: Array.isArray(raw.customSections) ? raw.customSections : [],
     sectionOrder: Array.isArray(raw.sectionOrder) ? raw.sectionOrder : [],

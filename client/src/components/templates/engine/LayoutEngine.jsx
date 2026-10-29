@@ -1099,6 +1099,8 @@ export function SectionTitle({
         fontFamily: fontFamily || 'inherit',
         breakInside: 'avoid',
         pageBreakInside: 'avoid',
+        breakAfter: 'avoid',
+        pageBreakAfter: 'avoid',
         ...style,
       }}
     >
@@ -1359,7 +1361,8 @@ export function ProjectCard({
       (b) =>
         b &&
         typeof b === 'string' &&
-        b.trim().length > 0
+        b.trim().length > 0 &&
+        (!description || b.trim().toLowerCase() !== description.trim().toLowerCase())
     )
     : [];
 

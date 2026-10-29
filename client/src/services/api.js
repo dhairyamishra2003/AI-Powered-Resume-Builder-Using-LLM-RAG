@@ -130,6 +130,58 @@ const fetchApi = async (endpoint, options = {}) => {
   }
 };
 
+export const uploadWithProgress = (endpoint, formData, onProgress, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const token = localStorage.getItem('token');
+    const baseUrl = PRIMARY_BASE_URL;
+
+    xhr.open('POST', `${baseUrl}${endpoint}`, true);
+    xhr.withCredentials = true;
+    if (token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    }
+
+    if (xhr.upload && typeof onProgress === 'function') {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100);
+          onProgress(percent);
+        }
+      };
+    }
+
+    xhr.onload = () => {
+      let data = null;
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {
+        data = xhr.responseText ? { message: xhr.responseText } : null;
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(data);
+      } else {
+        const message = data?.message || data?.error || `Upload failed with status ${xhr.status}`;
+        const error = new Error(message);
+        error.response = { data, status: xhr.status };
+        reject(error);
+      }
+    };
+
+    xhr.onerror = () => {
+      reject(new Error('Network error during upload. Please check your connection.'));
+    };
+
+    xhr.ontimeout = () => {
+      reject(new Error('Upload timed out. The server took too long to process the document.'));
+    };
+
+    xhr.timeout = options.timeoutMs || 120000;
+    xhr.send(formData);
+  });
+};
+
 const API = {
   get: (endpoint) => fetchApi(endpoint),
 
@@ -150,3 +202,4 @@ const API = {
 };
 
 export default API;
+

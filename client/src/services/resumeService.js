@@ -3,7 +3,7 @@
 // ============================================
 // Reference: fetch(), async/await - reference-javascript.md
 
-import API from './api.js';
+import API, { uploadWithProgress } from './api.js';
 
 const createResume = async (data = {}) => {
   const response = await API.post('/resumes', data);
@@ -60,17 +60,17 @@ const deleteVersion = async (resumeId, versionId) => {
   return response.data;
 };
 
-const uploadResume = async (file) => {
+const uploadResume = async (file, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await API.post('/resumes/upload', formData, { timeoutMs: 120000 });
+  const response = await uploadWithProgress('/resumes/upload', formData, onProgress, { timeoutMs: 120000 });
   return response.data;
 };
 
-const importResumeData = async (file) => {
+const importResumeData = async (file, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await API.post('/resumes/import', formData, { timeoutMs: 120000 });
+  const response = await uploadWithProgress('/resumes/import', formData, onProgress, { timeoutMs: 120000 });
   return response.data;
 };
 

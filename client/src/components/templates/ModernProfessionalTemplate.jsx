@@ -24,6 +24,7 @@ import {
 import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
+import styles from './ModernProfessionalTemplate.module.css';
 
 function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
   const normalizedSections = normalizeResumeSections(sections || {});
@@ -489,6 +490,7 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
 
   return (
     <TwoPageResumeCanvas
+      className={styles.container}
       header={header}
       sidebarSections={sidebarSections}
       page2Header={
@@ -511,7 +513,10 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
       page2Padding="16px 22px"
       twoColumnGap={10}
       blockGap={8}
-      disablePage2Sidebar={true}
+      // Keep the same two-column grid on continuation pages. Moving a long
+      // skills sidebar into the full-width main flow made page two look like a
+      // different template and displaced the remaining sections.
+      disablePage2Sidebar={false}
     />
   );
 }

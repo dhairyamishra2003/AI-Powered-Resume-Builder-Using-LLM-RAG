@@ -27,6 +27,7 @@ import {
 import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
+import styles from './SoftwareEngineerTemplate.module.css';
 
 function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
   const normalizedSections = normalizeResumeSections(sections || {});
@@ -66,20 +67,21 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: `2.5px solid ${primaryColor}`,
-        padding: '16px 24px 12px',
+        borderBottom: `3px solid ${accentColor}`,
+        padding: '16px 24px 14px',
         boxSizing: 'border-box',
         width: '100%',
         gap: '16px',
-        background: '#ffffff',
+        background: primaryColor,
+        color: '#ffffff',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
         {/* Developer Icon Badge */}
         <div
           style={{
-            width: '40px',
-            height: '40px',
+            width: '42px',
+            height: '42px',
             borderRadius: '8px',
             background: accentColor,
             color: '#ffffff',
@@ -88,7 +90,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
             justifyContent: 'center',
             fontSize: '22px',
             flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
           }}
         >
           <HiCodeBracket />
@@ -100,7 +102,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '0.6px',
-              color: primaryColor,
+              color: '#ffffff',
               margin: 0,
               lineHeight: 1.15,
               overflowWrap: 'anywhere',
@@ -112,7 +114,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
             style={{
               fontSize: typo.targetRole,
               fontWeight: 650,
-              color: accentColor,
+              color: '#93c5fd',
               marginTop: '3px',
               letterSpacing: '0.3px',
               overflowWrap: 'anywhere',
@@ -127,8 +129,8 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
       <ContactList
         personalInfo={personalInfo}
         align="right"
-        accentColor={accentColor}
-        textColor="#334155"
+        accentColor="#60a5fa"
+        textColor="#cbd5e1"
         style={{ fontSize: typo.contact }}
       />
     </div>
@@ -428,6 +430,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
 
   return (
     <TwoPageResumeCanvas
+      className={styles.container}
       header={header}
       page2Header={
         <PageRunningHeader

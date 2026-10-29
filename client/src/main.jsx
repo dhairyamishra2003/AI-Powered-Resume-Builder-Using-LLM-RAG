@@ -42,8 +42,9 @@ class ErrorBoundary extends React.Component {
 }
 
 const rawClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const googleClientId = (rawClientId && rawClientId !== 'your-google-')
-  ? rawClientId
+const trimmedClientId = String(rawClientId || '').trim();
+const googleClientId = (trimmedClientId && !trimmedClientId.startsWith('your-google-') && trimmedClientId.length > 10)
+  ? trimmedClientId
   : '100000000000-dummyclientid.apps.googleusercontent.com';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

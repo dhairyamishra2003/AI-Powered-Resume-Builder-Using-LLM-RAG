@@ -77,10 +77,12 @@ function LoginPage() {
     }
   };
 
-  const handleGoogleError = () => {
-    console.error('[Auth] Google OAuth popup closed or failed');
+  const handleGoogleError = (errorDetails) => {
+    console.error('[Auth] Google OAuth popup closed or failed', errorDetails);
     setIsAuthenticating(false);
-    toast.error('Google login failed. Please try again.');
+    setIsLoading(false);
+    googleLoginInFlight.current = false;
+    toast.error('Google login failed or was cancelled. Please try again.');
   };
 
   const googleButtonDisabled = isLoading;

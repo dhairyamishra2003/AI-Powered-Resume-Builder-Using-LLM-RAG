@@ -6,7 +6,7 @@
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ../scripts/dev.ps1",
     "dev:ui": "vite",
     "build": "vite build",
-    "test": "esbuild tests/templates.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-tests.mjs --external:react --external:react-dom && node tests/dist/run-tests.mjs && esbuild tests/consistency.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-consistency.mjs --external:react --external:react-dom && node tests/dist/run-consistency.mjs"
+    "test": "esbuild tests/templates.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-tests.mjs --external:react --external:react-dom && node tests/dist/run-tests.mjs && esbuild tests/consistency.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-consistency.mjs --external:react --external:react-dom && node tests/dist/run-consistency.mjs && esbuild tests/isolation.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-isolation.mjs --external:react --external:react-dom && node tests/dist/run-isolation.mjs && esbuild tests/pdf-render-all-templates.test.mjs --bundle --platform=node --format=esm --outfile=tests/dist/run-pdf-tests.mjs --external:react --external:react-dom && node tests/dist/run-pdf-tests.mjs"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
@@ -26,4 +26,5 @@
     "tailwindcss": "^4.0.0",
     "vite": "^6.0.0"
   }
+
 }

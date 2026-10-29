@@ -80,7 +80,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
       background: '#f8fafc',
       border: '1px solid #e2e8f0',
       padding: '12px 10px',
-      disablePage2Sidebar: true,
+      disablePage2Sidebar: false,
     }),
     margins: Object.freeze({
       mainPadding: '12px 16px',
@@ -104,7 +104,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     aliases: Object.freeze(['classic', 'modern']),
     typography: TEMPLATE_TYPOGRAPHY_BASES['modern-professional'],
     continuationRules: Object.freeze({
-      disablePage2Sidebar: true,
+      disablePage2Sidebar: false,
       hasRunningHeader: true,
       continuationNotice: true,
     }),

@@ -28,7 +28,9 @@ function HomePage() {
   const [newTemplate, setNewTemplate] = useState('modern-professional');
   const [newTargetRole, setNewTargetRole] = useState('');
   const [uploadFile, setUploadFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [processingStage, setProcessingStage] = useState('idle');
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     const fetchResumes = async () => {
@@ -61,23 +63,34 @@ function HomePage() {
 
   const handleUpload = async () => {
     if (!uploadFile) return;
-    setIsUploading(true);
+    setProcessingStage('uploading');
+    setUploadProgress(0);
+    setUploadError('');
     try {
-      const resume = await uploadResume(uploadFile);
-      toast.success('Resume parsed and imported!');
+      const response = await uploadResume(uploadFile, (percent) => {
+        setUploadProgress(percent);
+        if (percent >= 100) {
+          setProcessingStage('processing');
+        }
+      });
+      const resume = response?.data || response;
+      if (response?.warnings && response.warnings.length > 0) {
+        toast.success('Resume imported successfully!');
+      } else {
+        toast.success('Resume parsed and imported!');
+      }
       setShowUpload(false);
       setUploadFile(null);
+      setProcessingStage('idle');
       navigate(`/builder/${resume._id}`);
     } catch (error) {
-      // api.js wraps server errors as: error.message = server message,
-      // error.response = { data, status }. Both paths are checked here.
       const message =
         error?.response?.data?.message ||
         error?.message ||
         'Failed to parse resume. Please try a text-selectable PDF.';
+      setUploadError(message);
+      setProcessingStage('error');
       toast.error(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -224,12 +237,32 @@ function HomePage() {
         </form>
       </ModalLayout>
 
-      <ModalLayout isOpen={showUpload} title="Upload Existing Resume" onClose={() => setShowUpload(false)}>
-        {isUploading ? (
+      <ModalLayout
+        isOpen={showUpload}
+        title="Upload Existing Resume"
+        onClose={() => {
+          if (processingStage === 'uploading' || processingStage === 'processing') return;
+          setShowUpload(false);
+          setProcessingStage('idle');
+          setUploadError('');
+        }}
+      >
+        {processingStage === 'uploading' ? (
+          <div className="home-upload-state">
+            <span className="home-upload-stage-badge">Transferring File</span>
+            <div className="home-upload-progress-wrapper">
+              <div className="home-upload-progress-track">
+                <div className="home-upload-progress-fill" style={{ width: `${uploadProgress}%` }} />
+              </div>
+              <p className="text-xs text-muted">Uploading PDF ({uploadProgress}%)...</p>
+            </div>
+          </div>
+        ) : processingStage === 'processing' ? (
           <div className="home-upload-state">
             <div className="spinner" />
-            <p className="text-muted">Parsing your resume with AI...</p>
-            <p className="text-xs">Extracting sections, experience, and skills...</p>
+            <span className="home-upload-stage-badge">Analyzing & Saving</span>
+            <p className="text-muted" style={{ fontWeight: 600 }}>Structuring resume content with AI...</p>
+            <p className="text-xs text-muted">Extracting text, identifying sections, and verifying completeness...</p>
           </div>
         ) : (
           <div className="home-upload-form">
@@ -238,7 +271,10 @@ function HomePage() {
               <input
                 type="file"
                 accept=".pdf,application/pdf"
-                onChange={(event) => setUploadFile(event.target.files[0] || null)}
+                onChange={(event) => {
+                  setUploadFile(event.target.files[0] || null);
+                  setUploadError('');
+                }}
               />
               <HiArrowUpTray />
               <span>{uploadFile ? uploadFile.name : 'Click to select a PDF file'}</span>
@@ -248,12 +284,34 @@ function HomePage() {
               <div className="home-upload-file">
                 <HiDocumentText />
                 <span>{uploadFile.name}</span>
-                <button type="button" className="btn btn-ghost" onClick={() => setUploadFile(null)}>Remove</button>
+                <button type="button" className="btn btn-ghost" onClick={() => { setUploadFile(null); setUploadError(''); }}>Remove</button>
+              </div>
+            )}
+            {uploadError && (
+              <div className="home-upload-error-box">
+                <strong>Upload issue:</strong> {uploadError}
               </div>
             )}
             <div className="home-modal-actions">
-              <button type="button" className="btn btn-outline" onClick={() => setShowUpload(false)}>Cancel</button>
-              <button type="button" className="btn btn-primary" disabled={!uploadFile} onClick={handleUpload}>Parse & Import</button>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => {
+                  setShowUpload(false);
+                  setProcessingStage('idle');
+                  setUploadError('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!uploadFile}
+                onClick={handleUpload}
+              >
+                Parse & Import
+              </button>
             </div>
           </div>
         )}

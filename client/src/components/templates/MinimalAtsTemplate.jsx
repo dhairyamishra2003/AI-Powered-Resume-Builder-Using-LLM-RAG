@@ -14,6 +14,7 @@ import {
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
 import { getTemplateTypography } from '../../config/resumeTypography.js';
+import styles from './MinimalAtsTemplate.module.css';
 
 function MinimalAtsTemplate({
   sections,
@@ -90,7 +91,7 @@ function MinimalAtsTemplate({
             overflowWrap: 'anywhere',
           }}
         >
-          {personalInfo.fullName || (isPreview ? 'Dhairya Mishra' : 'Your Name')}
+          {personalInfo.fullName || (isPreview ? 'Alex Johnson' : 'Your Name')}
         </h1>
 
         {(personalInfo.targetRole || isPreview) && (
@@ -275,8 +276,6 @@ function MinimalAtsTemplate({
       blocks.push({
         id: `project-${idx}`,
         type: 'projects',
-        forcePage: idx === 0 ? 1 : 2,
-        pageBreakBefore: idx === 1,
         render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
           <div>
             {(idx === 0 || isFirstOfThisSectionOnPage) && (
@@ -427,6 +426,7 @@ function MinimalAtsTemplate({
 
   return (
     <TwoPageResumeCanvas
+      className={styles.container}
       header={header}
       page2Header={
         <PageRunningHeader

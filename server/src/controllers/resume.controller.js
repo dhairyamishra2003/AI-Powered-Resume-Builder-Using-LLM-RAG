@@ -2,7 +2,7 @@ import * as resumeService from '../services/resume.service.js';
 import extractTextFromPdf, { extractFallbackSections } from '../utils/resumeParser.js';
 import * as aiService from '../services/ai.service.js';
 import { VALID_TEMPLATE_IDS } from '../constants/templates.js';
-import { importDocument, validateImportedSections } from '../utils/resumeImport.js';
+import { importDocument, mergeImportedSections, validateImportedSections, verifyImportCompleteness } from '../utils/resumeImport.js';
 import { hasPdfSignature } from '../middleware/upload.middleware.js';
 
 export const createResume = async (req, res, next) => {
@@ -116,23 +116,29 @@ export const uploadResume = async (req, res, next) => {
       });
     }
 
-    // Trim to 15 000 chars to stay within Gemini token limits on large PDFs
-    const trimmedText = extractedText.length > 15000
-      ? extractedText.slice(0, 15000)
+    // Bound only the model request; the full PDF remains available to fallback extraction.
+    const trimmedText = extractedText.length > 30000
+      ? extractedText.slice(0, 30000)
       : extractedText;
 
     // ── Step 2: AI parsing with automatic resilient heuristic fallback ──
-    let parsedSections;
+    const fallbackSections = extractFallbackSections(extractedText);
+    let rawParsed;
     try {
       const parsePromise = aiService.parseResume({ resumeText: trimmedText });
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('AI parsing timeout (12s)')), 12000)
+        setTimeout(() => reject(new Error('AI parsing timeout (30s)')), 30000)
       );
-      parsedSections = await Promise.race([parsePromise, timeoutPromise]);
+      rawParsed = mergeImportedSections(await Promise.race([parsePromise, timeoutPromise]), fallbackSections);
     } catch (aiError) {
       console.warn('[Upload] AI parsing encountered an issue or timed out, seamlessly applying heuristic fallback parser:', aiError.message);
-      parsedSections = extractFallbackSections(trimmedText);
+      rawParsed = fallbackSections;
     }
+
+    // Completeness verification: compare against detected source headers and recover any gaps
+    const verification = verifyImportCompleteness(extractedText, rawParsed, fallbackSections);
+    const parsedSections = verification.sections;
+    const warnings = verification.warnings;
 
     // Derive a clean title from the uploaded file's original name
     const rawTitle = req.file.originalname
@@ -142,7 +148,7 @@ export const uploadResume = async (req, res, next) => {
 
     // ── Step 3: Save parsed resume to database ────────────────────────────
     const resume = await resumeService.createFromUpload(req.user._id, parsedSections, title);
-    return res.status(201).json({ success: true, data: resume });
+    return res.status(201).json({ success: true, data: resume, warnings });
   } catch (error) {
     next(error);
   }
@@ -159,52 +165,25 @@ export const importResume = async (req, res, next) => {
     }
     if (imported.sections) return res.json({ success: true, data: { sections: imported.sections, source: imported.source } });
 
-    let sections;
+    let rawSections;
+    const fallback = extractFallbackSections(imported.text);
     try {
-      const parsePromise = aiService.parseResumeImport({ resumeText: imported.text });
+      const modelText = imported.text.length > 30000 ? imported.text.slice(0, 30000) : imported.text;
+      const parsePromise = aiService.parseResumeImport({ resumeText: modelText });
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('AI parsing timeout (12s)')), 12000)
+        setTimeout(() => reject(new Error('AI parsing timeout (30s)')), 30000)
       );
       const parsed = await Promise.race([parsePromise, timeoutPromise]);
-      sections = validateImportedSections(parsed);
-
-      // Merge with deterministic fallback if any critical fields were missed by AI
-      const fallback = extractFallbackSections(imported.text);
-      if (!sections.personalInfo?.fullName || sections.personalInfo.fullName === 'Candidate') {
-        if (fallback.personalInfo?.fullName && fallback.personalInfo.fullName !== 'Candidate') {
-          sections.personalInfo.fullName = fallback.personalInfo.fullName;
-        }
-      }
-      if (!sections.personalInfo?.email && fallback.personalInfo?.email) sections.personalInfo.email = fallback.personalInfo.email;
-      if (!sections.personalInfo?.phone && fallback.personalInfo?.phone) sections.personalInfo.phone = fallback.personalInfo.phone;
-      if (!sections.personalInfo?.location && fallback.personalInfo?.location) sections.personalInfo.location = fallback.personalInfo.location;
-      if (!sections.personalInfo?.linkedIn && fallback.personalInfo?.linkedIn) sections.personalInfo.linkedIn = fallback.personalInfo.linkedIn;
-      if (!sections.personalInfo?.portfolio && fallback.personalInfo?.portfolio) sections.personalInfo.portfolio = fallback.personalInfo.portfolio;
-      if (!sections.summary && fallback.summary) sections.summary = fallback.summary;
-      if ((!sections.experience || sections.experience.length === 0) && fallback.experience?.length > 0) {
-        sections.experience = fallback.experience;
-      }
-      if ((!sections.education || sections.education.length === 0) && fallback.education?.length > 0) {
-        sections.education = fallback.education;
-      }
-      if ((!sections.skills?.technical || sections.skills.technical.length === 0) && fallback.skills?.technical?.length > 0) {
-        sections.skills = { ...(sections.skills || {}), technical: fallback.skills.technical };
-      }
-      if ((!sections.projects || sections.projects.length === 0) && fallback.projects?.length > 0) {
-        sections.projects = fallback.projects;
-      }
-      if ((!sections.certifications || sections.certifications.length === 0) && fallback.certifications?.length > 0) {
-        sections.certifications = fallback.certifications;
-      }
-      if ((!sections.publications || sections.publications.length === 0) && fallback.publications?.length > 0) {
-        sections.publications = fallback.publications;
-      }
+      rawSections = mergeImportedSections(parsed, fallback);
     } catch (error) {
       console.warn('[Resume import] AI extraction unavailable or timed out, seamlessly using deterministic extractor:', error.message);
-      const fallback = extractFallbackSections(imported.text);
-      sections = validateImportedSections(fallback);
+      rawSections = fallback;
     }
 
-    return res.json({ success: true, data: { sections, source: imported.source } });
+    const verification = verifyImportCompleteness(imported.text, rawSections, fallback);
+    const sections = validateImportedSections(verification.sections);
+    const warnings = verification.warnings;
+
+    return res.json({ success: true, data: { sections, source: imported.source }, warnings });
   } catch (error) { next(error); }
 };

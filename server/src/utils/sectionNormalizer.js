@@ -141,6 +141,95 @@ export const normalizeProjectItem = (item) => {
 };
 
 /**
+ * Defragment projects by merging orphaned technology stack strings and
+ * description/bullet fragments into their parent project.
+ */
+export const defragmentProjects = (projects) => {
+  if (!Array.isArray(projects)) return [];
+
+  const TECH_PREFIX_REGEX = /^(?:technologies|tech\s*stack|tools\s*used|stack|skills\s*used|built\s*with|technologies\s*used)\s*[:\-–—]?\s*(.*)$/i;
+  const DESC_PREFIX_REGEX = /^(?:description|overview|details|summary|highlights|key\s*highlights|responsibilities|features)\s*[:\-–—]?\s*(.*)$/i;
+  const BULLET_PREFIX_REGEX = /^[•\-\*\u2022\u2023\u25E6\u2043\u2219]\s*(.*)$/;
+  const ACTION_VERB_REGEX = /^(?:built|engineered|developed|implemented|designed|created|optimized|architected|spearheaded|integrated|orchestrated|automated|trained|fine-tuned|deployed|maintained|refactored|leveraged|utilized|enhanced|reduced|increased)\b/i;
+
+  const defragmented = [];
+
+  for (const rawItem of projects) {
+    if (!rawItem) continue;
+    const item = typeof rawItem === 'string'
+      ? normalizeProjectItem(rawItem)
+      : { ...rawItem };
+
+    if (!item) continue;
+
+    const name = String(item.name || item.title || '').trim();
+    const desc = String(item.description || '').trim();
+    const techList = Array.isArray(item.technologies) ? item.technologies.filter(Boolean).map(String) : [];
+    const bulletList = Array.isArray(item.bullets) ? item.bullets.filter(Boolean).map(String) : [];
+
+    const prev = defragmented.length > 0 ? defragmented[defragmented.length - 1] : null;
+
+    // Check if this project item is actually a technology stack fragment
+    const techMatch = name.match(TECH_PREFIX_REGEX);
+    const isTechFragment = Boolean(
+      techMatch ||
+      /^(?:technologies|tech\s*stack|tools)$/i.test(name) ||
+      (techList.length > 0 && !desc && bulletList.length === 0 && (/^tech/i.test(name) || name.length < 3))
+    );
+
+    if (isTechFragment && prev) {
+      let extractedTech = [...techList];
+      const remainder = techMatch ? techMatch[1].trim() : (name.length > 20 ? name : desc);
+      if (remainder) {
+        const parts = remainder.split(/[,|•·\n]+/).map((s) => s.trim()).filter(Boolean);
+        extractedTech.push(...parts);
+      }
+      const existingUpper = new Set((prev.technologies || []).map((t) => String(t).toUpperCase()));
+      for (const t of extractedTech) {
+        if (!existingUpper.has(t.toUpperCase())) {
+          prev.technologies = prev.technologies || [];
+          prev.technologies.push(t);
+          existingUpper.add(t.toUpperCase());
+        }
+      }
+      continue;
+    }
+
+    // Check if this project item is actually a description or bullet point fragment
+    const descMatch = name.match(DESC_PREFIX_REGEX);
+    const bulletMatch = name.match(BULLET_PREFIX_REGEX);
+    const isActionSentence = ACTION_VERB_REGEX.test(name) && name.length > 25 && techList.length === 0 && !item.link;
+    const isDescFragment = Boolean(descMatch || bulletMatch || isActionSentence);
+
+    if (isDescFragment && prev) {
+      let content = bulletMatch ? bulletMatch[1].trim() : (descMatch ? descMatch[1].trim() : name);
+      if (desc && desc !== name) {
+        content = content ? `${content} ${desc}` : desc;
+      }
+      if (content) {
+        prev.bullets = prev.bullets || [];
+        if (!prev.bullets.includes(content)) {
+          prev.bullets.push(content);
+        }
+        if (!prev.description) {
+          prev.description = content;
+        }
+      }
+      for (const b of bulletList) {
+        if (b && !prev.bullets.includes(b)) {
+          prev.bullets.push(b);
+        }
+      }
+      continue;
+    }
+
+    defragmented.push(item);
+  }
+
+  return defragmented;
+};
+
+/**
  * Normalizes projects section:
  * CASE 1: Array of project objects -> validated & preserved.
  * CASE 2: Single string -> converted into [{ name: str, description: '', technologies: [], link: '', bullets: [] }]
@@ -151,57 +240,55 @@ export const normalizeProjectItem = (item) => {
 export const normalizeProjects = (projects) => {
   if (!projects) return [];
 
+  let normalized = [];
+
   // CASE 2: Single string
   if (typeof projects === 'string') {
-    const normalized = normalizeProjectItem(projects);
-    return normalized ? [normalized] : [];
-  }
-
-  // CASE 1 & 3: Array of objects or strings
-  if (Array.isArray(projects)) {
-    return projects
+    const item = normalizeProjectItem(projects);
+    normalized = item ? [item] : [];
+  } else if (Array.isArray(projects)) {
+    // CASE 1 & 3: Array of objects or strings
+    normalized = projects
       .map(normalizeProjectItem)
       .filter(Boolean);
-  }
-
-  // CASE 5: Single object wrapper or key-value dictionary
-  if (typeof projects === 'object') {
+  } else if (typeof projects === 'object') {
+    // CASE 5: Single object wrapper or key-value dictionary
     if (projects.name || projects.title || projects.description) {
-      const normalized = normalizeProjectItem(projects);
-      return normalized ? [normalized] : [];
-    }
-    if (Array.isArray(projects.projects || projects.list || projects.items)) {
-      return (projects.projects || projects.list || projects.items)
+      const item = normalizeProjectItem(projects);
+      normalized = item ? [item] : [];
+    } else if (Array.isArray(projects.projects || projects.list || projects.items)) {
+      normalized = (projects.projects || projects.list || projects.items)
         .map(normalizeProjectItem)
         .filter(Boolean);
-    }
-    const entries = Object.entries(projects);
-    if (entries.length > 0) {
-      return entries.map(([key, val]) => {
-        if (typeof val === 'string') {
+    } else {
+      const entries = Object.entries(projects);
+      if (entries.length > 0) {
+        normalized = entries.map(([key, val]) => {
+          if (typeof val === 'string') {
+            return {
+              name: key,
+              description: val,
+              technologies: [],
+              link: '',
+              bullets: [val],
+            };
+          }
+          if (typeof val === 'object' && val !== null) {
+            return normalizeProjectItem({ name: key, ...val });
+          }
           return {
             name: key,
-            description: val,
+            description: '',
             technologies: [],
             link: '',
-            bullets: [val],
+            bullets: [],
           };
-        }
-        if (typeof val === 'object' && val !== null) {
-          return normalizeProjectItem({ name: key, ...val });
-        }
-        return {
-          name: key,
-          description: '',
-          technologies: [],
-          link: '',
-          bullets: [],
-        };
-      }).filter(Boolean);
+        }).filter(Boolean);
+      }
     }
   }
 
-  return [];
+  return defragmentProjects(normalized);
 };
 
 /**
@@ -489,6 +576,8 @@ export const normalizePersonalInfo = (personalInfo) => {
     location: '',
     linkedIn: '',
     portfolio: '',
+    github: '',
+    targetRole: '',
   };
 
   if (!personalInfo) return result;
@@ -505,6 +594,8 @@ export const normalizePersonalInfo = (personalInfo) => {
     result.location = String(personalInfo.location || personalInfo.address || personalInfo.city || '').trim();
     result.linkedIn = String(personalInfo.linkedIn || personalInfo.linkedin || '').trim();
     result.portfolio = String(personalInfo.portfolio || personalInfo.website || personalInfo.github || '').trim();
+    result.github = String(personalInfo.github || personalInfo.portfolio || '').trim();
+    result.targetRole = String(personalInfo.targetRole || personalInfo.role || personalInfo.title || '').trim();
   }
 
   return result;
@@ -616,7 +707,7 @@ export const normalizeSections = (sections = {}) => {
       publisher: (proj.description && proj.description.trim().toLowerCase() === 'independent research')
         ? 'Independent Research'
         : (proj.publisher || 'Independent Research'),
-      authors: proj.authors || 'Dhairya Mishra',
+      authors: proj.authors || raw.personalInfo?.fullName || 'Author',
       date: proj.date || '2026',
       link: proj.link || '',
       description: (proj.description && proj.description.trim().toLowerCase() !== 'independent research')
@@ -635,16 +726,23 @@ export const normalizeSections = (sections = {}) => {
     rawProjects.splice(researchProjIdx, 1);
   }
 
-  const hasSnapStudy = rawProjects.some((p) => p && typeof p.name === 'string' && p.name.includes('Snap & Study'));
-  if (hasSnapStudy && rawPubs.length === 0) {
-    rawPubs.push({
-      title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
-      publisher: 'Independent Research',
-      authors: 'Dhairya Mishra',
-      date: '2026',
-      link: '',
-      description: 'Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication. Analyzed planning, collaboration, memory, coordination, scalability, reliability, and security challenges in multi-agent AI systems. Proposed a scalable multi-agent architecture focused on LLM-driven agents, planning, collaboration, workflow orchestration, and decision-making.',
-    });
+  // Soft Skills candidate regex for separating from Certifications
+  const SOFT_SKILL_WORDS = /^(leadership|problem solving|critical thinking|communication|teamwork|collaboration|adaptability|time management|mentorship|work ethic|conflict resolution|emotional intelligence|agile collaboration|creativity|public speaking|decision making)$/i;
+
+  const normalizedSkills = normalizeSkills(raw.skills, rawLangs);
+  const normalizedCerts = normalizeCertifications(raw.certifications);
+  const cleanCerts = [];
+
+  for (const cert of normalizedCerts) {
+    const certName = String(cert?.name || '').trim();
+    const certIssuer = String(cert?.issuer || '').trim();
+    if (SOFT_SKILL_WORDS.test(certName) && !certIssuer) {
+      if (!normalizedSkills.soft.some((s) => s.toLowerCase() === certName.toLowerCase())) {
+        normalizedSkills.soft.push(certName);
+      }
+    } else {
+      cleanCerts.push(cert);
+    }
   }
 
   return {
@@ -653,9 +751,9 @@ export const normalizeSections = (sections = {}) => {
     summary: normalizeSummary(raw.summary),
     experience: normalizeExperience(raw.experience),
     education: normalizeEducation(raw.education),
-    skills: normalizeSkills(raw.skills, rawLangs),
+    skills: normalizedSkills,
     projects: normalizeProjects(rawProjects),
-    certifications: normalizeCertifications(raw.certifications),
+    certifications: cleanCerts,
     publications: normalizePublications(rawPubs),
     customSections: Array.isArray(raw.customSections) ? raw.customSections : [],
     sectionOrder: Array.isArray(raw.sectionOrder) ? raw.sectionOrder : [],

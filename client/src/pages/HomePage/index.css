@@ -222,10 +222,56 @@
 .home-upload-state {
   display: grid;
   justify-items: center;
-  gap: 12px;
-  padding: 28px 0;
+  gap: 14px;
+  padding: 24px 0;
   text-align: center;
 }
+
+.home-upload-progress-wrapper {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.home-upload-progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--color-primary-soft, #ede9fe);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.home-upload-progress-fill {
+  height: 100%;
+  background: var(--color-primary, #7c3aed);
+  transition: width 0.25s ease;
+  border-radius: 999px;
+}
+
+.home-upload-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary, #7c3aed);
+}
+
+.home-upload-error-box {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+  text-align: left;
+  line-height: 1.5;
+}
+
 
 @media (max-width: 900px) {
   .home-page__actions,

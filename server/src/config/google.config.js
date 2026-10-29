@@ -9,6 +9,8 @@ const clientId = rawClientId.trim();
 
 const googleClient = new OAuth2Client(clientId);
 
+const getClientId = () => (process.env.GOOGLE_CLIENT_ID || rawClientId || '').trim();
+
 const verifyGoogleToken = async (credential) => {
   if (!credential) {
     const error = new Error('Google credential is required.');
@@ -17,10 +19,19 @@ const verifyGoogleToken = async (credential) => {
     throw error;
   }
 
+  const configuredClientId = getClientId();
+  if (!configuredClientId || configuredClientId.startsWith('your-google-')) {
+    const error = new Error('Google OAuth is not configured on the server. Please set GOOGLE_CLIENT_ID in server/.env.');
+    error.statusCode = 500;
+    error.code = 'OAUTH_NOT_CONFIGURED';
+    throw error;
+  }
+
   try {
-    const ticket = await googleClient.verifyIdToken({
+    const client = new OAuth2Client(configuredClientId);
+    const ticket = await client.verifyIdToken({
       idToken: credential,
-      audience: clientId || undefined,
+      audience: configuredClientId,
     });
 
     const payload = ticket.getPayload();

@@ -126,10 +126,12 @@ export const updateTemplate = async (resumeId, userId, templateId) => {
 export const createFromUpload = async (userId, parsedSections, title = 'Uploaded Resume') => {
   const sections = sanitizeSections(parsedSections || {});
   console.log("NORMALIZED RESUME SECTIONS:", JSON.stringify(sections, null, 2));
+  const targetRole = sections.personalInfo?.targetRole || parsedSections?.targetRole || '';
   const resume = await Resume.create({
     userId,
     title,
     templateId: DEFAULT_TEMPLATE_ID,
+    targetRole,
     sections,
   });
   return resume;

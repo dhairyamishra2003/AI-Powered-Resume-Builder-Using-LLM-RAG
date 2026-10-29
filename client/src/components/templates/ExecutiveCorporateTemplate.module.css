@@ -1,0 +1,129 @@
+/* ExecutiveCorporateTemplate.module.css — Scoped Styles for Executive Corporate Template */
+
+.container {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #1e293b;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header {
+  background: #1e1b4b;
+  color: #ffffff;
+  padding: 16px 24px 14px;
+  border-bottom: 3.5px solid #d97706;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  gap: 16px;
+}
+
+.candidateName {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.targetRole {
+  font-size: 12px;
+  font-style: italic;
+  color: #fef3c7;
+  letter-spacing: 0.8px;
+  margin: 3px 0 0 0;
+  overflow-wrap: anywhere;
+}
+
+.sidebar {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 12px 10px;
+  box-sizing: border-box;
+}
+
+.sectionTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e1b4b;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 2px solid #d97706;
+  padding-bottom: 3px;
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.sectionTitleIcon {
+  color: #d97706;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.summaryCard {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 3.5px solid #d97706;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: #1e293b;
+  box-sizing: border-box;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.projectCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #1e1b4b;
+  padding: 6px 10px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  margin-bottom: 6px;
+}
+
+.projectTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+.techBadge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #1e1b4b;
+  border: 1px solid #cbd5e1;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+.bulletList {
+  margin: 3px 0 0 16px;
+  padding: 0;
+  font-size: 10px;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.bulletItem {
+  margin-bottom: 2px;
+  overflow-wrap: anywhere;
+}

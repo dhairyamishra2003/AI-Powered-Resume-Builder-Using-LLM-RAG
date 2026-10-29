@@ -312,9 +312,57 @@ assert.ok(ccResearchHtml.includes('Studied multi-agent collaboration architectur
 assert.ok(ccSnapIndex < ccPubIndex, `Creative Clean: Research Paper (idx ${ccPubIndex}) must appear AFTER Snap & Study project (idx ${ccSnapIndex})`);
 assert.ok(ccPubIndex < ccCertIndex, `Creative Clean: Research Paper (idx ${ccPubIndex}) must appear BEFORE Certifications (idx ${ccCertIndex})`);
 
-console.log('  ✓ PASSED: Creative Clean renders Research Paper immediately after Projects (Snap & Study) and before Certifications');
+// 3. Verify Project Defragmentation: orphaned technologies and bullets are merged into parent
+console.log('\n>>> Test 12: Project Defragmentation in Client Normalizer');
+const fragmentedInput = {
+  projects: [
+    {
+      name: 'OmniSpec Speculative Decoding Engine',
+      description: 'Zero-loss speculative sampling library',
+      technologies: ['C++'],
+      bullets: ['Adopted by 15+ production AI engines.'],
+    },
+    {
+      name: 'Technologies: CUDA, Python, PyTorch, TensorRT',
+      description: '',
+      technologies: [],
+      bullets: [],
+    },
+    {
+      name: '• Optimized GPU kernel execution reducing latency by 45%',
+      description: '',
+      technologies: [],
+      bullets: [],
+    },
+  ],
+};
+const defragged = normalizeResumeSections(fragmentedInput);
+assert.equal(defragged.projects.length, 1, 'Should defragment orphaned tech and bullets into single project');
+assert.ok(defragged.projects[0].technologies.includes('CUDA'));
+assert.ok(defragged.projects[0].technologies.includes('PyTorch'));
+assert.equal(defragged.projects[0].bullets.length, 2);
+assert.ok(defragged.projects[0].bullets[1].includes('Optimized GPU kernel execution'));
+console.log('  ✓ PASSED: Project defragmentation successfully consolidates orphaned tech cards and bullet cards');
+
+// 4. Verify Soft Skills vs Certifications Separation
+console.log('\n>>> Test 13: Soft Skills vs Certifications Classification');
+const softSkillTest = {
+  skills: { technical: ['Go', 'Docker'], soft: [] },
+  certifications: [
+    { name: 'CKA: Certified Kubernetes Administrator', issuer: 'Cloud Native Computing Foundation' },
+    { name: 'Problem Solving' },
+    { name: 'Critical Thinking' },
+  ],
+};
+const classified = normalizeResumeSections(softSkillTest);
+assert.equal(classified.certifications.length, 1, 'Legitimate certification preserved');
+assert.equal(classified.certifications[0].name, 'CKA: Certified Kubernetes Administrator');
+assert.ok(classified.skills.soft.includes('Problem Solving'), 'Soft skills moved to skills.soft');
+assert.ok(classified.skills.soft.includes('Critical Thinking'), 'Soft skills moved to skills.soft');
+console.log('  ✓ PASSED: Soft skills accurately classified under skills.soft rather than certifications');
 
 console.log('\n================================================================');
-console.log('ALL 11 REGRESSION & CONSISTENCY CRITERIA FULLY VERIFIED!');
+console.log('ALL 13 REGRESSION & CONSISTENCY CRITERIA FULLY VERIFIED!');
 console.log('================================================================\n');
+
 

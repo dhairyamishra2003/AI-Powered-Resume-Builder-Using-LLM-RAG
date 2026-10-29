@@ -1,0 +1,115 @@
+/* MinimalAtsTemplate.module.css — Scoped Styles for Minimal ATS Template */
+
+.container {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #1e293b;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 18px 24px 12px;
+  border-bottom: 2.5px solid #0f172a;
+  box-sizing: border-box;
+  width: 100%;
+  background: #ffffff;
+}
+
+.candidateName {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #0f172a;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.targetRole {
+  margin-top: 4px;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #334155;
+  overflow-wrap: anywhere;
+}
+
+.contactBlock {
+  text-align: right;
+  color: #64748b;
+  font-size: 9.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.sectionTitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #0f172a;
+  border-bottom: 1.5px solid #0f172a;
+  padding-bottom: 2px;
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.summaryText {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #334155;
+  margin: 0;
+}
+
+.projectCard {
+  padding: 5px 0;
+  border-bottom: 1px solid #f1f5f9;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.projectTitle {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.projectMeta {
+  font-size: 9.5px;
+  color: #475569;
+  margin-top: 1px;
+}
+
+.bulletList {
+  margin: 3px 0 0 16px;
+  padding: 0;
+  font-size: 9.8px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.bulletItem {
+  margin-bottom: 2px;
+  overflow-wrap: anywhere;
+}
+
+.skillLine {
+  font-size: 9.8px;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 3px;
+}
+
+.skillLabel {
+  font-weight: 700;
+  color: #0f172a;
+}

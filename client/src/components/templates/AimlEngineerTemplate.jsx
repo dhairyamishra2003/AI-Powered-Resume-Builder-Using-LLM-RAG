@@ -26,6 +26,7 @@ import {
 import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
+import styles from './AimlEngineerTemplate.module.css';
 
 function AimlEngineerTemplate({
   sections,
@@ -128,9 +129,10 @@ function AimlEngineerTemplate({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '18px',
-        background: '#ffffff',
-        borderBottom: `2.5px solid ${primaryColor}`,
-        padding: '16px 24px 12px',
+        background: '#0f172a',
+        color: '#ffffff',
+        borderBottom: `3px solid ${primaryColor}`,
+        padding: '16px 24px 14px',
         boxSizing: 'border-box',
         width: '100%',
       }}
@@ -156,7 +158,7 @@ function AimlEngineerTemplate({
             justifyContent: 'center',
             fontSize: typo.headerIcon,
             flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(15, 118, 110, 0.22)',
+            boxShadow: '0 2px 8px rgba(15, 118, 110, 0.4)',
           }}
         >
           <HiCpuChip />
@@ -169,7 +171,7 @@ function AimlEngineerTemplate({
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '0.7px',
-              color: primaryColor,
+              color: '#ffffff',
               margin: 0,
               lineHeight: 1.1,
               overflowWrap: 'anywhere',
@@ -182,7 +184,7 @@ function AimlEngineerTemplate({
             style={{
               fontSize: typo.targetRole,
               fontWeight: 650,
-              color: accentColor,
+              color: '#5eead4',
               marginTop: '3px',
               letterSpacing: '0.4px',
               lineHeight: 1.25,
@@ -197,8 +199,8 @@ function AimlEngineerTemplate({
       <ContactList
         personalInfo={personalInfo}
         align="right"
-        accentColor={primaryColor}
-        textColor="#334155"
+        accentColor="#5eead4"
+        textColor="#cbd5e1"
         style={{ fontSize: typo.contact }}
       />
     </div>
@@ -325,8 +327,6 @@ function AimlEngineerTemplate({
       blocks.push({
         id: `project-${idx}`,
         type: 'projects',
-        forcePage: idx === 0 ? 1 : 2,
-        pageBreakBefore: idx === 1,
         render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
           <div>
             {(idx === 0 || isFirstOfThisSectionOnPage) && (
@@ -402,7 +402,6 @@ function AimlEngineerTemplate({
     blocks.push({
       id: 'certifications',
       type: 'certifications',
-      pageBreakBefore: validProjects.length === 1,
       render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
         <div>
           <SectionTitle
@@ -538,7 +537,7 @@ function AimlEngineerTemplate({
         />
       }
       blocks={blocks}
-      className="aiml-engineer-resume"
+      className={styles.container}
       fontFamily="'Inter', system-ui, sans-serif"
       mainPadding="12px 22px"
       page2Padding="16px 22px"

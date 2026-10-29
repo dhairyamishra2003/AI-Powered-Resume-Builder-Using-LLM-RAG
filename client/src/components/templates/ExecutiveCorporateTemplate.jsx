@@ -24,6 +24,7 @@ import {
 import { getTemplateTypography } from '../../config/resumeTypography.js';
 import { normalizeResumeSections } from './utils/normalizeResumeSections.js';
 import { withPlaceholder } from './utils/placeholderData.js';
+import styles from './ExecutiveCorporateTemplate.module.css';
 
 function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
   const normalizedSections = normalizeResumeSections(sections || {});
@@ -566,6 +567,7 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
 
   return (
     <TwoPageResumeCanvas
+      className={styles.container}
       header={header}
       sidebarSections={sidebarSections}
       page2Sidebar={null}
