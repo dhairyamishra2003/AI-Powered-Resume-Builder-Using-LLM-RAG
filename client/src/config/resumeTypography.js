@@ -206,7 +206,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 11.5,
     technicalSkills: 12,
     softSkills: 10.25,
-    certification: 10,
+    certification: 8,
     language: 15,
   },
   'creative-clean': {
@@ -229,7 +229,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 14.8,
     technicalSkills: 12,
     softSkills: 11.5,
-    certification: 12.5,
+    certification: 11,
     language: 15.5,
   },
 
