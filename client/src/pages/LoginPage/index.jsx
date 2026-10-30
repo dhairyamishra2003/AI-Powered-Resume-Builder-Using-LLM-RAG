@@ -108,9 +108,8 @@ function LoginPage() {
               onError={handleGoogleError}
               theme="outline"
               size="large"
-              width="100%"
-              text={isRegister ? 'signup_with' : 'signin_with'}
-              // Prevent re-clicks while auth is in-flight
+              width="360"
+              text="continue_with"
               click_listener={() => {
                 if (googleButtonDisabled) return false;
                 console.debug('[Auth] Google button clicked');

@@ -19,6 +19,11 @@ const allowedOrigins = rawOrigins
   .map((url) => url.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+// Production frontend origins allowed by default
+const defaultProdOrigins = [
+  'https://ai-powered-resume-builder-using-llm.vercel.app',
+];
+
 const defaultDevOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -28,22 +33,36 @@ const defaultDevOrigins = [
   'http://127.0.0.1:3000',
 ];
 
+// Matches any Vercel deployment preview or production domain for this application
+const vercelProjectRegex = /^https:\/\/ai-powered-resume-builder-using-llm(-[a-z0-9-]+)?\.vercel\.app$/i;
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  const normalized = origin.trim().replace(/\/$/, '');
+  return (
+    allowedOrigins.includes(normalized) ||
+    defaultProdOrigins.includes(normalized) ||
+    defaultDevOrigins.includes(normalized) ||
+    vercelProjectRegex.test(normalized) ||
+    (process.env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalized))
+  );
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g. server-to-server or tests)
       if (!origin) return callback(null, true);
-      const normalized = origin.trim().replace(/\/$/, '');
-      if (
-        allowedOrigins.includes(normalized) ||
-        defaultDevOrigins.includes(normalized) ||
-        (process.env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalized))
-      ) {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
-      return callback(new Error(`CORS blocked: Origin ${origin} not permitted.`));
+      console.warn(`[CORS] Blocked request from unauthorized origin: ${origin}`);
+      return callback(null, false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Set-Cookie'],
   })
 );
 app.use(express.json({ limit: '10mb' })); // JSON body parser (Express.js: Middleware)

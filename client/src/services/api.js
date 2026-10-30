@@ -3,9 +3,10 @@
 // ============================================
 // Reference: fetch(), async/await - reference-javascript.md
 
-const PRIMARY_BASE_URL = import.meta.env.DEV
+const rawBaseUrl = import.meta.env.DEV
   ? '/api'
   : (import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api');
+const PRIMARY_BASE_URL = String(rawBaseUrl).trim().replace(/\/+$/, '');
 
 // Direct fallback URL for development mode when Vite proxy is restarting or unavailable
 const DIRECT_BACKEND_URL = import.meta.env.DEV
