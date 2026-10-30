@@ -75,10 +75,7 @@ function UploadDataImport() {
             ...(current.sections?.personalInfo || {}),
             ...(newSections.personalInfo || {}),
           },
-          skills: {
-            ...(current.sections?.skills || {}),
-            ...(newSections.skills || {}),
-          },
+          skills: (newSections.skills && Object.values(newSections.skills).some(v => Array.isArray(v) ? v.length > 0 : Boolean(v))) ? newSections.skills : (current.sections?.skills || {}),
         },
       }));
       setHasChanges(true);

@@ -122,13 +122,13 @@
       {
         "company": "FODRIX",
         "role": "Machine Learning Intern",
-        "startDate": "2026-01",
-        "endDate": "2026-05",
+        "startDate": "January 2026",
+        "endDate": "May 2026",
         "current": false,
         "bullets": [
           "Engineered a CNN-based deep learning system for automated image selection and quality assessment.",
-          "Developed and evaluated image-quality assessment workflows for a real-world computer vision problem.",
-          "Applied Python, deep learning, and model evaluation techniques to image-quality assessment workflows."
+          "Developed and evaluated image-quality assessment workflows to address real-world computer vision challenges.",
+          "Applied Python, deep learning, and model evaluation techniques to improve image-quality assessment workflows."
         ],
         "_id": "6adf4ecb65195625bc37dcb9"
       }

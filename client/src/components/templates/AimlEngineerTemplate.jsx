@@ -90,10 +90,12 @@ function AimlEngineerTemplate({
   const techSkills = (skills.technical || []).filter(
     (s) => s && typeof s === 'string' && s.trim()
   );
-  const softSkills = (skills.soft || []).filter(
+  const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || sections?.coreStrengths || sections?.strengths || [];
+  const softSkills = (rawSoft || []).filter(
     (s) => s && typeof s === 'string' && s.trim()
   );
-  const languages = (skills.languages || []).filter(
+  const rawLang = skills.languages || sections?.languages || [];
+  const languages = (rawLang || []).filter(
     (l) => l && typeof l === 'string' && l.trim()
   );
 
@@ -328,7 +330,12 @@ function AimlEngineerTemplate({
         id: `project-${idx}`,
         type: 'projects',
         render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
-          <div>
+          <div
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid',
+            }}
+          >
             {(idx === 0 || isFirstOfThisSectionOnPage) && (
               <SectionTitle
                 title={idx === 0 || !sectionStartedOnPrevPage ? 'AI / ML Projects & Models' : 'AI / ML Projects & Models (Continued)'}
@@ -355,6 +362,8 @@ function AimlEngineerTemplate({
                 padding: '2px 10px',
                 borderRadius: '5px',
                 borderLeft: `3px solid ${primaryColor}`,
+                pageBreakInside: 'avoid',
+                breakInside: 'avoid',
               }}
             />
           </div>
@@ -434,15 +443,15 @@ function AimlEngineerTemplate({
     });
   }
 
-  // 6. Core Competencies & Soft Skills
+  // 6. Core Strengths
   if (softSkills.length > 0) {
     blocks.push({
-      id: 'soft-skills',
+      id: 'core-strengths',
       type: 'strengths',
       render: () => (
-        <div>
+        <div style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
           <SectionTitle
-            title="Core Competencies & Research Strengths"
+            title="Core Strengths"
             icon={HiUserGroup}
             primaryColor={primaryColor}
             accentColor={accentColor}
@@ -485,7 +494,7 @@ function AimlEngineerTemplate({
       id: 'languages',
       type: 'languages',
       render: () => (
-        <div>
+        <div style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
           <SectionTitle
             title="Languages"
             icon={HiLanguage}

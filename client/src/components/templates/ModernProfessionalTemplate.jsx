@@ -40,10 +40,104 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
   const primaryColor = colors?.primary || '#0f172a';
   const accentColor = colors?.accent || '#2563eb';
 
-  const techSkills = (skills.technical || []).filter((s) => s && typeof s === 'string' && s.trim());
-  const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || [];
+  // Comprehensive extraction of all existing technical/domain skills, tools, frameworks, and languages
+  const rawSkillSources = [
+    skills.programmingLanguages,
+    skills.programming,
+    sections?.skills?.programmingLanguages,
+    sections?.skills?.programming,
+    sections?.programmingLanguages,
+    skills.technical,
+    sections?.skills?.technical,
+    sections?.skills?.tech,
+    sections?.skills?.hard,
+    sections?.technicalSkills,
+    skills.frameworks,
+    sections?.skills?.frameworks,
+    sections?.frameworks,
+    skills.libraries,
+    sections?.skills?.libraries,
+    sections?.libraries,
+    skills.databases,
+    sections?.skills?.databases,
+    sections?.databases,
+    skills.tools,
+    skills.developerTools,
+    sections?.skills?.tools,
+    sections?.skills?.developerTools,
+    sections?.tools,
+    skills.technologies,
+    skills.techStack,
+    sections?.skills?.technologies,
+    sections?.skills?.techStack,
+    sections?.technologies,
+    skills.aiml,
+    skills.ai,
+    skills.ml,
+    skills.machineLearning,
+    sections?.skills?.aiml,
+    sections?.skills?.ai,
+    sections?.skills?.ml,
+    skills.cloud,
+    skills.platforms,
+    skills.devops,
+    sections?.skills?.cloud,
+    sections?.skills?.platforms,
+    sections?.skills?.devops,
+  ];
+
+  const excludedCategoryKeys = new Set([
+    'soft',
+    'softskills',
+    'corestrengths',
+    'strengths',
+    'interpersonal',
+    'languages',
+    'spokenlanguages',
+  ]);
+
+  const extractCustomCategorySkills = (container) => {
+    if (!container || typeof container !== 'object' || Array.isArray(container)) return [];
+    const items = [];
+    for (const [key, val] of Object.entries(container)) {
+      const normalizedKey = key.toLowerCase().replace(/[^a-z]/g, '');
+      if (excludedCategoryKeys.has(normalizedKey)) continue;
+      if (Array.isArray(val)) {
+        items.push(...val);
+      } else if (typeof val === 'string' && val.trim()) {
+        items.push(val.trim());
+      }
+    }
+    return items;
+  };
+
+  const allRawSkillCandidates = [
+    ...rawSkillSources.flat(Infinity).filter(Boolean),
+    ...extractCustomCategorySkills(skills),
+    ...extractCustomCategorySkills(sections?.skills),
+  ];
+
+  const seenSkillSet = new Set();
+  const techSkills = [];
+  for (const rawItem of allRawSkillCandidates) {
+    if (!rawItem) continue;
+    const splitItems = typeof rawItem === 'string' && rawItem.includes(',')
+      ? rawItem.split(',').map((s) => s.trim()).filter(Boolean)
+      : [typeof rawItem === 'string' ? rawItem.trim() : String(rawItem || '').trim()];
+    for (const item of splitItems) {
+      if (!item) continue;
+      const lower = item.toLowerCase();
+      if (!seenSkillSet.has(lower)) {
+        seenSkillSet.add(lower);
+        techSkills.push(item);
+      }
+    }
+  }
+
+  const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || sections?.coreStrengths || sections?.strengths || [];
   const softSkills = (rawSoft || []).filter((s) => s && typeof s === 'string' && s.trim());
-  const languages = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
+  const rawLang = skills.languages || sections?.languages || [];
+  const languages = (rawLang || []).filter((l) => l && typeof l === 'string' && l.trim());
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));
   const validProjects = (projects || []).filter((p) => p && (p.name || p.description));

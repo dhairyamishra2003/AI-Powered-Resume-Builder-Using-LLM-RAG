@@ -61,7 +61,7 @@ export const BASE_TYPOGRAPHY = {
   experience: 12,
   experienceRole: 15,
   experienceDate: 12,
-  bullet: 12.4,
+  bullet: 11.2,
 
   // Projects
   projectTitle: 12,
@@ -206,7 +206,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 11.5,
     technicalSkills: 12,
     softSkills: 10.25,
-    certification: 14,
+    certification: 10,
     language: 15,
   },
   'creative-clean': {
@@ -217,7 +217,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 11.5,
     technicalSkills: 19,
     softSkills: 10.25,
-    certification: 15,
+    certification: 14,
     language: 15,
     headerIcon: 22,
   },

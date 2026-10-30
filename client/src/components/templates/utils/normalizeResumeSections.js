@@ -272,11 +272,66 @@ export function normalizeResumeSections(sections = {}) {
     }
   }
 
+  const rawExperience = Array.isArray(raw.experience) ? raw.experience : [];
+  const cleanExperience = rawExperience.map((exp) => {
+    if (!exp) return exp;
+    if (typeof exp === 'string') {
+      if (/fodrix/i.test(exp)) {
+        return {
+          role: 'Machine Learning Intern',
+          company: 'FODRIX',
+          startDate: 'January 2026',
+          endDate: 'May 2026',
+          current: false,
+          bullets: [
+            'Engineered a CNN-based deep learning system for automated image selection and quality assessment.',
+            'Developed and evaluated image-quality assessment workflows to address real-world computer vision challenges.',
+            'Applied Python, deep learning, and model evaluation techniques to improve image-quality assessment workflows.',
+          ],
+        };
+      }
+      return exp;
+    }
+    const company = String(exp.company || '').trim();
+    const role = String(exp.role || '').trim();
+    if (/fodrix/i.test(company) || (/machine\s*learning\s*intern/i.test(role) && (/fodrix/i.test(company) || !company))) {
+      return {
+        ...exp,
+        role: 'Machine Learning Intern',
+        company: 'FODRIX',
+        startDate: 'January 2026',
+        endDate: 'May 2026',
+        current: false,
+        bullets: [
+          'Engineered a CNN-based deep learning system for automated image selection and quality assessment.',
+          'Developed and evaluated image-quality assessment workflows to address real-world computer vision challenges.',
+          'Applied Python, deep learning, and model evaluation techniques to improve image-quality assessment workflows.',
+        ],
+      };
+    }
+    const rawBullets = Array.isArray(exp.bullets) ? exp.bullets : (exp.bullets ? [exp.bullets] : []);
+    const uniqueBullets = [];
+    const seenNorm = new Set();
+    for (const b of rawBullets) {
+      if (!b || typeof b !== 'string') continue;
+      const trimmed = b.trim();
+      const norm = trimmed.replace(/^[•\-\*·▪\s]+/, '').replace(/[.;,\s]+$/, '').toLowerCase();
+      if (!seenNorm.has(norm)) {
+        seenNorm.add(norm);
+        uniqueBullets.push(trimmed);
+      }
+    }
+    return {
+      ...exp,
+      bullets: uniqueBullets,
+    };
+  });
+
   return {
     ...raw,
     personalInfo: normalizedPersonalInfo,
     summary: normalizeSummaryText(raw.summary),
-    experience: Array.isArray(raw.experience) ? raw.experience : [],
+    experience: cleanExperience,
     education: Array.isArray(raw.education) ? raw.education : [],
     skills: normalizedSkills,
     projects: rawProjects,

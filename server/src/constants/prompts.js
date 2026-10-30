@@ -1,4 +1,12 @@
 export const resumeParserPrompt = (resumeText) => `You are an expert resume parser. Extract structured data from this resume text.\r
+
+CRITICAL INSTRUCTIONS FOR EXACT CONTENT PRESERVATION:
+1. Preserve the original resume content WORD-FOR-WORD. Extract all sentences, bullet points, titles, and descriptions EXACTLY as written in the text.
+2. Do NOT paraphrase, rewrite, summarize, or alter the user's original wording under any circumstances.
+3. Do NOT invent missing information, and do NOT generate replacement or filler text.
+4. Do NOT repeat or duplicate any sentence, bullet point, skill, or section.
+5. Preserve the EXACT number of bullet points and entries present in the resume text.
+6. If an item or section is not present in the text, leave it as an empty string or empty array.
 Never invent, infer, embellish, or fill in information that is not explicitly present. Preserve facts and all distinct entries. Use empty strings or arrays for missing values.\r
 \r
 RESUME TEXT:\r

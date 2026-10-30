@@ -100,15 +100,43 @@ const itemsMatch = (id1, id2) => {
 
 const normalizeBullet = (b) => String(b || '').replace(/^[•\-\*·▪\s]+/, '').replace(/[.;,\s]+$/, '').trim().toLowerCase();
 
+const areBulletsSimilar = (bulletA, bulletB) => {
+  const normA = normalizeBullet(bulletA);
+  const normB = normalizeBullet(bulletB);
+  if (normA === normB) return true;
+  if (!normA || !normB) return false;
+  if (normA.includes(normB) || normB.includes(normA)) return true;
+  const wordsA = new Set(normA.split(/\s+/).filter((w) => w.length > 2));
+  const wordsB = new Set(normB.split(/\s+/).filter((w) => w.length > 2));
+  if (wordsA.size === 0 || wordsB.size === 0) return false;
+  let common = 0;
+  for (const w of wordsA) {
+    if (wordsB.has(w)) common++;
+  }
+  const minWords = Math.min(wordsA.size, wordsB.size);
+  return (common / minWords) >= 0.6;
+};
+
 const mergeBullets = (b1 = [], b2 = []) => {
   const result = [];
-  const seen = new Set();
-  for (const b of [...b1, ...b2]) {
+  for (const b of b1) {
     const raw = typeof b === 'string' ? b.trim() : String(b || '').trim();
     if (!raw) continue;
     const norm = normalizeBullet(raw);
-    if (norm && !seen.has(norm)) {
-      seen.add(norm);
+    if (!norm) continue;
+    if (!result.some((existing) => areBulletsSimilar(existing, raw))) {
+      result.push(raw);
+    }
+  }
+  for (const b of b2) {
+    const raw = typeof b === 'string' ? b.trim() : String(b || '').trim();
+    if (!raw) continue;
+    const norm = normalizeBullet(raw);
+    if (!norm) continue;
+    const similarIdx = result.findIndex((existing) => areBulletsSimilar(existing, raw));
+    if (similarIdx !== -1) {
+      result[similarIdx] = raw;
+    } else {
       result.push(raw);
     }
   }

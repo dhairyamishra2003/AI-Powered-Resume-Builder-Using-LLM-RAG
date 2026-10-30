@@ -1663,18 +1663,23 @@ export function ExperienceItem({
       {validBullets.length > 0 && (
         <ul
           style={{
-            margin: '3px 0 0 15px',
+            margin: '3px 0 0 16px',
             padding: 0,
             fontSize: scaledFont(resumeTypography.bullet, fontScale),
             color: '#334155',
-            lineHeight: 1.4,
+            lineHeight: 1.42,
+            listStyleType: 'disc',
           }}
         >
           {validBullets.map((b, i) => (
             <li
               key={i}
               style={{
-                marginBottom: '1px',
+                marginBottom: '2px',
+                textAlign: 'left',
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+                lineHeight: 1.42,
               }}
             >
               {b}

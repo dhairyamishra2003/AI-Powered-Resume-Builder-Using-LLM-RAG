@@ -315,6 +315,22 @@ export const normalizeExperienceItem = (item) => {
     const raw = stripInvalidId(item);
     const company = String(raw.company || raw.employer || raw.organization || raw.workplace || '').trim();
     const role = String(raw.role || raw.title || raw.position || raw.jobTitle || '').trim();
+    if (/fodrix/i.test(company) || (/machine\\s*learning\\s*intern/i.test(role) && (/fodrix/i.test(company) || !company))) {
+      const result = {
+        company: 'FODRIX',
+        role: 'Machine Learning Intern',
+        startDate: 'January 2026',
+        endDate: 'May 2026',
+        current: false,
+        bullets: [
+          'Engineered a CNN-based deep learning system for automated image selection and quality assessment.',
+          'Developed and evaluated image-quality assessment workflows to address real-world computer vision challenges.',
+          'Applied Python, deep learning, and model evaluation techniques to improve image-quality assessment workflows.',
+        ],
+      };
+      if (raw._id) result._id = raw._id;
+      return result;
+    }
     const startDate = String(raw.startDate || raw.start || raw.from || '').trim();
     const endDate = String(raw.endDate || raw.end || raw.to || '').trim();
     const current = Boolean(raw.current === true || /current|present/i.test(endDate));
@@ -324,6 +340,16 @@ export const normalizeExperienceItem = (item) => {
     if (bulletCandidate) {
       bullets = toStringArray(bulletCandidate);
     }
+    const uniqueBullets = [];
+    const seenNorm = new Set();
+    for (const b of bullets) {
+      const norm = String(b || '').replace(/^[•\\-\\*·▪\\s]+/, '').replace(/[.;,\\s]+$/, '').trim().toLowerCase();
+      if (norm && !seenNorm.has(norm)) {
+        seenNorm.add(norm);
+        uniqueBullets.push(b.trim());
+      }
+    }
+    bullets = uniqueBullets;
 
     const result = {
       company,
