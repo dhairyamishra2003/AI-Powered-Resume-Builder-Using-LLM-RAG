@@ -40,7 +40,8 @@ function MinimalAtsTemplate({
   const techSkills          = (skills.technical || []).filter((s) => s && typeof s === 'string' && s.trim());
   const rawSoft             = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || [];
   const softSkills          = (rawSoft          || []).filter((s) => s && typeof s === 'string' && s.trim());
-  const languages           = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
+  const rawLang = (skills.languages && skills.languages.length > 0) ? skills.languages : (sections?.languages || []);
+  const languages           = (rawLang || []).filter((l) => l && typeof l === 'string' && l.trim());
   const validExperience     = (experience    || []).filter((e) => e && (e.role   || e.company));
   const validProjects       = (projects      || []).filter((p) => p && (p.name   || p.description));
   const validEducation      = (education     || []).filter((e) => e && (e.degree || e.institution));

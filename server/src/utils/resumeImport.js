@@ -28,6 +28,8 @@ export const importedSectionsSchema = z.object({
     technical: stringArray.optional(), tools: stringArray.optional(), languages: stringArray.optional(),
     frameworks: stringArray.optional(), databases: stringArray.optional(), other: stringArray.optional(), soft: stringArray.optional(),
   }).passthrough().optional(),
+  languages: stringArray.optional(),
+  spokenLanguages: stringArray.optional(),
   projects: z.array(z.object({
     name: stringValue.optional(), title: stringValue.optional(), description: stringValue.optional(),
     technologies: stringArray.optional(), link: stringValue.optional(), githubUrl: stringValue.optional(),
@@ -45,27 +47,41 @@ export const importedSectionsSchema = z.object({
   achievements: stringArray.optional(),
 }).passthrough();
 
-const mapImportedSections = (sections) => ({
-  ...sections,
-  personalInfo: {
-    ...sections.personalInfo,
-    portfolio: sections.personalInfo?.portfolio || sections.personalInfo?.github || '',
-  },
-  experience: (sections.experience || []).map((item) => ({
-    ...item,
-    bullets: [...(item.bullets || []), ...(item.responsibilities || []), ...(item.achievements || [])],
-  })),
-  education: (sections.education || []).map((item) => ({
-    ...item,
-    gpa: item.gpa || item.cgpa || item.percentage || '',
-  })),
-  projects: (sections.projects || []).map((item) => ({
-    ...item,
-    name: item.name || item.title || '',
-    link: item.link || item.githubUrl || item.liveUrl || '',
-  })),
-  publications: sections.publications || sections.researchPapers || [],
-});
+const mapImportedSections = (sections) => {
+  const rawLangs = (Array.isArray(sections.languages) && sections.languages.length > 0)
+    ? sections.languages
+    : ((Array.isArray(sections.spokenLanguages) && sections.spokenLanguages.length > 0)
+      ? sections.spokenLanguages
+      : (Array.isArray(sections.skills?.languages) ? sections.skills.languages : []));
+  const cleanLangs = Array.from(new Set(rawLangs.filter(Boolean).map((s) => String(s).trim())));
+
+  return {
+    ...sections,
+    personalInfo: {
+      ...sections.personalInfo,
+      portfolio: sections.personalInfo?.portfolio || sections.personalInfo?.github || '',
+    },
+    skills: {
+      ...(sections.skills || {}),
+      languages: cleanLangs,
+    },
+    languages: cleanLangs,
+    experience: (sections.experience || []).map((item) => ({
+      ...item,
+      bullets: [...(item.bullets || []), ...(item.responsibilities || []), ...(item.achievements || [])],
+    })),
+    education: (sections.education || []).map((item) => ({
+      ...item,
+      gpa: item.gpa || item.cgpa || item.percentage || '',
+    })),
+    projects: (sections.projects || []).map((item) => ({
+      ...item,
+      name: item.name || item.title || '',
+      link: item.link || item.githubUrl || item.liveUrl || '',
+    })),
+    publications: sections.publications || sections.researchPapers || [],
+  };
+};
 
 const isMeaningful = (value) => typeof value === 'string' && value.trim() && !/^candidate$/i.test(value.trim());
 
@@ -217,12 +233,18 @@ export const mergeImportedSections = (aiSections = {}, fallbackSections = {}) =>
     mergedSkills.soft = mergeTechList(mergedSkills.soft || [], reroutedSoftSkills);
   }
 
+  const mergedLanguages = mergeTechList(primary.languages || primary.skills?.languages || [], fallback.languages || fallback.skills?.languages || []);
+  if (mergedLanguages.length > 0) {
+    mergedSkills.languages = mergedLanguages;
+  }
+
   return {
     ...fallback,
     ...primary,
     personalInfo,
     summary: isMeaningful(primary.summary) ? primary.summary : (fallback.summary || ''),
     skills: mergedSkills,
+    languages: mergedLanguages.length > 0 ? mergedLanguages : (mergedSkills.languages || []),
     experience: mergeArrays(primary.experience || [], fallback.experience || []),
     education: mergeArrays(primary.education || [], fallback.education || []),
     projects: mergeArrays(primary.projects || [], fallback.projects || []),
@@ -304,7 +326,7 @@ const SECTION_PATTERNS = {
   projects: /\b(?:projects|personal\s+projects|academic\s+projects|key\s+projects|technical\s+projects)\b/i,
   certifications: /\b(?:certifications|certificates|licenses|credentials|accreditations)\b/i,
   publications: /\b(?:publications|research(?:\s+papers)?|scholarly\s+articles)\b/i,
-  languages: /\b(?:languages|language\s+proficiency)\b/i,
+  languages: /\b(?:languages|language\s+proficiency|languages?\s+known|known\s+languages?)\b/i,
 };
 
 export const verifyImportCompleteness = (extractedText = '', parsedSections = {}, fallbackSections = {}) => {
@@ -383,14 +405,22 @@ export const verifyImportCompleteness = (extractedText = '', parsedSections = {}
     }
   }
 
-  if (detected.includes('languages') || (fallbackSections.skills?.languages?.length > 0)) {
+  const fallbackLangs = (fallbackSections.skills?.languages?.length > 0)
+    ? fallbackSections.skills.languages
+    : (fallbackSections.languages || []);
+
+  const primaryLangs = (complete.skills?.languages?.length > 0)
+    ? complete.skills.languages
+    : (complete.languages || []);
+
+  if (detected.includes('languages') || fallbackLangs.length > 0 || primaryLangs.length > 0) {
     complete.skills = complete.skills || {};
-    if (!complete.skills.languages || complete.skills.languages.length === 0) {
-      if (fallbackSections.skills?.languages?.length > 0) {
-        complete.skills.languages = fallbackSections.skills.languages;
-        recovered.push('languages');
-      }
+    let finalLangs = primaryLangs.length > 0 ? primaryLangs : fallbackLangs;
+    if (primaryLangs.length === 0 && fallbackLangs.length > 0) {
+      recovered.push('languages');
     }
+    complete.skills.languages = Array.from(new Set(finalLangs));
+    complete.languages = complete.skills.languages;
   }
 
   // 7. Personal Info Recovery

@@ -52,7 +52,8 @@ function ExecutiveCorporateTemplate({ sections, colors, isPreview = false }) {
   const rawSoft = Array.isArray(skills.soft) ? skills.soft : (skills.coreStrengths || skills.softSkills || skills.strengths || []);
   const softSkills = [...new Set(rawSoft.map((s) => (typeof s === 'string' ? s.trim() : String(s || '').trim())).filter(Boolean))];
 
-  const languages = (skills.languages || []).filter((l) => l && typeof l === 'string' && l.trim());
+  const rawLang = (skills.languages && skills.languages.length > 0) ? skills.languages : (sections?.languages || []);
+  const languages = (rawLang || []).filter((l) => l && typeof l === 'string' && l.trim());
 
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validCertifications = (certifications || []).filter((c) => c && c.name);

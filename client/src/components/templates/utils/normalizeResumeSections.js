@@ -263,7 +263,16 @@ export function normalizeResumeSections(sections = {}) {
   // Soft Skills candidate regex for separating from Certifications
   const SOFT_SKILL_WORDS = /^(leadership|problem solving|critical thinking|communication|teamwork|collaboration|adaptability|time management|mentorship|work ethic|conflict resolution|emotional intelligence|agile collaboration|creativity|public speaking|decision making)$/i;
 
-  const normalizedSkills = normalizeSkills(raw.skills);
+  const rawLangs = (Array.isArray(raw.languages) && raw.languages.length > 0)
+    ? raw.languages
+    : ((Array.isArray(raw.spokenLanguages) && raw.spokenLanguages.length > 0)
+      ? raw.spokenLanguages
+      : ((Array.isArray(raw.skills?.languages) && raw.skills.languages.length > 0) ? raw.skills.languages : []));
+
+  const normalizedSkills = normalizeSkills(raw.skills, rawLangs);
+  const cleanLanguages = normalizedSkills.languages && normalizedSkills.languages.length > 0
+    ? normalizedSkills.languages
+    : rawLangs.filter(Boolean).map((s) => String(s).trim());
   const rawCerts = Array.isArray(raw.certifications) ? raw.certifications : [];
   const cleanCerts = [];
 
@@ -340,7 +349,11 @@ export function normalizeResumeSections(sections = {}) {
     summary: normalizeSummaryText(raw.summary),
     experience: cleanExperience,
     education: Array.isArray(raw.education) ? raw.education : [],
-    skills: normalizedSkills,
+    skills: {
+      ...normalizedSkills,
+      languages: cleanLanguages,
+    },
+    languages: cleanLanguages,
     projects: rawProjects,
     certifications: cleanCerts,
     publications: normalizePublications(rawPubs),

@@ -94,7 +94,7 @@ function AimlEngineerTemplate({
   const softSkills = (rawSoft || []).filter(
     (s) => s && typeof s === 'string' && s.trim()
   );
-  const rawLang = skills.languages || sections?.languages || [];
+  const rawLang = (skills.languages && skills.languages.length > 0) ? skills.languages : (sections?.languages || []);
   const languages = (rawLang || []).filter(
     (l) => l && typeof l === 'string' && l.trim()
   );

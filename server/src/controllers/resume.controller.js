@@ -137,7 +137,7 @@ export const uploadResume = async (req, res, next) => {
 
     // Completeness verification: compare against detected source headers and recover any gaps
     const verification = verifyImportCompleteness(extractedText, rawParsed, fallbackSections);
-    const parsedSections = verification.sections;
+    const parsedSections = validateImportedSections(verification.sections);
     const warnings = verification.warnings;
 
     // Derive a clean title from the uploaded file's original name

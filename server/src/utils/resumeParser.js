@@ -103,14 +103,15 @@ export const extractFallbackSections = (text = '') => {
     { type: 'projects', regex: /^(?:key\s+projects|technical\s+projects|academic\s+projects|personal\s+projects|projects|strategic\s+initiatives)$/i },
     { type: 'certifications', regex: /^(?:certifications?|certificates?|licenses?\s*&?\s*certifications?|credentials?\s*&?\s*honors?|honors?\s*&?\s*awards?)$/i },
     { type: 'publications', regex: /^(?:publications?|research\s+papers?|research\s+publications?|research\s+work|research\s+projects?|research|papers?|scholarly\s+work|patents?\s*&?\s*publications?)$/i },
-    { type: 'languages', regex: /^(?:languages?|known\s+languages?)$/i },
+    { type: 'languages', regex: /^(?:languages?|known\s+languages?|languages?\s+known|language\s+proficiency|spoken\s+languages?)$/i },
     { type: 'achievements', regex: /^(?:achievements?|key\s+achievements?|awards?\s*&?\s*achievements?|honors?\s*&?\s*achievements?)$/i },
   ];
 
   const sectionIndices = [];
   lines.forEach((line, index) => {
-    if (line.length < 38 && !line.includes('@') && !line.includes('http') && !/[-–—|:]/.test(line)) {
-      const cleanH = line.replace(/[^a-zA-Z\s]/g, '').trim();
+    const trimmedHeaderCandidate = line.trim();
+    if (trimmedHeaderCandidate.length < 50 && !trimmedHeaderCandidate.includes('@') && !trimmedHeaderCandidate.includes('http')) {
+      const cleanH = trimmedHeaderCandidate.replace(/[:\-–—|]+$/, '').replace(/[^a-zA-Z\s]/g, ' ').replace(/\s+/g, ' ').trim();
       for (const sh of SECTION_HEADERS) {
         if (sh.regex.test(cleanH)) {
           sectionIndices.push({ type: sh.type, index, line });
@@ -160,6 +161,9 @@ export const extractFallbackSections = (text = '') => {
 
   const extractedFromSkillSection = [];
   skillLines.forEach((sl) => {
+    if (/^(?:languages?|known\s+languages?|languages?\s+known|language\s+proficiency|spoken\s+languages?)\s*[:\-–—]/i.test(sl.trim())) {
+      return;
+    }
     const cleaned = sl.replace(/^[•\-\*·▪\s]+/, '').replace(/^[^:\-–—|]+[:\-–—]\s*/, '');
     cleaned.split(/[,;•|/·\t\n]+/).forEach((item) => {
       const trimmed = item.trim();
@@ -527,13 +531,28 @@ export const extractFallbackSections = (text = '') => {
   const languages = [];
   langLines.forEach((l) => {
     const cleanL = fixKerning(l.replace(/^[•\-\*·▪\s]+/, '').trim());
-    if (cleanL && cleanL.length > 2 && cleanL.length < 150 && !/^(languages?|known\s+languages?)$/i.test(cleanL)) {
-      cleanL.split(/[,/|•\t]+/).forEach((lang) => {
+    if (cleanL && cleanL.length > 2 && cleanL.length < 150 && !/^(languages?|known\s+languages?|languages?\s+known|language\s+proficiency|spoken\s+languages?)$/i.test(cleanL)) {
+      cleanL.split(/[,/|•\t;]+/).forEach((lang) => {
         const trimmed = lang.replace(/\s*\([^)]*\)/g, '').trim();
         if (trimmed && trimmed.length > 1 && !languages.includes(trimmed)) languages.push(trimmed);
       });
     }
   });
+
+  if (languages.length === 0) {
+    const inlineLangRegex = /^(?:languages?|known\s+languages?|languages?\s+known|language\s+proficiency|spoken\s+languages?)\s*[:\-–—]\s*(.+)$/i;
+    lines.forEach((l) => {
+      const match = l.match(inlineLangRegex);
+      if (match && match[1]) {
+        match[1].split(/[,/|•\t;]+/).forEach((lang) => {
+          const trimmed = lang.replace(/\s*\([^)]*\)/g, '').trim();
+          if (trimmed && trimmed.length > 1 && !languages.includes(trimmed)) {
+            languages.push(trimmed);
+          }
+        });
+      }
+    });
+  }
 
   return {
     personalInfo: {
@@ -553,6 +572,7 @@ export const extractFallbackSections = (text = '') => {
       soft: softSkills,
       languages: languages.length > 0 ? languages : ['English'],
     },
+    languages: languages.length > 0 ? languages : ['English'],
     projects: projects.slice(0, 8),
     certifications: certifications.slice(0, 10),
     publications: publications.slice(0, 8),

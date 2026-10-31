@@ -11,6 +11,7 @@ CRITICAL INSTRUCTIONS FOR EXACT CONTENT PRESERVATION:
 - Do NOT skip, omit, or truncate any skill.
 - Preserve the exact original skill labels and versions (e.g. both HTML and HTML5, CSS and CSS3, React and React.js, Express and Express.js, Tailwind and Tailwind CSS, REST API and REST APIs if both appear).
 - Return all technical skills in the "skills.technical" array without any length limit or truncation.
+8. COMPLETE LANGUAGES EXTRACTION: Extract EVERY human/spoken language mentioned anywhere in the resume text (e.g., in a Languages section, Skills, or Profile) into the "skills.languages" array (e.g. ["English", "Hindi", "Spanish", "German"]). If no spoken languages are mentioned in the resume, leave "skills.languages" as an empty array []. Never omit user-specified languages.
 Never invent, infer, embellish, or fill in information that is not explicitly present. Preserve facts and all distinct entries. Use empty strings or arrays for missing values.\r
 \r
 RESUME TEXT:\r

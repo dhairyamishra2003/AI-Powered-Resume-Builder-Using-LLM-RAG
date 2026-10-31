@@ -136,7 +136,7 @@ function ModernProfessionalTemplate({ sections, colors, isPreview = false }) {
 
   const rawSoft = skills.soft || skills.coreStrengths || skills.softSkills || skills.strengths || sections?.coreStrengths || sections?.strengths || [];
   const softSkills = (rawSoft || []).filter((s) => s && typeof s === 'string' && s.trim());
-  const rawLang = skills.languages || sections?.languages || [];
+  const rawLang = (skills.languages && skills.languages.length > 0) ? skills.languages : (sections?.languages || []);
   const languages = (rawLang || []).filter((l) => l && typeof l === 'string' && l.trim());
   const validEducation = (education || []).filter((e) => e && (e.degree || e.institution));
   const validExperience = (experience || []).filter((e) => e && (e.role || e.company));

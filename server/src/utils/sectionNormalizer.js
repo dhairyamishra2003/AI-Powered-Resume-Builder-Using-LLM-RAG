@@ -506,7 +506,11 @@ export const normalizeSkills = (skills, fallbackLanguages = []) => {
     }
 
     // Languages
-    const langCandidate = skills.languages ?? skills.spokenLanguages ?? rawFallback;
+    const langCandidate = (Array.isArray(skills.languages) && skills.languages.length > 0)
+      ? skills.languages
+      : ((Array.isArray(skills.spokenLanguages) && skills.spokenLanguages.length > 0)
+        ? skills.spokenLanguages
+        : rawFallback);
     if (langCandidate) {
       result.languages = toStringArray(langCandidate);
     }
@@ -715,7 +719,11 @@ export const normalizePublications = (publications) => {
  */
 export const normalizeSections = (sections = {}) => {
   const raw = (sections && typeof sections === 'object') ? sections : {};
-  const rawLangs = raw.languages || raw.spokenLanguages || [];
+  const rawLangs = (Array.isArray(raw.languages) && raw.languages.length > 0)
+    ? raw.languages
+    : ((Array.isArray(raw.spokenLanguages) && raw.spokenLanguages.length > 0)
+      ? raw.spokenLanguages
+      : ((Array.isArray(raw.skills?.languages) && raw.skills.languages.length > 0) ? raw.skills.languages : []));
   
   let rawPubs = raw.publications || raw.research || raw.researchPapers || raw.papers || raw.researchPublications || [];
   if (!Array.isArray(rawPubs)) {
@@ -785,6 +793,7 @@ export const normalizeSections = (sections = {}) => {
     experience: normalizeExperience(raw.experience),
     education: normalizeEducation(raw.education),
     skills: normalizedSkills,
+    languages: normalizedSkills.languages || [],
     projects: normalizeProjects(rawProjects),
     certifications: cleanCerts,
     publications: normalizePublications(rawPubs),

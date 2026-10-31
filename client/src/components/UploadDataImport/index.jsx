@@ -3,6 +3,7 @@ import { useContext, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { HiCheck, HiDocumentArrowUp, HiOutlineArrowPath } from 'react-icons/hi2';
 import { ResumeContext } from '../../context/ResumeContext.jsx';
+import { normalizeResumeSections } from '../templates/utils/normalizeResumeSections.js';
 import { importResumeData } from '../../services/resumeService.js';
 
 const STEPS = [
