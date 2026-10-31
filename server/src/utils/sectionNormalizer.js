@@ -516,6 +516,13 @@ export const normalizeSkills = (skills, fallbackLanguages = []) => {
     if (skills.databases) result.databases = toStringArray(skills.databases);
     if (skills.libraries) result.libraries = toStringArray(skills.libraries);
 
+    // Preserve any custom category keys (e.g. programmingLanguages, technologies, aiml, cloud, etc.)
+    for (const [k, v] of Object.entries(skills)) {
+      if (!result[k] && (Array.isArray(v) || typeof v === 'string')) {
+        result[k] = toStringArray(v);
+      }
+    }
+
     // If technical was empty, combine from tools and frameworks
     if (result.technical.length === 0 && (result.tools.length > 0 || result.frameworks.length > 0)) {
       result.technical = [...result.tools, ...result.frameworks];

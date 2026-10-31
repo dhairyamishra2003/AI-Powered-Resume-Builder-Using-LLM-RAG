@@ -7,6 +7,10 @@ CRITICAL INSTRUCTIONS FOR EXACT CONTENT PRESERVATION:
 4. Do NOT repeat or duplicate any sentence, bullet point, skill, or section.
 5. Preserve the EXACT number of bullet points and entries present in the resume text.
 6. If an item or section is not present in the text, leave it as an empty string or empty array.
+7. ZERO-MISSING-SKILLS REQUIREMENT: Extract EVERY single technical skill, tool, programming language, framework, database, library, platform, cloud technology, AI/ML skill, and software mentioned anywhere in the resume text (in Skills section, Summary, Experience, Projects, or Certifications).
+- Do NOT skip, omit, or truncate any skill.
+- Preserve the exact original skill labels and versions (e.g. both HTML and HTML5, CSS and CSS3, React and React.js, Express and Express.js, Tailwind and Tailwind CSS, REST API and REST APIs if both appear).
+- Return all technical skills in the "skills.technical" array without any length limit or truncation.
 Never invent, infer, embellish, or fill in information that is not explicitly present. Preserve facts and all distinct entries. Use empty strings or arrays for missing values.\r
 \r
 RESUME TEXT:\r

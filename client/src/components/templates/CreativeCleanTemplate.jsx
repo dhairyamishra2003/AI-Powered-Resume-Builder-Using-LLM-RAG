@@ -256,30 +256,26 @@ function CreativeCleanTemplate({
     sidebarSections.push({
       id: 'tech-skills',
       type: 'skills',
-      items: techSkills,
-      render: ({ isOverflow, page, items = techSkills }) => {
-        if (isOverflow || page === 2) return null;
-        return (
-          <div>
-            <SectionTitle
-              title="Skills & Tools"
-              icon={HiPaintBrush}
-              primaryColor="#4c1d95"
-              accentColor={accentColor}
-              borderColor="#ddd6fe"
-              style={sectionStyle}
-            />
-            <SkillBadges
-              skills={items}
-              size="small"
-              textColor="#581c87"
-              borderColor="#c4b5fd"
-              style={{ gap: '6px 5px' }}
-              itemDataAttribute="data-sidebar-skill"
-            />
-          </div>
-        );
-      },
+      render: () => (
+        <div>
+          <SectionTitle
+            title="Skills & Tools"
+            icon={HiPaintBrush}
+            primaryColor="#4c1d95"
+            accentColor={accentColor}
+            borderColor="#ddd6fe"
+            style={sectionStyle}
+          />
+          <SkillBadges
+            skills={techSkills}
+            size="small"
+            textColor="#581c87"
+            borderColor="#c4b5fd"
+            style={{ gap: '6px 5px' }}
+            itemDataAttribute="data-sidebar-skill"
+          />
+        </div>
+      ),
     });
   }
 

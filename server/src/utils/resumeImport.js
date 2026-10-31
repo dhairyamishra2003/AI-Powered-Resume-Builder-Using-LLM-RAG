@@ -209,7 +209,7 @@ export const mergeImportedSections = (aiSections = {}, fallbackSections = {}) =>
   const mergedSkills = Object.fromEntries(
     [...new Set([...Object.keys(fallback.skills || {}), ...Object.keys(primary.skills || {})])].map((key) => [
       key,
-      mergeArrays(primary.skills?.[key] || [], fallback.skills?.[key] || []),
+      mergeTechList(primary.skills?.[key] || [], fallback.skills?.[key] || []),
     ])
   );
 

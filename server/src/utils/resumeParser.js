@@ -160,16 +160,16 @@ export const extractFallbackSections = (text = '') => {
 
   const extractedFromSkillSection = [];
   skillLines.forEach((sl) => {
-    const cleaned = sl.replace(/^[^:]+:\s*/, '');
-    cleaned.split(/[,•|/·\t\n]+/).forEach((item) => {
+    const cleaned = sl.replace(/^[•\-\*·▪\s]+/, '').replace(/^[^:\-–—|]+[:\-–—]\s*/, '');
+    cleaned.split(/[,;•|/·\t\n]+/).forEach((item) => {
       const trimmed = item.trim();
-      if (trimmed.length > 1 && trimmed.length < 35 && !extractedFromSkillSection.includes(trimmed)) {
+      if (trimmed.length > 1 && trimmed.length < 60 && !extractedFromSkillSection.includes(trimmed)) {
         extractedFromSkillSection.push(trimmed);
       }
     });
   });
 
-  const finalTechSkills = Array.from(new Set([...matchedTech, ...extractedFromSkillSection])).slice(0, 50);
+  const finalTechSkills = Array.from(new Set([...matchedTech, ...extractedFromSkillSection]));
 
   // Soft Skills extraction
   const softSkillLines = getSectionLines('softSkills');

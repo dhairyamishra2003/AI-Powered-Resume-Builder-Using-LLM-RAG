@@ -47,6 +47,13 @@ export function normalizeSkills(skills) {
     result.databases = Array.isArray(skills.databases) ? skills.databases.filter(Boolean).map((s) => String(s).trim()) : [];
     result.libraries = Array.isArray(skills.libraries) ? skills.libraries.filter(Boolean).map((s) => String(s).trim()) : [];
 
+    // Preserve any custom category keys (e.g. programmingLanguages, technologies, aiml, cloud, devops)
+    for (const [k, v] of Object.entries(skills)) {
+      if (!result[k] && Array.isArray(v)) {
+        result[k] = v.filter(Boolean).map((s) => String(s).trim());
+      }
+    }
+
     // Fallback if technical was empty but tools/frameworks exist
     if (result.technical.length === 0 && (result.tools.length > 0 || result.frameworks.length > 0)) {
       result.technical = [...new Set([...result.tools, ...result.frameworks])];
