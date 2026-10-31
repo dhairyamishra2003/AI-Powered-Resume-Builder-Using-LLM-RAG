@@ -256,10 +256,11 @@ function CreativeCleanTemplate({
     sidebarSections.push({
       id: 'tech-skills',
       type: 'skills',
-      render: () => (
+      items: techSkills,
+      render: ({ isOverflow, items = techSkills }) => (
         <div>
           <SectionTitle
-            title="Skills & Tools"
+            title={isOverflow ? 'Technical Skills (Continued)' : 'Skills & Tools'}
             icon={HiPaintBrush}
             primaryColor="#4c1d95"
             accentColor={accentColor}
@@ -267,11 +268,11 @@ function CreativeCleanTemplate({
             style={sectionStyle}
           />
           <SkillBadges
-            skills={techSkills}
+            skills={items}
+            background="#ffffff"
+            borderColor="#cbd5e1"
+            textColor="#1e293b"
             size="small"
-            textColor="#581c87"
-            borderColor="#c4b5fd"
-            style={{ gap: '6px 5px' }}
             itemDataAttribute="data-sidebar-skill"
           />
         </div>
