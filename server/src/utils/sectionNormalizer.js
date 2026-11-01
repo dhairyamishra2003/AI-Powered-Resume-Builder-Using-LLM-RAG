@@ -82,7 +82,7 @@ export const normalizeProjectItem = (item) => {
         description,
         technologies: [],
         link: '',
-        bullets: description ? [description] : [],
+        bullets: [],
       };
     }
 
@@ -99,9 +99,32 @@ export const normalizeProjectItem = (item) => {
   if (typeof item === 'object' && !Array.isArray(item)) {
     const raw = stripInvalidId(item);
 
-    const name = String(raw.name || raw.title || raw.projectName || raw.project || raw.heading || '').trim();
+    let name = String(raw.name || raw.title || raw.projectName || raw.project || raw.heading || '').trim();
     let description = String(raw.description || raw.summary || raw.details || raw.overview || '').trim();
     const link = String(raw.link || raw.url || raw.github || raw.repo || raw.website || '').trim();
+
+    // Check if name has Title: Description or Title – Description and separate them
+    if (name.includes(': ') && !name.startsWith('http')) {
+      const colonIdx = name.indexOf(': ');
+      const potentialTitle = name.slice(0, colonIdx).replace(/^[:\-\*•\s]+/, '').trim();
+      const potentialDesc = name.slice(colonIdx + 2).trim();
+      if (potentialTitle.length >= 2 && potentialTitle.length <= 60 && potentialDesc.length > 0) {
+        name = potentialTitle;
+        if (!description || description.toLowerCase() === potentialDesc.toLowerCase()) {
+          description = potentialDesc;
+        }
+      }
+    } else if (name.includes(' – ') && !name.startsWith('http')) {
+      const dashIdx = name.indexOf(' – ');
+      const potentialTitle = name.slice(0, dashIdx).replace(/^[:\-\*•\s]+/, '').trim();
+      const potentialDesc = name.slice(dashIdx + 3).trim();
+      if (potentialTitle.length >= 2 && potentialTitle.length <= 60 && potentialDesc.length > 0) {
+        name = potentialTitle;
+        if (!description || description.toLowerCase() === potentialDesc.toLowerCase()) {
+          description = potentialDesc;
+        }
+      }
+    }
 
     // Technologies can be array of strings or comma-separated string
     let technologies = [];
@@ -117,11 +140,10 @@ export const normalizeProjectItem = (item) => {
       bullets = toStringArray(bulletCandidate);
     }
 
-    // If description is empty but bullets are present, join bullets into description
-    if (!description && bullets.length > 0) {
-      description = bullets.join(' ');
-    } else if (description && bullets.length === 0) {
-      bullets = description.split('\n').map((l) => l.trim()).filter(Boolean);
+    // If description is identical to a bullet, remove duplicate bullet
+    if (description && bullets.length > 0) {
+      const normDesc = description.trim().toLowerCase();
+      bullets = bullets.filter((b) => b && b.trim().toLowerCase() !== normDesc);
     }
 
     const finalName = name || (description ? description.slice(0, 40).trim() : 'Project');

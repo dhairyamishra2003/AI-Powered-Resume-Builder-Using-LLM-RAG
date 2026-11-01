@@ -1356,15 +1356,63 @@ export function ProjectCard({
   fontScale = 1,
   style = {},
 }) {
+  // 1. Separate title and description if fused together in name
+  let cleanName = (name || '').trim();
+  let cleanDesc = (description || '').trim();
+
+  if (cleanName.includes(': ') && !cleanName.startsWith('http')) {
+    const colonIdx = cleanName.indexOf(': ');
+    const potentialTitle = cleanName.slice(0, colonIdx).trim();
+    const potentialDesc = cleanName.slice(colonIdx + 2).trim();
+    if (potentialTitle.length >= 2 && potentialTitle.length <= 60 && potentialDesc.length > 0) {
+      cleanName = potentialTitle;
+      if (!cleanDesc || cleanDesc.toLowerCase() === potentialDesc.toLowerCase()) {
+        cleanDesc = potentialDesc;
+      }
+    }
+  } else if (cleanName.includes(' – ') && !cleanName.startsWith('http')) {
+    const dashIdx = cleanName.indexOf(' – ');
+    const potentialTitle = cleanName.slice(0, dashIdx).trim();
+    const potentialDesc = cleanName.slice(dashIdx + 3).trim();
+    if (potentialTitle.length >= 2 && potentialTitle.length <= 60 && potentialDesc.length > 0) {
+      cleanName = potentialTitle;
+      if (!cleanDesc || cleanDesc.toLowerCase() === potentialDesc.toLowerCase()) {
+        cleanDesc = potentialDesc;
+      }
+    }
+  }
+
+  // If description is identical to title, remove description to avoid duplication
+  if (cleanDesc.toLowerCase() === cleanName.toLowerCase()) {
+    cleanDesc = '';
+  }
+
+  // 2. Deduplicate description against bullets
+  const normDesc = cleanDesc.toLowerCase().replace(/^[•\-\*·▪\s]+/, '').replace(/[.;,\s]+$/, '');
+
   const validBullets = Array.isArray(bullets)
-    ? bullets.filter(
-      (b) =>
-        b &&
-        typeof b === 'string' &&
-        b.trim().length > 0 &&
-        (!description || b.trim().toLowerCase() !== description.trim().toLowerCase())
-    )
+    ? bullets.filter((b) => {
+      if (!b || typeof b !== 'string') return false;
+      const normB = b.trim().toLowerCase().replace(/^[•\-\*·▪\s]+/, '').replace(/[.;,\s]+$/, '');
+      if (!normB) return false;
+      if (!normDesc) return true;
+      if (normB === normDesc) return false;
+      if (normDesc.length > 20 && normB.length > 20) {
+        if (normDesc.startsWith(normB) || normB.startsWith(normDesc)) {
+          return false;
+        }
+      }
+      return true;
+    })
     : [];
+
+  // Check if description was formed by concatenating bullets
+  const isDescJoinedFromBullets = validBullets.length > 0 && cleanDesc.length > 0 && validBullets.some((b) => {
+    const normB = b.trim().toLowerCase().replace(/[.;,\s]+$/, '');
+    return normB.length > 20 && normDesc.includes(normB);
+  });
+
+  const shouldRenderDescription = cleanDesc && !isDescJoinedFromBullets;
 
   const cleanLink = link
     ? link
@@ -1415,21 +1463,22 @@ export function ProjectCard({
               lineHeight: 1.25,
             }}
           >
-            {name}
-
-            {description && (
-              <span
-                style={{
-                  fontWeight: 400,
-                  color: '#475569',
-                  marginLeft: '6px',
-                  fontSize: scaledFont(resumeTypography.projectDescription, fontScale),
-                }}
-              >
-                – {description}
-              </span>
-            )}
+            {cleanName}
           </div>
+
+          {shouldRenderDescription && (
+            <div
+              style={{
+                fontWeight: 400,
+                color: '#475569',
+                marginTop: '2px',
+                fontSize: scaledFont(resumeTypography.projectDescription, fontScale),
+                lineHeight: 1.35,
+              }}
+            >
+              {cleanDesc}
+            </div>
+          )}
         </div>
 
         <div

@@ -6,6 +6,7 @@ import ExecutiveCorporateTemplate from '../src/components/templates/ExecutiveCor
 import SoftwareEngineerTemplate from '../src/components/templates/SoftwareEngineerTemplate.jsx';
 import AimlEngineerTemplate from '../src/components/templates/AimlEngineerTemplate.jsx';
 import CreativeCleanTemplate from '../src/components/templates/CreativeCleanTemplate.jsx';
+import { ProjectCard } from '../src/components/templates/engine/LayoutEngine.jsx';
 
 console.log('================================================================');
 console.log('RUNNING 10-SCENARIO REGRESSION & STABILITY SUITE');
@@ -261,7 +262,78 @@ console.log('================================================================');
   console.log('  ✓ PASSED: Canonical schema synchronization works bidirectionally across all aliases');
 }
 
+// ── Scenario 11: Project Title and Description Separation ──
+{
+  console.log('\n>>> Scenario 11: Project Title & Description Separate Rendering');
+  // When a project has name and description, they must render as distinct elements, not glued together
+  const cardElement = ProjectCard({
+    name: 'Autonomous Multi-Agent AI System',
+    description: 'Scalable LLM-driven task orchestration platform',
+    technologies: ['React', 'Node.js'],
+    bullets: ['Designed agent communication bus.', 'Reduced timeout rate by 40%.'],
+  });
+
+  assert.ok(cardElement, 'ProjectCard should render');
+  // Check the title and description separation
+  const cardChildren = cardElement.props.children;
+  const topRow = cardChildren[0];
+  const leftCol = topRow.props.children[0];
+  const titleDiv = leftCol.props.children[0];
+  const descDiv = leftCol.props.children[1];
+
+  assert.equal(titleDiv.props.children, 'Autonomous Multi-Agent AI System', 'Title must appear separately in its own element');
+  assert.equal(descDiv.props.children, 'Scalable LLM-driven task orchestration platform', 'Description must appear separately on its own line');
+
+  // When name has "Title: Description" fused together, it separates them
+  const fusedCard = ProjectCard({
+    name: 'AgenticHireAI: An autonomous multi-agent recruitment platform',
+    description: 'An autonomous multi-agent recruitment platform',
+  });
+  const fusedLeftCol = fusedCard.props.children[0].props.children[0];
+  const fusedTitle = fusedLeftCol.props.children[0];
+  const fusedDesc = fusedLeftCol.props.children[1];
+  assert.equal(fusedTitle.props.children, 'AgenticHireAI', 'Fused name must extract title separately');
+  assert.equal(fusedDesc.props.children, 'An autonomous multi-agent recruitment platform', 'Description appears separately');
+
+  console.log('  ✓ PASSED: Project titles render separately and are not glued onto descriptions');
+}
+
+// ── Scenario 12: Project Description Deduplication ──
+{
+  console.log('\n>>> Scenario 12: Project Description Deduplication');
+  // When description is identical to a bullet, the duplicate bullet is removed
+  const dedupeCard = ProjectCard({
+    name: 'Defect Detection System',
+    description: 'Computer vision pipeline for manufacturing quality assessment.',
+    bullets: [
+      'Computer vision pipeline for manufacturing quality assessment.',
+      'Trained ResNet model achieving 98.4% precision on test set.',
+    ],
+  });
+
+  const cardChildren = dedupeCard.props.children;
+  const bulletsUl = cardChildren[2]; // bullet list
+  const bulletItems = bulletsUl.props.children;
+  assert.equal(bulletItems.length, 1, 'Duplicate bullet identical to description must be removed');
+  assert.ok(bulletItems[0].props.children.includes('Trained ResNet model'), 'Only non-duplicate bullets remain');
+
+  // When description is the concatenation of all bullets, description is not rendered twice
+  const concatCard = ProjectCard({
+    name: 'Distributed Event Bus',
+    description: 'Engineered high-throughput event bus. Reduced end-to-end latency by 35%.',
+    bullets: [
+      'Engineered high-throughput event bus.',
+      'Reduced end-to-end latency by 35%.',
+    ],
+  });
+  const concatLeftCol = concatCard.props.children[0].props.children[0];
+  const concatDesc = concatLeftCol.props.children[1];
+  assert.ok(!concatDesc, 'Concatenated description must not render twice when bullets are already present');
+
+  console.log('  ✓ PASSED: Descriptions are never duplicated across title, description block, or bullets');
+}
+
 console.log('\n================================================================');
-console.log('ALL 10 REGRESSION & STABILITY SCENARIOS FULLY VERIFIED!');
+console.log('ALL 12 REGRESSION & STABILITY SCENARIOS FULLY VERIFIED!');
 console.log('================================================================\n');
 

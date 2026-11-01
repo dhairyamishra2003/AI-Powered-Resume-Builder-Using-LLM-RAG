@@ -461,12 +461,7 @@ export const extractFallbackSections = (text = '') => {
   finalizeBullet();
   if (currentProj) projects.push(currentProj);
 
-  // Set project descriptions from first bullet if description is empty
-  projects.forEach((p) => {
-    if (!p.description && p.bullets.length > 0) {
-      p.description = p.bullets[0];
-    }
-  });
+
 
   // 8. Certifications Extraction
   const certLines = getSectionLines('certifications');
