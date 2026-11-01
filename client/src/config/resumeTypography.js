@@ -174,7 +174,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     contact: 9.5,
     summary: 8.5,
     technicalSkills: 10.5,
-    certification: 11,
+    certification: 10,
     headerIcon: 22,
   },
   'software-engineer': {
