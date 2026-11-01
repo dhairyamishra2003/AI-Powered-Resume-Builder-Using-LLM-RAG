@@ -119,8 +119,8 @@ function AimlEngineerTemplate({
 
   const sectionTitleStyle = {
     fontSize: typo.sectionTitle,
-    paddingBottom: '4px',
-    marginBottom: '7px',
+    paddingBottom: '3px',
+    marginBottom: '5px',
   };
 
   // ── Header (Page 1 ONLY) ────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ function AimlEngineerTemplate({
         background: '#0f172a',
         color: '#ffffff',
         borderBottom: `3px solid ${primaryColor}`,
-        padding: '16px 24px 14px',
+        padding: '14px 24px 12px',
         boxSizing: 'border-box',
         width: '100%',
       }}
@@ -231,7 +231,8 @@ function AimlEngineerTemplate({
             background="#f0fdfa"
             borderColor="#99f6e4"
             textColor={primaryColor}
-            style={{ gap: '5px 6px', fontSize: typo.technicalSkills, padding: '4px 8px' }}
+            size="small"
+            style={{ gap: '3px 5px', fontSize: typo.technicalSkills }}
           />
         </div>
       ),
@@ -249,7 +250,7 @@ function AimlEngineerTemplate({
           borderColor={primaryColor}
           backgroundColor="#f0fdfa"
           textColor="#134e4a"
-          style={{ padding: '8px 12px', fontSize: typo.summary, lineHeight: 1.55 }}
+          style={{ padding: '6px 12px', fontSize: typo.summary, lineHeight: 1.48 }}
         />
       ),
     });
@@ -270,7 +271,7 @@ function AimlEngineerTemplate({
             borderColor={primaryColor}
             style={sectionTitleStyle}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             {validEducation.map((edu, idx) => (
               <EducationItem
                 key={idx}
@@ -329,6 +330,8 @@ function AimlEngineerTemplate({
       blocks.push({
         id: `project-${idx}`,
         type: 'projects',
+        ...(idx === 0 ? { forcePage: 1 } : {}),
+        ...(idx === 1 ? { pageBreakBefore: true } : {}),
         render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
           <div
             style={{
@@ -359,7 +362,7 @@ function AimlEngineerTemplate({
               cardBg="#ffffff"
               borderColor="#ccfbf1"
               style={{
-                padding: '2px 10px',
+                padding: '4px 10px',
                 borderRadius: '5px',
                 borderLeft: `3px solid ${primaryColor}`,
                 pageBreakInside: 'avoid',
@@ -548,9 +551,9 @@ function AimlEngineerTemplate({
       blocks={blocks}
       className={styles.container}
       fontFamily="'Inter', system-ui, sans-serif"
-      mainPadding="12px 22px"
+      mainPadding="10px 22px"
       page2Padding="16px 22px"
-      blockGap={7}
+      blockGap={6}
     />
   );
 }
