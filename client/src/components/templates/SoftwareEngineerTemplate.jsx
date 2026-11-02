@@ -57,7 +57,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
   const typo = getTemplateTypography('software-engineer');
   const sectionTitleStyle = {
     fontSize: typo.sectionTitle,
-    marginBottom: '6px',
+    marginBottom: '5px',
     paddingBottom: '3px',
   };
 
@@ -69,7 +69,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         borderBottom: `3px solid ${accentColor}`,
-        padding: '16px 24px 14px',
+        padding: '14px 24px 12px',
         boxSizing: 'border-box',
         width: '100%',
         gap: '16px',
@@ -151,7 +151,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
           borderColor={accentColor}
           backgroundColor="#f8fafc"
           textColor="#334155"
-          style={{ fontSize: typo.summary, lineHeight: 1.5 }}
+          style={{ fontSize: typo.summary, lineHeight: 1.48 }}
         />
       ),
     });
@@ -176,6 +176,8 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
             background="#eff6ff"
             borderColor="#bfdbfe"
             textColor="#1e40af"
+            size="small"
+            style={{ gap: '3px 5px' }}
           />
         </div>
       ),
@@ -196,7 +198,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
             accentColor={accentColor}
             style={sectionTitleStyle}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             {validEducation.map((edu, idx) => (
               <EducationItem
                 key={idx}
@@ -254,6 +256,8 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
       blocks.push({
         id: `project-${idx}`,
         type: 'projects',
+        ...(idx === 0 ? { forcePage: 1 } : {}),
+        ...(idx === 1 ? { pageBreakBefore: true } : {}),
         render: ({ isFirstOfThisSectionOnPage, sectionStartedOnPrevPage }) => (
           <div>
             {(idx === 0 || isFirstOfThisSectionOnPage) && (
@@ -279,7 +283,7 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
               borderColor="#e2e8f0"
               style={{
                 borderLeft: `3px solid ${accentColor}`,
-                padding: '7px 10px',
+                padding: '4px 10px',
               }}
             />
           </div>
@@ -444,9 +448,9 @@ function SoftwareEngineerTemplate({ sections, colors, isPreview = false }) {
       }
       blocks={blocks}
       fontFamily="'Inter', system-ui, sans-serif"
-      mainPadding="14px 22px"
+      mainPadding="10px 22px"
       page2Padding="16px 22px"
-      blockGap={8}
+      blockGap={6}
     />
   );
 }

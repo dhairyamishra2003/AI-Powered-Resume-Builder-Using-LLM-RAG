@@ -259,14 +259,16 @@ function CreativeCleanTemplate({
       items: techSkills,
       render: ({ isOverflow, items = techSkills }) => (
         <div>
-          <SectionTitle
-            title={isOverflow ? 'Technical Skills (Continued)' : 'Skills & Tools'}
-            icon={HiPaintBrush}
-            primaryColor="#4c1d95"
-            accentColor={accentColor}
-            borderColor="#ddd6fe"
-            style={sectionStyle}
-          />
+          {!isOverflow && (
+            <SectionTitle
+              title="Skills & Tools"
+              icon={HiPaintBrush}
+              primaryColor="#4c1d95"
+              accentColor={accentColor}
+              borderColor="#ddd6fe"
+              style={sectionStyle}
+            />
+          )}
           <SkillBadges
             skills={items}
             background="#ffffff"
