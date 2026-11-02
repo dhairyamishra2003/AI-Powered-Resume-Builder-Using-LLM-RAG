@@ -217,7 +217,7 @@ export const TEMPLATE_TYPOGRAPHY_BASES = {
     summary: 11.5,
     technicalSkills: 19,
     softSkills: 10.25,
-    certification: 14,
+    certification: 12,
     language: 15,
     headerIcon: 22,
   },
