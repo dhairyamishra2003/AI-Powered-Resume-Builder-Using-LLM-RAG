@@ -292,6 +292,13 @@ export function TwoPageResumeCanvas({
         const sh = Math.ceil(el.getBoundingClientRect().height);
         const gap = sidebarPage1Sections.length > 0 ? 12 : 0;
 
+        // Sections explicitly flagged to remain intact on Page 1 (e.g. single-page sidebars)
+        if (sSection.keepOnPage1 || sSection.forcePage1) {
+          sidebarPage1Sections.push(sSection);
+          sideH += gap + sh;
+          return;
+        }
+
         // A skill section opts into item-level continuation. Its individual
         // chips are measured in the real sidebar width, so wrapping, headings,
         // padding, and preceding sections determine the split—not a guessed
@@ -896,7 +903,9 @@ export function TwoPageResumeCanvas({
                     </div>
                   );
                 })}
-                {disablePage2Sidebar && (sidebarOverflowBlocks || []).map((section) => (
+                {disablePage2Sidebar && (sidebarOverflowBlocks || [])
+                  .filter((section) => section.id !== 'tech-skills' && section.type !== 'skills')
+                  .map((section) => (
                   <div
                     key={`side-ovf-${section.id}`}
                     data-block-id={section.id}

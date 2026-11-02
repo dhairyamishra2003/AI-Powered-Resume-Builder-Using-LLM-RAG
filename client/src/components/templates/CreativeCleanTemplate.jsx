@@ -256,10 +256,10 @@ function CreativeCleanTemplate({
     sidebarSections.push({
       id: 'tech-skills',
       type: 'skills',
-      render: ({ isOverflow }) => {
-        if (isOverflow) return null;
-        return (
-          <div>
+      items: techSkills,
+      render: ({ isOverflow, items = techSkills }) => (
+        <div>
+          {!isOverflow && (
             <SectionTitle
               title="Skills & Tools"
               icon={HiPaintBrush}
@@ -268,16 +268,17 @@ function CreativeCleanTemplate({
               borderColor="#ddd6fe"
               style={sectionStyle}
             />
-            <SkillBadges
-              skills={techSkills}
-              background="#ffffff"
-              borderColor="#cbd5e1"
-              textColor="#1e293b"
-              size="small"
-            />
-          </div>
-        );
-      },
+          )}
+          <SkillBadges
+            skills={items}
+            background="#ffffff"
+            borderColor="#cbd5e1"
+            textColor="#1e293b"
+            size="small"
+            itemDataAttribute="data-sidebar-skill"
+          />
+        </div>
+      ),
     });
   }
 
@@ -603,7 +604,7 @@ function CreativeCleanTemplate({
       page2Padding="16px 22px"
       twoColumnGap={10}
       blockGap={8}
-      disablePage2Sidebar={true}
+      disablePage2Sidebar={false}
     />
   );
 }
