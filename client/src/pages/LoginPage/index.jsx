@@ -110,8 +110,9 @@ function LoginPage() {
               size="large"
               width="360"
               text="continue_with"
+              useOneTap
+              auto_select={false}
               click_listener={() => {
-                if (googleButtonDisabled) return false;
                 console.debug('[Auth] Google button clicked');
               }}
             />
