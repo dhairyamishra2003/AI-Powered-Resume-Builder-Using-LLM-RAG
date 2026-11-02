@@ -1928,6 +1928,10 @@ export function DualSectionRow({
   );
 }
 
+const IS_PRESENTATION_ITEM_REGEX = /^(?:research\s+presentation\b|presented\s+research\s+work\s+at\s+(?:the\s+)?international\s+conference)/i;
+const PRESENTATION_TEXT_REGEX = /\s*(?:Research\s+Presentation:\s*)?Presented\s+research\s+work\s+at\s+the\s+International\s+Conference\s+on\s+Technology\s+for\s+Sustainable\s+Development\s+Goals\s*(?:\(SDGs\))?[.]?\s*/gi;
+const CLEAN_PUBLISHER_REGEX = /\s*(?:\/|\—|\-)?\s*Presented\s+(?:research\s+work\s+)?at\s+(?:the\s+)?International\s+Conference\s+on\s+Technology\s+for\s+(?:Sustainable\s+Development\s+Goals|SDGs)\s*(?:\(SDGs\))?[.]?\s*/gi;
+
 // Standardized Publication / Research Paper Item Component
 export function PublicationItem({
   title,
@@ -1940,6 +1944,20 @@ export function PublicationItem({
   fontScale = 1,
   style = {},
 }) {
+  if (!title || IS_PRESENTATION_ITEM_REGEX.test(title)) {
+    return null;
+  }
+
+  const displayTitle = (title || '').replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+  const displayPublisher = (publisher || '').replace(CLEAN_PUBLISHER_REGEX, '').trim();
+  let displayDescription = (description || '').replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+  if (
+    displayDescription.toLowerCase() === (title || '').toLowerCase() ||
+    displayDescription.toLowerCase() === displayTitle.toLowerCase()
+  ) {
+    displayDescription = '';
+  }
+
   const cleanLink = link
     ? link.replace(/^https?:\/\//i, '').replace(/\/$/, '')
     : '';
@@ -1972,9 +1990,9 @@ export function PublicationItem({
               color: '#0f172a',
             }}
           >
-            {title}
+            {displayTitle}
           </span>
-          {publisher && (
+          {displayPublisher && (
             <span
               style={{
                 fontStyle: 'italic',
@@ -1983,7 +2001,7 @@ export function PublicationItem({
                 fontSize: scaledFont(resumeTypography.companyName || 11, fontScale),
               }}
             >
-              — {publisher}
+              — {displayPublisher}
             </span>
           )}
         </div>
@@ -2014,7 +2032,7 @@ export function PublicationItem({
         </div>
       )}
 
-      {description && (
+      {displayDescription && (
         <div
           style={{
             fontSize: scaledFont(resumeTypography.bullet || 10.5, fontScale),
@@ -2023,7 +2041,7 @@ export function PublicationItem({
             lineHeight: 1.35,
           }}
         >
-          {description}
+          {displayDescription}
         </div>
       )}
 

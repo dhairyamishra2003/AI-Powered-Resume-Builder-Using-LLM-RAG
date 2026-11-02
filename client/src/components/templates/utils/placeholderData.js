@@ -97,7 +97,7 @@ export const PLACEHOLDER_SECTIONS = {
   publications: [
     {
       title: 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation',
-      publisher: 'Independent Research / Presented at International Conference on Technology for SDGs',
+      publisher: 'Independent Research',
       authors: 'Dhairya Mishra',
       date: '2026',
       link: '',

@@ -63,13 +63,19 @@ export function normalizeSkills(skills) {
   return result;
 }
 
+const IS_PRESENTATION_ITEM_REGEX = /^(?:research\s+presentation\b|presented\s+research\s+work\s+at\s+(?:the\s+)?international\s+conference)/i;
+const PRESENTATION_TEXT_REGEX = /\s*(?:Research\s+Presentation:\s*)?Presented\s+research\s+work\s+at\s+the\s+International\s+Conference\s+on\s+Technology\s+for\s+Sustainable\s+Development\s+Goals\s*(?:\(SDGs\))?[.]?\s*/gi;
+const CLEAN_PUBLISHER_REGEX = /\s*(?:\/|\—|\-)?\s*Presented\s+(?:research\s+work\s+)?at\s+(?:the\s+)?International\s+Conference\s+on\s+Technology\s+for\s+(?:Sustainable\s+Development\s+Goals|SDGs)\s*(?:\(SDGs\))?[.]?\s*/gi;
+
 export function normalizePublicationItem(item) {
   if (!item) return null;
   if (typeof item === 'string') {
     const trimmed = item.trim();
-    if (!trimmed) return null;
+    if (!trimmed || IS_PRESENTATION_ITEM_REGEX.test(trimmed)) return null;
+    const cleanTitle = trimmed.replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+    if (!cleanTitle) return null;
     return {
-      title: trimmed,
+      title: cleanTitle,
       publisher: '',
       authors: '',
       date: '',
@@ -79,11 +85,17 @@ export function normalizePublicationItem(item) {
   }
   if (typeof item === 'object') {
     const title = String(item.title || item.name || item.paperTitle || '').trim();
-    const publisher = String(item.publisher || item.journal || item.conference || item.venue || '').trim();
+    if (IS_PRESENTATION_ITEM_REGEX.test(title)) return null;
+
+    let publisher = String(item.publisher || item.journal || item.conference || item.venue || '').replace(CLEAN_PUBLISHER_REGEX, '').trim();
     const authors = String(item.authors || item.author || '').trim();
     const date = String(item.date || item.year || item.publicationDate || '').trim();
     const link = String(item.link || item.url || item.doi || '').trim();
-    const description = String(item.description || item.abstract || item.summary || '').trim();
+    let description = String(item.description || item.abstract || item.summary || '').replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+
+    if (description.toLowerCase() === title.toLowerCase()) {
+      description = '';
+    }
 
     if (!title && !publisher && !description) return null;
 

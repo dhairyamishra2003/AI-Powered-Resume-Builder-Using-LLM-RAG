@@ -263,3 +263,21 @@ IEEE Transactions
   assert.ok(fallback.publications.length > 0, 'Publications parsed despite long text');
 });
 
+test('research presentation duplicate note is not parsed as publication or appended to description', () => {
+  const resumeText = `
+RESEARCH PAPERS & PUBLICATIONS
+Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation
+Independent Research
+Studied multi-agent collaboration architectures for intelligent task automation, autonomous task decomposition, and agent communication.
+Research Presentation: Presented research work at the International Conference on Technology for Sustainable Development Goals (SDGs).
+Presented research work at the International Conference on Technology for Sustainable Development Goals (SDGs).
+`;
+  const parsed = parseResumeLocally(resumeText);
+  assert.equal(parsed.publications.length, 1, 'Should only have 1 genuine publication');
+  assert.equal(parsed.publications[0].title, 'Multi-Agent Collaboration Systems Using Agentic AI for Intelligent Task Automation');
+  assert.equal(parsed.publications[0].publisher, 'Independent Research');
+  assert.ok(!parsed.publications[0].description.includes('Presented research work at the International Conference'));
+  assert.ok(!parsed.publications[0].description.includes('Research Presentation:'));
+  assert.ok(parsed.publications[0].description.includes('Studied multi-agent collaboration architectures'));
+});
+

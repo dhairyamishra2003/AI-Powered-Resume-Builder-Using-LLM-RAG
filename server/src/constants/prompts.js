@@ -83,7 +83,7 @@ Parse the resume and extract ALL information into this EXACT JSON format:\r
   ]\r
 }\r
 \r
-Extract only information actually present. For projects, return an array of project objects with name, description, technologies, link, and bullets. Normalize dates to YYYY-MM only when the source supplies enough date information; otherwise preserve the available text. If information is missing, leave it as an empty string or empty array. Respond ONLY with valid JSON.`;
+Extract only information actually present. For projects, return an array of project objects with name, description, technologies, link, and bullets. Do not create separate publication entries for conference presentations, oral presentations, or presentation notes; do not duplicate presentation sentences into paper descriptions. Normalize dates to YYYY-MM only when the source supplies enough date information; otherwise preserve the available text. If information is missing, leave it as an empty string or empty array. Respond ONLY with valid JSON.`;
 
 export const bulletWriterPrompt = (data, ragContext = '') => `You are an expert resume writer specializing in STAR-method bullet points.\r
 \r

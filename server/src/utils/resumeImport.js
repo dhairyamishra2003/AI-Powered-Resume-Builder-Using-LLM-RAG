@@ -174,6 +174,31 @@ const mergeTechList = (t1 = [], t2 = []) => {
   return result;
 };
 
+const IS_PRESENTATION_TEXT = /^(?:research\s+presentation\b|presented\s+research\s+work\s+at\s+(?:the\s+)?international\s+conference)/i;
+const PRESENTATION_TEXT_REGEX = /\s*(?:Research\s+Presentation:\s*)?Presented\s+research\s+work\s+at\s+the\s+International\s+Conference\s+on\s+Technology\s+for\s+Sustainable\s+Development\s+Goals\s*(?:\(SDGs\))?[.]?\s*/gi;
+const CLEAN_PUBLISHER_REGEX = /\s*(?:\/|\—|\-)?\s*Presented\s+(?:research\s+work\s+)?at\s+(?:the\s+)?International\s+Conference\s+on\s+Technology\s+for\s+(?:Sustainable\s+Development\s+Goals|SDGs)\s*(?:\(SDGs\))?[.]?\s*/gi;
+
+const sanitizePublications = (pubs = []) => {
+  return (Array.isArray(pubs) ? pubs : [])
+    .filter((p) => {
+      if (!p) return false;
+      const title = typeof p === 'string' ? p : (p.title || p.name || '');
+      return !IS_PRESENTATION_TEXT.test(title);
+    })
+    .map((p) => {
+      if (typeof p === 'string') return p.replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+      const title = String(p.title || p.name || '').trim();
+      const publisher = String(p.publisher || '').replace(CLEAN_PUBLISHER_REGEX, '').trim();
+      let description = String(p.description || '').replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+      if (description.toLowerCase() === title.toLowerCase()) description = '';
+      return {
+        ...p,
+        publisher,
+        description,
+      };
+    });
+};
+
 const mergeArrays = (primary = [], fallback = []) => {
   const merged = [...primary];
   for (const fallbackItem of fallback) {
@@ -249,7 +274,7 @@ export const mergeImportedSections = (aiSections = {}, fallbackSections = {}) =>
     education: mergeArrays(primary.education || [], fallback.education || []),
     projects: mergeArrays(primary.projects || [], fallback.projects || []),
     certifications: realCertifications,
-    publications: mergeArrays(primary.publications || [], fallback.publications || []),
+    publications: sanitizePublications(mergeArrays(primary.publications || [], fallback.publications || [])),
   };
 };
 
@@ -391,7 +416,7 @@ export const verifyImportCompleteness = (extractedText = '', parsedSections = {}
   if (detected.includes('publications')) {
     const hasPubs = Array.isArray(complete.publications) && complete.publications.length > 0;
     if (!hasPubs && Array.isArray(fallbackSections.publications) && fallbackSections.publications.length > 0) {
-      complete.publications = fallbackSections.publications;
+      complete.publications = sanitizePublications(fallbackSections.publications);
       recovered.push('publications');
     }
   }

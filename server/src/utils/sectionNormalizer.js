@@ -675,6 +675,10 @@ export const normalizeSummary = (summary) => {
   return String(summary).trim();
 };
 
+const IS_PRESENTATION_ITEM_REGEX = /^(?:research\s+presentation\b|presented\s+research\s+work\s+at\s+(?:the\s+)?international\s+conference)/i;
+const PRESENTATION_TEXT_REGEX = /\s*(?:Research\s+Presentation:\s*)?Presented\s+research\s+work\s+at\s+the\s+International\s+Conference\s+on\s+Technology\s+for\s+Sustainable\s+Development\s+Goals\s*(?:\(SDGs\))?[.]?\s*/gi;
+const CLEAN_PUBLISHER_REGEX = /\s*(?:\/|\—|\-)?\s*Presented\s+(?:research\s+work\s+)?at\s+(?:the\s+)?International\s+Conference\s+on\s+Technology\s+for\s+(?:Sustainable\s+Development\s+Goals|SDGs)\s*(?:\(SDGs\))?[.]?\s*/gi;
+
 /**
  * Normalizes a single publication / research paper item:
  * { title, publisher, authors, date, link, description }
@@ -684,9 +688,11 @@ export const normalizePublicationItem = (item) => {
 
   if (typeof item === 'string') {
     const trimmed = item.trim();
-    if (!trimmed) return null;
+    if (!trimmed || IS_PRESENTATION_ITEM_REGEX.test(trimmed)) return null;
+    const cleanTitle = trimmed.replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+    if (!cleanTitle) return null;
     return {
-      title: trimmed,
+      title: cleanTitle,
       publisher: '',
       authors: '',
       date: '',
@@ -698,11 +704,19 @@ export const normalizePublicationItem = (item) => {
   if (typeof item === 'object' && !Array.isArray(item)) {
     const raw = stripInvalidId(item);
     const title = String(raw.title || raw.name || raw.paperTitle || '').trim();
-    const publisher = String(raw.publisher || raw.journal || raw.conference || raw.venue || '').trim();
+    if (IS_PRESENTATION_ITEM_REGEX.test(title)) return null;
+
+    let publisher = String(raw.publisher || raw.journal || raw.conference || raw.venue || '').replace(CLEAN_PUBLISHER_REGEX, '').trim();
     const authors = String(raw.authors || raw.author || '').trim();
     const date = String(raw.date || raw.year || raw.publicationDate || '').trim();
     const link = String(raw.link || raw.url || raw.doi || '').trim();
-    const description = String(raw.description || raw.abstract || raw.summary || '').trim();
+    let description = String(raw.description || raw.abstract || raw.summary || '').replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+
+    if (description.toLowerCase() === title.toLowerCase()) {
+      description = '';
+    }
+
+    if (!title && !publisher && !description) return null;
 
     const result = {
       title: title || 'Research Publication',

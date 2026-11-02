@@ -102,7 +102,7 @@ export const extractFallbackSections = (text = '') => {
     { type: 'skills', regex: /^(?:technical\s+skills|technical\s+competencies|skills\s*&?\s*competencies|skills|technologies|tools\s*&?\s*technologies)$/i },
     { type: 'projects', regex: /^(?:key\s+projects|technical\s+projects|academic\s+projects|personal\s+projects|projects|strategic\s+initiatives)$/i },
     { type: 'certifications', regex: /^(?:certifications?|certificates?|licenses?\s*&?\s*certifications?|credentials?\s*&?\s*honors?|honors?\s*&?\s*awards?)$/i },
-    { type: 'publications', regex: /^(?:publications?|research\s+papers?|research\s+publications?|research\s+work|research\s+projects?|research|papers?|scholarly\s+work|patents?\s*&?\s*publications?)$/i },
+    { type: 'publications', regex: /^(?:publications?|research\s*(?:papers?)?\s*(?:and|&)?\s*publications?|research\s+papers?|research\s+publications?|research\s+work|research\s+projects?|research|papers?|scholarly\s+work|patents?\s*(?:and|&)?\s*publications?)$/i },
     { type: 'languages', regex: /^(?:languages?|known\s+languages?|languages?\s+known|language\s+proficiency|spoken\s+languages?)$/i },
     { type: 'achievements', regex: /^(?:achievements?|key\s+achievements?|awards?\s*&?\s*achievements?|honors?\s*&?\s*achievements?)$/i },
   ];
@@ -494,11 +494,17 @@ export const extractFallbackSections = (text = '') => {
   // 9. Publications & Research Papers Extraction
   const pubLines = getSectionLines('publications');
   const publications = [];
+  const IS_PRESENTATION_TEXT = /^(?:research\s+presentation\b|presented\s+research\s+work\s+at\s+(?:the\s+)?international\s+conference)/i;
+  const PRESENTATION_TEXT_REGEX = /\s*(?:Research\s+Presentation:\s*)?Presented\s+research\s+work\s+at\s+the\s+International\s+Conference\s+on\s+Technology\s+for\s+Sustainable\s+Development\s+Goals\s*(?:\(SDGs\))?[.]?\s*/gi;
+  const CLEAN_PUBLISHER_REGEX = /\s*(?:\/|\—|\-)?\s*Presented\s+(?:research\s+work\s+)?at\s+(?:the\s+)?International\s+Conference\s+on\s+Technology\s+for\s+(?:Sustainable\s+Development\s+Goals|SDGs)\s*(?:\(SDGs\))?[.]?\s*/gi;
+
   if (pubLines.length > 0) {
     let currentPub = null;
     pubLines.forEach((line) => {
       const cleaned = line.replace(/^[•\-\*·▪\s]+/, '').trim();
-      if (!cleaned || /^(publications?|research\s+papers?|research|papers?)$/i.test(cleaned)) return;
+      if (!cleaned || /^(?:publications?|research\s*(?:papers?)?\s*(?:and|&)?\s*publications?|research\s+papers?|research\s+publications?|research|papers?)$/i.test(cleaned)) return;
+      if (IS_PRESENTATION_TEXT.test(cleaned)) return;
+
       const dateMatch = cleaned.match(/\b(20\d{2})\b/);
       const doiMatch = cleaned.match(/\b(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)\b/);
       const urlMatch = cleaned.match(/https?:\/\/[^\s]+/i);
@@ -513,12 +519,19 @@ export const extractFallbackSections = (text = '') => {
           description: '',
         };
       } else if (!currentPub.publisher && cleaned.length < 50 && !cleaned.endsWith('.')) {
-        currentPub.publisher = cleaned;
+        currentPub.publisher = cleaned.replace(CLEAN_PUBLISHER_REGEX, '').trim();
       } else {
-        currentPub.description = currentPub.description ? `${currentPub.description} ${cleaned}` : cleaned;
+        const textToAdd = cleaned.replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+        if (textToAdd) {
+          currentPub.description = currentPub.description ? `${currentPub.description} ${textToAdd}` : textToAdd;
+        }
       }
     });
-    if (currentPub) publications.push(currentPub);
+    if (currentPub && !IS_PRESENTATION_TEXT.test(currentPub.title || '')) {
+      if (currentPub.publisher) currentPub.publisher = currentPub.publisher.replace(CLEAN_PUBLISHER_REGEX, '').trim();
+      if (currentPub.description) currentPub.description = currentPub.description.replace(PRESENTATION_TEXT_REGEX, ' ').trim();
+      publications.push(currentPub);
+    }
   }
 
   // 10. Languages Extraction
