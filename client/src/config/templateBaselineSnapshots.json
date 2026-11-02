@@ -1,0 +1,235 @@
+{
+  "version": "1.0.0-LOCKED",
+  "lockedAt": "2026-11-02T14:15:00+05:30",
+  "status": "PERMANENTLY_LOCKED",
+  "templates": {
+    "modern-professional": {
+      "id": "modern-professional",
+      "name": "Modern Professional",
+      "component": "ModernProfessionalTemplate",
+      "layoutType": "two-column",
+      "fontFamily": "'Inter', system-ui, sans-serif",
+      "sidebar": {
+        "width": "238px",
+        "lockWidth": true,
+        "background": "#f8fafc",
+        "border": "1px solid #e2e8f0",
+        "padding": "12px 10px",
+        "disablePage2Sidebar": false
+      },
+      "margins": {
+        "mainPadding": "12px 16px",
+        "page2Padding": "16px 22px",
+        "twoColumnGap": 10,
+        "blockGap": 8
+      },
+      "colors": {
+        "primary": "#0f172a",
+        "accent": "#2563eb",
+        "sidebarBg": "#f8fafc",
+        "sidebarBorder": "1px solid #e2e8f0"
+      },
+      "page1SidebarSections": ["tech-skills", "core-strengths", "languages", "education"],
+      "page2SidebarSupported": true,
+      "page1MainSections": ["summary", "experience", "projects", "certifications", "publications"],
+      "paginationRules": {
+        "allowsSidebarOverflowToPage2": true,
+        "continuedHeading": "Technical Skills (Continued)",
+        "requiresPageRunningHeader": true
+      }
+    },
+    "minimal-ats": {
+      "id": "minimal-ats",
+      "name": "Minimal ATS",
+      "component": "MinimalAtsTemplate",
+      "layoutType": "single-column",
+      "fontFamily": "Georgia, 'Times New Roman', serif",
+      "sidebar": null,
+      "margins": {
+        "mainPadding": "14px 26px",
+        "page2Padding": "16px 26px",
+        "twoColumnGap": 0,
+        "blockGap": 8
+      },
+      "colors": {
+        "primary": "#0f172a",
+        "accent": "#334155"
+      },
+      "page1SidebarSections": [],
+      "page2SidebarSupported": false,
+      "page1MainSections": [
+        "summary",
+        "technicalSkills",
+        "experience",
+        "education",
+        "projects",
+        "certifications",
+        "publications",
+        "coreStrengths",
+        "languages"
+      ],
+      "paginationRules": {
+        "singleColumnFlow": true,
+        "requiresPageRunningHeader": true
+      }
+    },
+    "executive-corporate": {
+      "id": "executive-corporate",
+      "name": "Executive Corporate",
+      "component": "ExecutiveCorporateTemplate",
+      "layoutType": "two-column",
+      "fontFamily": "Georgia, 'Times New Roman', serif",
+      "sidebar": {
+        "width": "238px",
+        "lockWidth": true,
+        "background": "#f8fafc",
+        "border": "1px solid #e2e8f0",
+        "padding": "12px 10px",
+        "disablePage2Sidebar": false
+      },
+      "margins": {
+        "mainPadding": "12px 16px",
+        "page2Padding": "16px 22px",
+        "twoColumnGap": 10,
+        "blockGap": 8
+      },
+      "colors": {
+        "primary": "#1e1b4b",
+        "accent": "#d97706",
+        "sidebarBg": "#f8fafc",
+        "sidebarBorder": "1px solid #e2e8f0"
+      },
+      "page1SidebarSections": ["tech-skills", "languages"],
+      "page2SidebarSupported": true,
+      "page1MainSections": [
+        "summary",
+        "experience",
+        "education",
+        "projects",
+        "certifications",
+        "publications",
+        "coreStrengths"
+      ],
+      "paginationRules": {
+        "allowsSidebarOverflowToPage2": true,
+        "requiresPageRunningHeader": true
+      }
+    },
+    "software-engineer": {
+      "id": "software-engineer",
+      "name": "Software Engineer",
+      "component": "SoftwareEngineerTemplate",
+      "layoutType": "single-column",
+      "fontFamily": "'Inter', system-ui, sans-serif",
+      "sidebar": null,
+      "margins": {
+        "mainPadding": "10px 22px",
+        "page2Padding": "16px 22px",
+        "twoColumnGap": 0,
+        "blockGap": 6
+      },
+      "colors": {
+        "primary": "#0f172a",
+        "accent": "#2563eb"
+      },
+      "page1SidebarSections": [],
+      "page2SidebarSupported": false,
+      "page1MainSections": [
+        "summary",
+        "technicalSkills",
+        "experience",
+        "projects",
+        "education",
+        "certifications",
+        "publications",
+        "languages"
+      ],
+      "paginationRules": {
+        "firstProjectStartsOnPage1": true,
+        "singleColumnFlow": true,
+        "requiresPageRunningHeader": true
+      }
+    },
+    "aiml-engineer": {
+      "id": "aiml-engineer",
+      "name": "AI/ML Engineer",
+      "component": "AimlEngineerTemplate",
+      "layoutType": "single-column",
+      "fontFamily": "'Inter', system-ui, sans-serif",
+      "sidebar": null,
+      "margins": {
+        "mainPadding": "10px 22px",
+        "page2Padding": "16px 22px",
+        "twoColumnGap": 0,
+        "blockGap": 6
+      },
+      "colors": {
+        "primary": "#0f766e",
+        "accent": "#2dd4bf"
+      },
+      "page1SidebarSections": [],
+      "page2SidebarSupported": false,
+      "page1MainSections": [
+        "summary",
+        "technicalSkills",
+        "experience",
+        "projects",
+        "education",
+        "certifications",
+        "publications",
+        "coreStrengths",
+        "languages"
+      ],
+      "paginationRules": {
+        "firstProjectStartsOnPage1": true,
+        "singleColumnFlow": true,
+        "requiresPageRunningHeader": true
+      }
+    },
+    "creative-clean": {
+      "id": "creative-clean",
+      "name": "Creative Clean",
+      "component": "CreativeCleanTemplate",
+      "layoutType": "two-column",
+      "fontFamily": "'Inter', system-ui, sans-serif",
+      "sidebar": {
+        "width": "238px",
+        "lockWidth": true,
+        "background": "#faf5ff",
+        "border": "1px solid #e9d5ff",
+        "padding": "12px 10px",
+        "disablePage2Sidebar": false
+      },
+      "margins": {
+        "mainPadding": "12px 14px",
+        "page2Padding": "16px 22px",
+        "twoColumnGap": 10,
+        "blockGap": 8
+      },
+      "colors": {
+        "primary": "#6d28d9",
+        "accent": "#ec4899",
+        "borderColor": "#ddd6fe",
+        "sidebarBg": "#faf5ff",
+        "sidebarBorder": "1px solid #e9d5ff"
+      },
+      "page1SidebarSections": ["tech-skills", "core-strengths"],
+      "page2SidebarSupported": true,
+      "page1MainSections": [
+        "summary",
+        "education",
+        "experience",
+        "projects",
+        "certifications",
+        "publications",
+        "languages"
+      ],
+      "paginationRules": {
+        "allowsSidebarOverflowToPage2": true,
+        "noContinuedSectionHeading": true,
+        "skillsInSidebarOnly": true,
+        "requiresPageRunningHeader": true
+      }
+    }
+  }
+}

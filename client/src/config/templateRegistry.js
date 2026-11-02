@@ -221,7 +221,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     name: 'Software Engineer',
     category: 'modern',
     description: 'Developer-centric design with categorized technical stack badges & project callouts',
-    layoutType: 'two-column',
+    layoutType: 'single-column',
     font: "'Inter', sans-serif",
     page: A4_PAGE_SPEC,
     colors: Object.freeze({
@@ -229,30 +229,25 @@ export const TEMPLATE_CONFIGS = Object.freeze({
       accent: '#2563eb',
       text: '#0f172a',
       light: '#eff6ff',
-      sidebarBg: '#f8fafc',
-      sidebarBorder: '1px solid #e2e8f0',
+      sidebarBg: '#ffffff',
+      sidebarBorder: 'none',
     }),
-    sidebar: Object.freeze({
-      width: '238px',
-      lockWidth: true,
-      background: '#f8fafc',
-      border: '1px solid #e2e8f0',
-      padding: '12px 10px',
-      disablePage2Sidebar: false,
-    }),
+    sidebar: null,
     margins: Object.freeze({
-      mainPadding: '12px 16px',
+      mainPadding: '10px 22px',
       page2Padding: '16px 22px',
-      twoColumnGap: '10px',
-      blockGap: 8,
+      twoColumnGap: '0px',
+      blockGap: 6,
     }),
     sectionOrder: Object.freeze({
-      page1Sidebar: ['technicalSkills', 'education'],
-      page2Sidebar: ['education'],
+      page1Sidebar: [],
+      page2Sidebar: [],
       mainContent: [
         'summary',
+        'technicalSkills',
         'experience',
         'projects',
+        'education',
         'certifications',
         'publications',
         'languages',
@@ -262,9 +257,9 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     aliases: Object.freeze([]),
     typography: TEMPLATE_TYPOGRAPHY_BASES['software-engineer'],
     continuationRules: Object.freeze({
-      disablePage2Sidebar: false,
+      disablePage2Sidebar: true,
       hasRunningHeader: true,
-      continuationNotice: true,
+      continuationNotice: false,
     }),
   }),
 
@@ -275,7 +270,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     name: 'AI/ML Engineer',
     category: 'modern',
     description: 'Specialized layout for AI/ML/Data Science engineers highlighting ML frameworks & model metrics',
-    layoutType: 'two-column',
+    layoutType: 'single-column',
     font: "'Inter', sans-serif",
     page: A4_PAGE_SPEC,
     colors: Object.freeze({
@@ -283,30 +278,25 @@ export const TEMPLATE_CONFIGS = Object.freeze({
       accent: '#2dd4bf',
       text: '#0f172a',
       light: '#f0fdfa',
-      sidebarBg: '#f0fdfa',
-      sidebarBorder: '1px solid #ccfbf1',
+      sidebarBg: '#ffffff',
+      sidebarBorder: 'none',
     }),
-    sidebar: Object.freeze({
-      width: '238px',
-      lockWidth: true,
-      background: '#f0fdfa',
-      border: '1px solid #ccfbf1',
-      padding: '12px 10px',
-      disablePage2Sidebar: false,
-    }),
+    sidebar: null,
     margins: Object.freeze({
-      mainPadding: '12px 16px',
+      mainPadding: '10px 22px',
       page2Padding: '16px 22px',
-      twoColumnGap: '10px',
-      blockGap: 8,
+      twoColumnGap: '0px',
+      blockGap: 6,
     }),
     sectionOrder: Object.freeze({
-      page1Sidebar: ['technicalSkills', 'education'],
-      page2Sidebar: ['education'],
+      page1Sidebar: [],
+      page2Sidebar: [],
       mainContent: [
         'summary',
+        'technicalSkills',
         'experience',
         'projects',
+        'education',
         'certifications',
         'publications',
         'coreStrengths',
@@ -317,9 +307,9 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     aliases: Object.freeze([]),
     typography: TEMPLATE_TYPOGRAPHY_BASES['aiml-engineer'],
     continuationRules: Object.freeze({
-      disablePage2Sidebar: false,
+      disablePage2Sidebar: true,
       hasRunningHeader: true,
-      continuationNotice: true,
+      continuationNotice: false,
     }),
   }),
 
@@ -347,7 +337,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
       background: '#faf5ff',
       border: '1px solid #e9d5ff',
       padding: '12px 10px',
-      disablePage2Sidebar: true,
+      disablePage2Sidebar: false,
     }),
     margins: Object.freeze({
       mainPadding: '12px 14px',
@@ -357,7 +347,7 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     }),
     sectionOrder: Object.freeze({
       page1Sidebar: ['technicalSkills', 'coreStrengths'],
-      page2Sidebar: [],
+      page2Sidebar: ['technicalSkills', 'coreStrengths'],
       mainContent: [
         'summary',
         'education',
@@ -372,12 +362,57 @@ export const TEMPLATE_CONFIGS = Object.freeze({
     aliases: Object.freeze(['creative']),
     typography: TEMPLATE_TYPOGRAPHY_BASES['creative-clean'],
     continuationRules: Object.freeze({
-      disablePage2Sidebar: true,
+      disablePage2Sidebar: false,
       hasRunningHeader: true,
-      continuationNotice: true,
+      continuationNotice: false,
     }),
   }),
 });
+
+export const LOCKED_TEMPLATE_IDS = Object.freeze([
+  'modern-professional',
+  'minimal-ats',
+  'executive-corporate',
+  'software-engineer',
+  'aiml-engineer',
+  'creative-clean',
+]);
+
+export const TEMPLATE_LOCK_METADATA = Object.freeze({
+  version: '1.0.0-LOCKED',
+  lockedAt: '2026-11-02T14:15:00+05:30',
+  status: 'PERMANENTLY_LOCKED',
+  protectedTemplates: LOCKED_TEMPLATE_IDS,
+  enforceImmutableLayout: true,
+});
+
+/**
+ * Returns true if the template is one of the 6 locked templates.
+ * @param {string} templateId
+ * @returns {boolean}
+ */
+export function isTemplateLocked(templateId) {
+  const canonicalId = resolveTemplateId(templateId);
+  return LOCKED_TEMPLATE_IDS.includes(canonicalId);
+}
+
+/**
+ * Validates that a template's runtime configuration has not been mutated or corrupted.
+ * Throws an Error if an unauthorized mutation is detected.
+ * @param {string} templateId
+ * @returns {object} Validated immutable template config
+ */
+export function validateTemplateConfig(templateId) {
+  const canonicalId = resolveTemplateId(templateId);
+  const config = TEMPLATE_CONFIGS[canonicalId];
+  if (!config) {
+    throw new Error(`[TemplateSecurityError] Template "${templateId}" is not a recognized locked template.`);
+  }
+  if (!Object.isFrozen(config)) {
+    throw new Error(`[TemplateSecurityError] Template "${canonicalId}" configuration has been mutated! Object must be frozen.`);
+  }
+  return config;
+}
 
 /**
  * Returns the immutable configuration object for a template.
