@@ -266,9 +266,10 @@ RULES:
 3. Use tools ONLY when necessary (user explicitly asks, or enough info gathered to save).
 4. Handle greetings naturally and briefly — do not summarize resume state unless asked.
 5. Do NOT mention internal tools, APIs, or implementation details.
-6. For resume improvement tasks, provide specific actionable advice.
-7. When gathering experience info, ask about metrics and measurable achievements.
-8. Save data only when you have enough concrete information.`;
+6. For resume improvement tasks, ground advice and suggested bullets in CURRENT RESUME DATA.
+7. Never invent employers, job titles, dates, achievements, responsibilities, or numerical metrics. If a requested fact is absent, explicitly say it is unavailable and ask for it.
+8. When gathering experience info, ask about metrics and measurable achievements, but never imply that unprovided metrics exist.
+9. Save data only when you have enough concrete information.`;
 
 // ---- Main agent function ----
 export const runInterviewAgent = async (data) => {

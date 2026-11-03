@@ -27,6 +27,7 @@ function HomePage() {
   const [newTitle, setNewTitle] = useState('');
   const [newTemplate, setNewTemplate] = useState('modern-professional');
   const [newTargetRole, setNewTargetRole] = useState('');
+  const [createErrors, setCreateErrors] = useState({});
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [processingStage, setProcessingStage] = useState('idle');
@@ -48,11 +49,18 @@ function HomePage() {
 
   const handleCreate = async (event) => {
     event.preventDefault();
+    const title = newTitle.trim();
+    const targetRole = newTargetRole.trim();
+    const errors = {};
+    if (!title) errors.title = 'Resume title is required.';
+    if (!targetRole) errors.targetRole = 'Target role is required.';
+    setCreateErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     try {
       const resume = await createResume({
-        title: newTitle || 'Untitled Resume',
+        title,
         templateId: newTemplate,
-        targetRole: newTargetRole,
+        targetRole,
       });
       toast.success('Resume created!');
       navigate(`/builder/${resume._id}`);
@@ -200,10 +208,13 @@ function HomePage() {
               id="resume-title"
               type="text"
               value={newTitle}
-              onChange={(event) => setNewTitle(event.target.value)}
+              onChange={(event) => { setNewTitle(event.target.value); setCreateErrors((errors) => ({ ...errors, title: '' })); }}
               className="input-field"
+              aria-invalid={Boolean(createErrors.title)}
+              aria-describedby={createErrors.title ? 'resume-title-error' : undefined}
               placeholder="e.g., Software Engineer Resume"
             />
+            {createErrors.title && <p id="resume-title-error" className="text-sm text-error" role="alert">{createErrors.title}</p>}
           </div>
           <div className="form-group">
             <label className="label-text" htmlFor="target-role">Target Role</label>
@@ -211,10 +222,13 @@ function HomePage() {
               id="target-role"
               type="text"
               value={newTargetRole}
-              onChange={(event) => setNewTargetRole(event.target.value)}
+              onChange={(event) => { setNewTargetRole(event.target.value); setCreateErrors((errors) => ({ ...errors, targetRole: '' })); }}
               className="input-field"
+              aria-invalid={Boolean(createErrors.targetRole)}
+              aria-describedby={createErrors.targetRole ? 'target-role-error' : undefined}
               placeholder="e.g., Frontend Developer"
             />
+            {createErrors.targetRole && <p id="target-role-error" className="text-sm text-error" role="alert">{createErrors.targetRole}</p>}
           </div>
           <div className="form-group">
             <span className="label-text">Template</span>

@@ -5,10 +5,12 @@ import {
 } from '../controllers/resume.controller.js';
 import authenticate from '../middleware/auth.middleware.js';
 import upload, { importUpload } from '../middleware/upload.middleware.js';
+import { validateResumeId } from '../middleware/resumeId.middleware.js';
 
 const router = Router();
 
 router.use(authenticate);
+router.param('id', validateResumeId);
 
 router.post('/upload', upload.single('file'), uploadResume);
 router.post('/import', importUpload.single('file'), importResume);

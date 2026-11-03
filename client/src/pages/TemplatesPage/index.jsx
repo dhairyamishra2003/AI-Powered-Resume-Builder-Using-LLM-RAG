@@ -31,6 +31,7 @@ function TemplatesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newTargetRole, setNewTargetRole] = useState('');
+  const [createErrors, setCreateErrors] = useState({});
   const [newTemplate, setNewTemplate] = useState('modern-professional');
 
   useEffect(() => {
@@ -49,11 +50,18 @@ function TemplatesPage() {
 
   const handleCreate = async (event) => {
     event.preventDefault();
+    const title = newTitle.trim();
+    const targetRole = newTargetRole.trim();
+    const errors = {};
+    if (!title) errors.title = 'Resume title is required.';
+    if (!targetRole) errors.targetRole = 'Target role is required.';
+    setCreateErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     try {
       const resume = await createResume({
-        title: newTitle || 'Untitled Resume',
+        title,
         templateId: newTemplate,
-        targetRole: newTargetRole,
+        targetRole,
       });
       toast.success('Resume created!');
       navigate(`/builder/${resume._id}`);
@@ -126,11 +134,13 @@ function TemplatesPage() {
         <form className="templates-page__create-form" onSubmit={handleCreate}>
           <div className="form-group">
             <label className="label-text" htmlFor="template-title">Resume Title</label>
-            <input id="template-title" value={newTitle} onChange={(event) => setNewTitle(event.target.value)} className="input-field" placeholder="e.g., Software Engineer Resume" />
+            <input id="template-title" value={newTitle} onChange={(event) => { setNewTitle(event.target.value); setCreateErrors((errors) => ({ ...errors, title: '' })); }} className="input-field" aria-invalid={Boolean(createErrors.title)} aria-describedby={createErrors.title ? 'template-title-error' : undefined} placeholder="e.g., Software Engineer Resume" />
+            {createErrors.title && <p id="template-title-error" className="text-sm text-error" role="alert">{createErrors.title}</p>}
           </div>
           <div className="form-group">
             <label className="label-text" htmlFor="template-role">Target Role</label>
-            <input id="template-role" value={newTargetRole} onChange={(event) => setNewTargetRole(event.target.value)} className="input-field" placeholder="e.g., Frontend Developer" />
+            <input id="template-role" value={newTargetRole} onChange={(event) => { setNewTargetRole(event.target.value); setCreateErrors((errors) => ({ ...errors, targetRole: '' })); }} className="input-field" aria-invalid={Boolean(createErrors.targetRole)} aria-describedby={createErrors.targetRole ? 'template-role-error' : undefined} placeholder="e.g., Frontend Developer" />
+            {createErrors.targetRole && <p id="template-role-error" className="text-sm text-error" role="alert">{createErrors.targetRole}</p>}
           </div>
           <p className="text-sm text-muted">
             Template: <strong>{TEMPLATES.find((template) => template.id === newTemplate)?.name}</strong>

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import * as aiService from '../services/ai.service.js';
 import ChatHistory from '../models/ChatHistory.model.js';
 import Resume from '../models/Resume.model.js';
+import { isValidResumeId } from '../middleware/resumeId.middleware.js';
 import { cacheAtsScore, getCachedAtsScore, makeAtsCacheKey } from '../services/ats-cache.service.js';
 
 export const chat = async (req, res, next) => {
@@ -12,8 +13,17 @@ export const chat = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'resumeId and message are required.' });
     }
 
+    if (!isValidResumeId(resumeId)) {
+      return res.status(400).json({ success: false, message: 'Invalid Resume ID' });
+    }
+
     if (typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({ success: false, message: 'message must be a non-empty string.' });
+    }
+
+    const resume = await Resume.findOne({ _id: resumeId, userId: req.user._id });
+    if (!resume) {
+      return res.status(404).json({ success: false, message: 'Resume not found.' });
     }
 
     let chatHistory = await ChatHistory.findOne({
@@ -31,8 +41,6 @@ export const chat = async (req, res, next) => {
         metadata: { sectionTargeted: sectionTargeted || '' },
       });
     }
-
-    const resume = await Resume.findById(resumeId);
 
     // Pass the last 10 saved messages as history context.
     // The current user message is NOT yet in chatHistory.messages —
@@ -256,6 +264,9 @@ export const skillGaps = async (req, res, next) => {
 export const getChatHistory = async (req, res, next) => {
   try {
     const { resumeId } = req.params;
+    if (!isValidResumeId(resumeId)) {
+      return res.status(400).json({ success: false, message: 'Invalid Resume ID' });
+    }
 
     const histories = await ChatHistory.find({
       resumeId,
