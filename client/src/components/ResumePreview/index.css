@@ -120,3 +120,31 @@
     border-radius: 0 !important;
   }
 }
+
+@media (max-width: 760px) {
+  .resume-preview__toolbar {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .resume-preview__toolbar > .btn {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .resume-preview__viewport {
+    display: block;
+    padding: 12px;
+    overscroll-behavior: contain;
+  }
+
+  .resume-preview__stage {
+    width: calc(794px * 0.4);
+  }
+
+  .resume-preview__paper {
+    transform-origin: top left !important;
+  }
+}

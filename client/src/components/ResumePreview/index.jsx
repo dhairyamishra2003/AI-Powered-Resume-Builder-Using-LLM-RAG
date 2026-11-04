@@ -1,5 +1,5 @@
 import './index.css';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ResumeContext } from '../../context/ResumeContext.jsx';
 import TEMPLATES, { resolveTemplateId } from '../../constants/templates.js';
 import ModernProfessionalTemplate from '../templates/ModernProfessionalTemplate.jsx';
@@ -19,6 +19,15 @@ function ResumePreview() {
   const exportContainerRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 760px)');
+    const setResponsiveZoom = () => setZoom(mobileQuery.matches ? 0.4 : 1);
+
+    setResponsiveZoom();
+    mobileQuery.addEventListener('change', setResponsiveZoom);
+    return () => mobileQuery.removeEventListener('change', setResponsiveZoom);
+  }, []);
 
   const canonicalTemplateId = resolveTemplateId(resume.templateId);
   const template = TEMPLATES.find((item) => item.id === canonicalTemplateId || item.layout === canonicalTemplateId) || TEMPLATES[0];
@@ -45,7 +54,7 @@ function ResumePreview() {
   };
 
   const handleZoomIn = () => setZoom((z) => Math.min(1.5, Math.round((z + 0.1) * 10) / 10));
-  const handleZoomOut = () => setZoom((z) => Math.max(0.5, Math.round((z - 0.1) * 10) / 10));
+  const handleZoomOut = () => setZoom((z) => Math.max(0.4, Math.round((z - 0.1) * 10) / 10));
   const handleZoomReset = () => setZoom(1);
 
   const handleDownloadPdf = async () => {
@@ -185,7 +194,7 @@ function ResumePreview() {
             className="btn btn-secondary resume-preview__zoom-btn"
             onClick={handleZoomOut}
             title="Zoom Out"
-            disabled={zoom <= 0.5}
+            disabled={zoom <= 0.4}
           >
             <HiMagnifyingGlassMinus />
           </button>

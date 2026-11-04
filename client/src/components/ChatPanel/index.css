@@ -91,3 +91,18 @@
   color: #9ca3af;
   margin-top: 4px;
 }
+
+@media (max-width: 760px) {
+  .chat-messages {
+    padding: 12px;
+  }
+
+  .chat-bubble {
+    max-width: 92%;
+    padding: 10px 12px;
+  }
+
+  .chat-input-area {
+    padding: 10px 12px;
+  }
+}

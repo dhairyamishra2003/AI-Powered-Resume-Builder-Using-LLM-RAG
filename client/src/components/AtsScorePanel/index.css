@@ -97,3 +97,18 @@
   color: #4c1d95;
   margin-bottom: 10px;
 }
+
+@media (max-width: 760px) {
+  .score-circle-container {
+    padding: 16px;
+  }
+
+  .metric-row {
+    gap: 8px;
+  }
+
+  .metric-label {
+    min-width: 0;
+    flex: 1 1 120px;
+  }
+}

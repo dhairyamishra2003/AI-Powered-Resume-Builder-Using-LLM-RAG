@@ -177,4 +177,20 @@
   .navbar-feedback-btn {
     padding: 6px 8px;
   }
+
+  .navbar {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .navbar-title {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar-page-title,
+  .navbar-breadcrumb {
+    display: none;
+  }
 }

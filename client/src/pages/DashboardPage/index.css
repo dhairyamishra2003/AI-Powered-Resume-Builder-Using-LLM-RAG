@@ -137,3 +137,19 @@
   align-items: center;
   gap: 6px;
 }
+
+@media (max-width: 720px) {
+  .dashboard-page__header {
+    margin-bottom: 20px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .dashboard-card__body {
+    gap: 12px;
+    padding: 16px;
+  }
+}
